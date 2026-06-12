@@ -1,28 +1,18 @@
-# fzq_ai/tools/translator.py
-import os
+﻿# fzq_ai/tools/translator.py
 import requests
+from fzq_ai.config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"  # 示例，按你实际为准
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def translate_to_english(text: str) -> str:
-    """
-    用 DeepSeek Expert 把中文/多语言 query 翻译成英文，用于 NewsAPI / GDELT。
-    """
     if not text:
         return ""
 
     payload = {
-        "model": "deepseek-chat",  # 或你实际用的 Expert 模型名
+        "model": DEEPSEEK_MODEL,
         "messages": [
-            {
-                "role": "system",
-                "content": "You are a professional translator. Translate the user query into concise English for news search."
-            },
-            {
-                "role": "user",
-                "content": text
-            }
+            {"role": "system", "content": "You are a professional translator. Translate the user query into concise English for news search."},
+            {"role": "user", "content": text},
         ],
         "temperature": 0.2,
     }
