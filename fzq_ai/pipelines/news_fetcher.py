@@ -70,13 +70,13 @@ def fetch_from_rss(query: str = "") -> List[Article]:
     for cfg in RSS_SOURCES:
         all_articles.extend(_parse_rss_source(cfg))
 
-    # 如果指定了 query，做简单关键字过滤
+    # ⭐ 自动翻译中文 query → 英文，再过滤（方案二）
     if query:
-        q_lower = query.lower()
+        q_en = translate_to_english(query).lower()
         all_articles = [
             a for a in all_articles
-            if q_lower in (a.title_original or "").lower()
-            or q_lower in (a.content_original or "").lower()
+            if q_en in (a.title_original or "").lower()
+            or q_en in (a.content_original or "").lower()
         ]
     return all_articles
 

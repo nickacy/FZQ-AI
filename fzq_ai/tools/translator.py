@@ -3,7 +3,7 @@ import os
 import requests
 
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"  # 示例，按你实际为准
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"  # 示例，按你实际为准
 
 def translate_to_english(text: str) -> str:
     """
