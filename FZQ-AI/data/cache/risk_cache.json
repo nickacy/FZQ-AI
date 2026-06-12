@@ -1,0 +1,6266 @@
+{
+  "Skip to content": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2661974
+  },
+  "Watch Live": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2661974
+  },
+  "British Broadcasting Corporation": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2661974
+  },
+  "Technology": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2661974
+  },
+  "US & Canada": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2661974
+  },
+  "UK Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "N. Ireland": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "N. Ireland Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "Scotland Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "Wales Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "Latin America": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "Middle East": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "In Pictures": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "BBC InDepth": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "BBC Verify": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.2818694
+  },
+  "World of Business": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Technology of Business": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "NYSE Opening Bell": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Artificial Intelligence": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Intelligence Revolution": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "AI v the Mind": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Art & Design": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Entertainment News": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Arts in Motion": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.297778
+  },
+  "Destinations": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "Antarctica": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "Australia and Pacific": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "Caribbean & Bermuda": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "Central America": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "North America": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "South America": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3137205
+  },
+  "World’s Table": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Culture & Experiences": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Adventures": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "The SpeciaList": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Natural Wonders": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Climate Solutions": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Sustainable Business": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Green Living": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3294694
+  },
+  "Podcast Categories": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "Audio FAQs": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "BBC Maestro": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "Discover the World": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "Live Sport": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "Newsletters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3453827
+  },
+  "Trump tells US negotiators 'not to rush' into deal with IranThe deal under discussion would involve a 60-day ceasefire extension during which the Strait of Hormuz would be reopened, according to US media.1 hr agoWorld": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "Large-scale Russian attack on Ukraine leaves four dead and dozens injuredThe Oreshnik missile, which reportedly travels over 10 times the speed of sound, was used, Russia has confirmed.10 hrs agoEurope": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "Blast targeting train kills at least 20 in PakistanOfficials say the train had been transporting military personnel home for Eid when it was attacked by armed separatists.4 hrs agoAsia": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "Suspect killed after opening fire on Secret Service near White HouseOfficials say a suspect approached a checkpoint near the building and opened fire, and that a bystander was wounded.11 hrs agoUS & Canada": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "Turkish riot police storm opposition offices after leaders oustedOfficers forced their way into the building days after the party vowed to defy a court ruling removing its leaders.7 hrs agoEurope": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "She was told to marry in a country which bans girls' education. So she got in a taxi and fledNearly five years on from the school ban, young women say they have waved goodbye to their dreams.6 hrs agoAsia": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "BBC at the site of China's worst mining disaster in more than a decadeAt least 82 people have been killed after a gas explosion at the Liushenyu mine in China.16 hrs agoAsia": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3612678
+  },
+  "Ebola outbreak poses massive challenges, warns nurseKate White says she is \"extremely concerned about the inability to get resources\" to the Democratic Republic of Congo.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "Man killed in shark attack off Australia's north-east coastThe 39-year-old was fatally injured at a shoal off the Cassowary Coast in Queensland, apparently while spearfishing.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "One killed and many feared trapped under collapsed building in PhilippinesA Malaysian man has died and about 20 people are feared trapped at the site near Manila, officials say.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "Bolivian minister's convoy ambushed while overseeing roadblock clearanceSecurity forces were met by resistance while attempting to clear highway barriers, amid unrest over the government's economic policies.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "California declares emergency as fire crews race to contain toxic leakThousands have been evacuated as officials warn a tank containing about 7,000 gallons of methyl methacrylate could explode.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "How Saudi Arabia's spending spree reached the end of the lineMBS's Vison 2030 project seemed the stuff of science fiction. Now reality has bitten": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.376941
+  },
+  "It's like the Olympics - except steroids are allowedThe first ever Enhanced Games are taking place this weekend in Las Vegas, with big names, big money and much controversy.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "Rosenberg: Luhansk strike sparks Russian accusations and vow to retaliateEighteen people were killed and 42 others injured in the strike on the town in Russian-occupied eastern Ukraine.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "I survived a missile strike in the Strait of Hormuz, but my friend has not been foundSunil Puniya was on his first sea job when a missile struck the oil tanker Skylight at the start of the Iran war.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "In Japan, divorce splits parents from children. Could a law change end sole custody?An amendment to Japan's Civil Code looks set to allow shared parenting for the first time.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "Watch: Pitches, PlayStations and protein ice cream - A look inside Brazil's World Cup base campBBC's Brandon Livesay toured the Columbia Park Training Facility in Morris Township, New Jersey that will host the team in the coming weeks.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "Moment SpaceX rocket explodes in the Indian Ocean after splashdownElon Musk's SpaceX has successfully launched its Starship V3 rocket, which landed in a planned fiery explosion on Friday.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.3927314
+  },
+  "Why thousands of stock trades tied to Trump are raising eyebrowsThe BBC's Michelle Fleury looks at trades disclosed by the president.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4088802
+  },
+  "Timelapse footage shows 'giant cave' inflating on Paris bridgeThe monumental structure was created by Parisan artist JR - often dubbed the French Banksy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4110546
+  },
+  "How Cuban-Americans feel about Raúl Castro's indictmentThe DOJ charged the former leader of Cuba with murder and other crimes for his alleged role in the downing of two civilian aircraft in 1996.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4110546
+  },
+  "4 hrs agoIndian billionaires buy foreign companies as growth slows at homeIndia Inc spent $18bn on global buyouts in 2025 and the deal value could cross $15bn in the first half of 2026.4 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4110546
+  },
+  "4 hrs agoBlast targeting train kills at least 20 in PakistanOfficials say the train had been transporting military personnel home for Eid when it was attacked by armed separatists.4 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4110546
+  },
+  "5 hrs agoRAF jet carrying defence secretary has signal jammed near Russian borderPilots on board had to use a different navigation system while the plane's GPS was disabled.5 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4247634
+  },
+  "6 hrs agoShe was told to marry in a country which bans girls' education. So she got in a taxi and fledNearly five years on from the school ban, young women say they have waved goodbye to their dreams.6 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4247634
+  },
+  "7 hrs agoSocial Democrats and Fine Gael win Irish by-election seatsTwo by-elections are being held to fill the vacant Dáil seats in Galway West and Dublin Central.7 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4247634
+  },
+  "7 hrs agoTurkish riot police storm opposition offices after leaders oustedOfficers forced their way into the building days after the party vowed to defy a court ruling removing its leaders.7 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4247634
+  },
+  "8 hrs agoCalifornia declares emergency as fire crews race to contain toxic leakThousands have been evacuated as officials warn a tank containing about 7,000 gallons of methyl methacrylate could explode.8 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4247634
+  },
+  "10 hrs agoLarge-scale Russian attack on Ukraine leaves four dead and dozens injuredThe Oreshnik missile, which reportedly travels over 10 times the speed of sound, was used, Russia has confirmed.10 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4404852
+  },
+  "11 hrs agoMan killed in shark attack off Australia's north-east coastThe 39-year-old was fatally injured at a shoal off the Cassowary Coast in Queensland, apparently while spearfishing.11 hrs ago": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4404852
+  },
+  "Oduu Afaan Oromootiin": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4404852
+  },
+  "Amharic ዜና በአማርኛ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4404852
+  },
+  "Arabic عربي": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4564538
+  },
+  "Azeri AZƏRBAYCAN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4601197
+  },
+  "Bangla বাংলা": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4635074
+  },
+  "Burmese မြန်မာ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4635074
+  },
+  "Chinese 中文网": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4635074
+  },
+  "French AFRIQUE": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4635074
+  },
+  "Hausa HAUSA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4791355
+  },
+  "Hindi हिन्दी": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4799314
+  },
+  "Gaelic NAIDHEACHDAN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4799314
+  },
+  "Gujarati ગુજરાતીમાં સમાચાર": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4799314
+  },
+  "Igbo AKỤKỌ N’IGBO": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4915779
+  },
+  "Indonesian INDONESIA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4935756
+  },
+  "Japanese 日本語": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4935756
+  },
+  "Kinyarwanda GAHUZA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.4935756
+  },
+  "Kirundi KIRUNDI": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5039494
+  },
+  "Korean 한국어": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5049477
+  },
+  "Kyrgyz Кыргыз": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5049477
+  },
+  "Marathi मराठी": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5049477
+  },
+  "Nepali नेपाली": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5180924
+  },
+  "Noticias para hispanoparlantes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5180924
+  },
+  "Pashto پښتو": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5180924
+  },
+  "Persian فارسی": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5180924
+  },
+  "Polish PO POLSKU": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5325446
+  },
+  "Portuguese BRASIL": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5345426
+  },
+  "Punjabi ਪੰਜਾਬੀ ਖ਼ਬਰਾਂ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5345426
+  },
+  "Russian НА РУССКОМ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5460422
+  },
+  "Serbian  NA SRPSKOM": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5460422
+  },
+  "Sinhala සිංහල": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5460422
+  },
+  "Somali SOMALI": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5566175
+  },
+  "Swahili  HABARI KWA KISWAHILI": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5566175
+  },
+  "Tamil தமிழில் செய்திகள்": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5566175
+  },
+  "Telugu తెలుగు వార్తలు": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5566175
+  },
+  "Thai ข่าวภาษาไทย": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.57072
+  },
+  "Tigrinya ዜና ብትግርኛ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.57072
+  },
+  "Turkish TÜRKÇE": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.57072
+  },
+  "Ukrainian УКРАЇНСЬКA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.57072
+  },
+  "Uzbek O'ZBEK": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.583621
+  },
+  "Vietnamese TIẾNG VIỆT": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.583621
+  },
+  "Welsh NEWYDDION": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.583621
+  },
+  "Yoruba  ÌRÒYÌN NÍ YORÙBÁ": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5968554
+  },
+  "Terms of Use": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5968554
+  },
+  "Subscription Terms": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5968554
+  },
+  "About the BBC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.5968554
+  },
+  "Privacy Policy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6101482
+  },
+  "Accessibility Help": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6101482
+  },
+  "Contact the BBC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6101482
+  },
+  "Advertise with us": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6234744
+  },
+  "Do not share or sell my info": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6234744
+  },
+  "BBC.com Help & FAQs": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6234744
+  },
+  "Content Index": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6370406
+  },
+  "Set Preferred Source": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6370406
+  },
+  "Read about our approach to external linking.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6370406
+  },
+  "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.649726
+  },
+  "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\">": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.650385
+  },
+  "\"href\": \"https://textise.org/privacy-policy/\"": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.650385
+  },
+  "if (s1 == \"http://en.wikipedia.org/wiki/*****\") {": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.650385
+  },
+  "if (s1 == \"http://www.textise.net/showText.aspx?strURL=*****\") {": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6635633
+  },
+  "location.href = 'http://www.textise.net/showText.aspx?strURL=' + escape(escape(s2));": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6635633
+  },
+  "<!-- script src=\"http://f1-eu.readspeaker.com/script/5/ReadSpeaker.js?pids=embhl\" type=\"text/javascript\"></!-->": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6635633
+  },
+  "<form method=\"post\" action=\"./showtext.aspx?strURL=https%3a%2f%2fwww.reuters.com%2fworld\" id=\"form1\">": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.677227
+  },
+  "<form id=\"_xclick\" action=\"https://www.paypal.com/cgi-bin/webscr\" method=\"post\" />": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.677227
+  },
+  "<img alt=\"\" border=\"0\" src=\"https://www.paypal.com/en_GB/i/scr/pixel.gif\" width=\"1\"": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.677227
+  },
+  "United Kingdom": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.6908197
+  },
+  "Topics you follow": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7040517
+  },
+  "International": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7040517
+  },
+  "US Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7174144
+  },
+  "Elections 2026": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7322335
+  },
+  "Facts First": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7335646
+  },
+  "Redistricting Tracker": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7335646
+  },
+  "Epstein Files": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.746104
+  },
+  "Calculators": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7501063
+  },
+  "Pre-markets": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7541037
+  },
+  "After-Hours": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7581034
+  },
+  "Fear & Greed": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7611039
+  },
+  "Markets Now": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7661052
+  },
+  "Life, But Better": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7696288
+  },
+  "Mindfulness": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7696288
+  },
+  "Relationships": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7696288
+  },
+  "Entertainment": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7696288
+  },
+  "Television": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7848635
+  },
+  "Architecture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7848635
+  },
+  "Food & Drink": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.7848635
+  },
+  "Motorsport": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8007283
+  },
+  "Ukraine-Russia War": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8007283
+  },
+  "Israel-Hamas War": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8007283
+  },
+  "Call to Earth": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8007283
+  },
+  "Freedom Project": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8168085
+  },
+  "Impact Your World": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.823121
+  },
+  "Inside Africa": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8267589
+  },
+  "CNN Heroes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8267589
+  },
+  "CNN TV Schedule": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.836873
+  },
+  "All There Is with Anderson Cooper": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.836873
+  },
+  "Chasing Life with Dr. Sanjay Gupta": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.836873
+  },
+  "The Assignment with Audie Cornish": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8518922
+  },
+  "Terms of Service with Clare Duffy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8518922
+  },
+  "CNN 5 Things": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8630233
+  },
+  "All CNN Podcasts": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8636184
+  },
+  "Daily Crossword": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8636184
+  },
+  "Jumble Crossword": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8636184
+  },
+  "Photo Shuffle": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8778784
+  },
+  "5 Things Quiz": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8778784
+  },
+  "Investigations": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.8907804
+  },
+  "CNN Profiles": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.895779
+  },
+  "CNN Leadership": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9007788
+  },
+  "CNN Newsletters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9052954
+  },
+  "Work for CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.909302
+  },
+  "•Live UpdatesMorteza Nikoubazl/NurPhoto/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9142942
+  },
+  "Live Updates24 min agoUS and Iran still negotiating key terms as officials signal progress on peace deal": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9162927
+  },
+  "Majid Saeedi/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9162927
+  },
+  "What’s in the proposed deal that could end the US-Iran conflict?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9162927
+  },
+  "Seros Muyisa/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9321315
+  },
+  "Inside the epicenter of the Ebola outbreak in DRC as the virus spreads": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9321315
+  },
+  "Efekan Akyuz/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9321315
+  },
+  "Turkish police storm offices of main opposition CHP party, firing tear gas and rubber bullets": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9321315
+  },
+  "Arshad Butt/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9480875
+  },
+  "Bomb attack near railway station in southwest Pakistan kills at least 23": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9480875
+  },
+  "Pavel Klimov/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9480875
+  },
+  "Russia fires powerful hypersonic missile in mass attack on Kyiv": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9641106
+  },
+  "Luca Bruno/AP Photo/Luca Bruno": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9641106
+  },
+  "Holy deception: Rome’s ‘sexy priest’ calendar star never set foot in a seminary": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9641106
+  },
+  "Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9641106
+  },
+  "Protesters attack DRC treatment center as the WHO warns violence is threatening Ebola efforts": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9800742
+  },
+  "Ukraine claims it killed scores of Russians in two strikes in occupied regions": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9800742
+  },
+  "Moses Sawasawa/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9800742
+  },
+  "US funding cuts have hampered response to the deadly Ebola crisis, aid workers say": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9961944
+  },
+  "Courtesy Victoria Police": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9961944
+  },
+  "Australian tourist killed falling into ravine on Peru’s Inca Trail": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676709.9961944
+  },
+  "Jordan Pettitt/Getty Images/File": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0121
+  },
+  "Andrew Mountbatten-Windsor investigation could examine sexual misconduct allegations": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0121
+  },
+  "Adem Altan/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0121
+  },
+  "Turkish court rules to remove head of the main opposition party in latest blow": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0121
+  },
+  "•Video4:53CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.027851
+  },
+  "Inside one of the most daring escapes from North Korea4:53": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.027851
+  },
+  "Facebook/University of Genoa/Albatros Top Boat/Instagram": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.027851
+  },
+  "Five cave divers slipped beneath the waves in the Maldives. Why didn’t they resurface?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0436382
+  },
+  "•Video4:53Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0436382
+  },
+  "On GPS: What Xi Jinping is learning from wars in Ukraine and Iran4:53": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0436382
+  },
+  "•Video0:32Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0597603
+  },
+  "One killed and 17 missing in torrential rainstorm in southwestern China0:32": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0597603
+  },
+  "•Video1:02Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0597603
+  },
+  "‘Massive’ Russian missile barrage hits Kyiv in retaliation for deadly Ukrainian attack1:02": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0597603
+  },
+  "•Video23:01CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0756142
+  },
+  "Tuma Basa: From Spotify to YouTube, making space for Black culture on the global stage23:01": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0756142
+  },
+  "•Video1:07MS": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0756142
+  },
+  "Trump fuels confusion, says he’s sending 5,000 troops to Poland1:07": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0916123
+  },
+  "•Video2:59Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0916123
+  },
+  "Angry residents burn down tents treating Ebola patients in DRC as health protocols clash with burial traditions2:59": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0916123
+  },
+  "•Video3:05CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.0916123
+  },
+  "The art fair that refused to cancel3:05": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1076114
+  },
+  "•Video2:30Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1076114
+  },
+  "Estonia’s spy chief tells CNN the Kremlin’s mindset on Ukraine is changing2:30": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1076114
+  },
+  "•Video1:11CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1236172
+  },
+  "Global Perspectives: Stories shaping how we see the world1:11": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1236172
+  },
+  "•Video2:27Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1236172
+  },
+  "‘This war is choking us,’ Myanmar’s farmers crushed by prolonged war in Iran2:27": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1393673
+  },
+  "EuropeShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1393673
+  },
+  "‘Time is not in Russia’s favor’: Battlefield losses and economic pain pile pressure on Putin, European spy chief says": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1393673
+  },
+  "Kirsty Wigglesworth/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1552389
+  },
+  "Andrew was not vetted for controversial UK trade envoy role that was late Queen’s ‘wish,’ files show": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1552389
+  },
+  "Ian Vogler/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1552389
+  },
+  "Radio station apologizes after accidentally announcing death of King Charles": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1712303
+  },
+  "Jack Taylor/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1712303
+  },
+  "Two Married at First Sight UK wives claim they were raped by onscreen husbands": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1712303
+  },
+  "Dodging the drones: Aerial attackers stalk Ukrainian troops, and a CNN team, on a key road to the front": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1871881
+  },
+  "Stringer/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.1871881
+  },
+  "Four bystanders tackle knife-wielding driver after car plows into crowd in Italy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2030084
+  },
+  "Middle EastShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2030084
+  },
+  "Brendan Smialowski/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2030084
+  },
+  "Trump says agreement with Iran has ‘been largely negotiated’ and Strait of Hormuz will be opened": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2030084
+  },
+  "Sobhan Farajvan/Pacific Press/LightRocket/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2186959
+  },
+  "A hardline general wanted by Interpol emerges as a key player in Iran war": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2186959
+  },
+  "Remo Casilli/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2186959
+  },
+  "Freed Gaza flotilla activists accuse Israeli forces of sexual violence and abuse while in custody": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2346983
+  },
+  "Office of Ben Gvir": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2346983
+  },
+  "Video showing far-right Israeli minister taunting Gaza flotilla activists sparks global outcry": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2346983
+  },
+  "Menahem Kahana/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.25038
+  },
+  "Far-right Israeli minister Bezalel Smotrich says ICC seeking warrant for his arrest": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.25038
+  },
+  "Morteza Nikoubazl/NurPhoto/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2660618
+  },
+  "Guns on the television and in Iran’s streets as Trump renews war threats": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2660618
+  },
+  "•GalleryPatrick McDermott/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2660618
+  },
+  "GalleryPeople we’ve lost in 2026": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.2818804
+  },
+  "•GalleryVincent Alban/The New York Times/Redux": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3296416
+  },
+  "GalleryThe week in 34 photos": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3296416
+  },
+  "•GalleryJeff Pachoud/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3452902
+  },
+  "GalleryThe week in 36 photos": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3452902
+  },
+  "•GalleryKenny Holston/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3609486
+  },
+  "GalleryIn pictures: Trump visits China": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3609486
+  },
+  "AfricaShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3609486
+  },
+  "Suspected Ebola patients ‘escape’ health center in DR Congo": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3767197
+  },
+  "How bushmeat, burial rites and disinformation make the DRC an Ebola hotspot": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3923943
+  },
+  "Amaury Hauchard / AFP via Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3923943
+  },
+  "Your guitar may depend on elephant poop. Here’s why": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.3923943
+  },
+  "Badru Katumba/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4081485
+  },
+  "Potential spread of Ebola ‘warrants serious concern,’ WHO chief says": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4081485
+  },
+  "AmericasShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.424136
+  },
+  "Norlys Perez/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.424136
+  },
+  "Why Castro’s indictment could lead to war between the US and Cuba": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.424136
+  },
+  "Ismael Francisco/AP/File": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4399695
+  },
+  "What to know about Brothers to the Rescue and Cuba’s 1996 shootdown of two planes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4399695
+  },
+  "Fidel Castro’s daughter has no love for the Cuban regime but warns against underestimating it": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.455769
+  },
+  "Adalberto Roque/Pool/AFP/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.455769
+  },
+  "Cuba’s president warns of ‘bloodbath’ if US takes military action": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.455769
+  },
+  "AsiaShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4715276
+  },
+  "Purnima Shrestha/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4715276
+  },
+  "New record set as 274 climbers scale Everest’s south side in single day": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4715276
+  },
+  "Jacquelyn Martin/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4876173
+  },
+  "Trump says he’s willing to talk to Taiwan’s leader, a major departure from diplomatic norms": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.4876173
+  },
+  "Ramil Sitdikov/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.503336
+  },
+  "Xi’s double act: Putin arrives in China days after Trump’s departure": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.503336
+  },
+  "Maldives President's Media Division via AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.503336
+  },
+  "Bodies of two Italian divers recovered from sea cave in Maldives": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5194514
+  },
+  "TravelShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5194514
+  },
+  "Vidr Photography": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5194514
+  },
+  "They felt a deep connection on a plane. A year later, he got back in touch in an unexpected way": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5352962
+  },
+  "Molly Flores/CNN Underscored": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5352962
+  },
+  "Your family beach vacation packing list isn’t complete without these must-haves": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5512245
+  },
+  "Kyle Olsen/CNN Underscored": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5512245
+  },
+  "I “weekend-maxxed” a luxury San Diego getaway with my mom using points, price-matching and carry-on-only packing": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5512245
+  },
+  "Can you bring a legendary airline back to life? Pan Am is about to find out": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.567116
+  },
+  "Courtesy Norma and Gaston Galella": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.567116
+  },
+  "They thought they had it all in Miami – then they moved to Italy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.567116
+  },
+  "StyleShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5831726
+  },
+  "Matthew Millman/Courtesy the artist/SFMOMA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5831726
+  },
+  "Amy Sherald finds her people": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5989685
+  },
+  "Vibeke Tandberg": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5989685
+  },
+  "These unassuming wedding photos poke holes in the patriarchy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.5989685
+  },
+  "Alyssa Greenberg/WWD/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6148272
+  },
+  "Everlane shoppers come unraveled over sale to Shein": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6148272
+  },
+  "Courtesy Neon": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6148272
+  },
+  "In the neon-drenched world of ‘I Love Boosters,’ fashion is for the people": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.630684
+  },
+  "Courtesy IKEA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.630684
+  },
+  "IKEA once put a pin in its dream of inflatable furniture. Now it’s finally blowing up": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.646634
+  },
+  "WeatherShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.646634
+  },
+  "Ethan Swope/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.646634
+  },
+  "Wildfire season is off to a historic start and it could get worse": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6626391
+  },
+  "Mark Wilson/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6626391
+  },
+  "Hurricane Season Fast Facts": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6786108
+  },
+  "US Coast Guard": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6786108
+  },
+  "A third of National Park island home to rare wildlife has burned in spate of Southern California wildfires": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6786108
+  },
+  "Catherine Phillips/CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6943521
+  },
+  "In a city of high-rises, ‘cardboard grannies’ collect waste for cash": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.6943521
+  },
+  "Cao Yang/Xinhua/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.710107
+  },
+  "China’s worst coal mining blast in over a decade kills 82": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.710107
+  },
+  "Ashwini Bhatia/AP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7262177
+  },
+  "India’s Gen Z have flipped the lowly cockroach into a symbol of defiance": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7262177
+  },
+  "•Video1:06CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7422638
+  },
+  "VideoSources tell CNN that according to U.S. intelligence, Iran is rebuilding its military capability faster than expected1:06": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7422638
+  },
+  "•Video4:39Chip Somodevilla/Getty Images/File": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7422638
+  },
+  "VideoThe Trump Administration more than doubles the number of white South African refugees allowed into U.S.4:39": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7581108
+  },
+  "•Video4:30CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7581108
+  },
+  "VideoMarco Rubio visits Sweden for NATO Foreign Ministers meeting4:30": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7738678
+  },
+  "•Video3:45CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7738678
+  },
+  "VideoIran rebuilding military industrial base faster than expected, already producing drones, according to US intel3:45": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7738678
+  },
+  "•Video3:16CNN": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7896812
+  },
+  "VideoNew details about American doctor being treated for Ebola3:16": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.7896812
+  },
+  "•Video2:13Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8056777
+  },
+  "VideoTrump hints at call with Taiwan’s leader, who says he is ready2:13": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8056777
+  },
+  "•Video1:05Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8056777
+  },
+  "VideoAttack on Russian drone pilot training camp kills at least 66, Ukraine says1:05": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.821606
+  },
+  "•Video0:37Clipped From Video": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.821606
+  },
+  "VideoAmerican exposed to Ebola arrives in Czech Republic0:37": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8376813
+  },
+  "Maxim Shemetov/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8376813
+  },
+  "China’s Xi gives Putin a red-carpet welcome – and makes a veiled jab at the US": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8376813
+  },
+  "Architecture around the worldShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8533967
+  },
+  "saiko3p/iStockphoto/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8533967
+  },
+  "A piece of France’s Eiffel Tower is now up for grabs. You’ll need deep pockets": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.869182
+  },
+  "Yosigo, Rocafort/Courtesy Kettal 2025/Eames Office, LLC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.869182
+  },
+  "Want an Eames house? You’ll soon be able to order your own": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8848295
+  },
+  "Tom Walsh/The Pritzker Architecture Prize": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8848295
+  },
+  "Pritzker Prize 2026: Chile’s Smiljan Radić wins ‘Nobel’ of architecture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.8848295
+  },
+  "Trevor Tondro/AD": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.900972
+  },
+  "Mandy Moore and Taylor Goldsmith nearly lost their dream home in the LA fires. Here’s how they rebuilt": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.900972
+  },
+  "Cox Architecture/Hassell": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.917106
+  },
+  "Plans for $2.3 billion stadium ignite debate in 2032 Olympics host city": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.917106
+  },
+  "SportsShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.917106
+  },
+  "Marc Lebryk/Imagn Images/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.9329252
+  },
+  "Late pass sends Felix Rosenqvist past David Malukas for the closest Indianapolis 500 win in history": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.9329252
+  },
+  "David Jensen/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.948681
+  },
+  "‘The only way you can honor his memory is to race’: NASCAR mourns Kyle Busch the only way it knows how": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.948681
+  },
+  "Sean Gardner/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.964622
+  },
+  "Katherine Legge’s bid for history ends early after crash in Indy 500. She still aims to race in Coca-Cola 600 tonight": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.964622
+  },
+  "Nicholas Hunt/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.964622
+  },
+  "Jason Collins opened a door. Many LGBTQ athletes still don’t feel safe walking through it more than a decade later": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.9806788
+  },
+  "Chris Graythen/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.9806788
+  },
+  "Kyle Busch’s family says the NASCAR superstar died after severe pneumonia progressed into sepsis": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.996707
+  },
+  "TechShow all": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676710.996707
+  },
+  "Benjamin Fanjoy/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0124555
+  },
+  "AI is changing the internet forever. Here’s how": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0124555
+  },
+  "Luis Alvarez/Digital Vision/Getty Images": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0281394
+  },
+  "How to AI-proof your job": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0281394
+  },
+  "Manuel Balce Ceneta/AP/File": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0281394
+  },
+  "White House postpones executive order on AI": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0442483
+  },
+  "Yonhap News Agency/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0442483
+  },
+  "AI turned Samsung into a $1 trillion company. Its workers want a bigger slice of the pie": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0602212
+  },
+  "Nathan Frandino/Reuters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0602212
+  },
+  "Meta’s campaign to promote scrutinized youth safety features involved hundreds of family influencers": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.0760972
+  },
+  "CNN Headlines": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.171162
+  },
+  "Ad Choices": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.2502115
+  },
+  "Accessibility & CC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.2502115
+  },
+  "Transcripts": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.2658885
+  },
+  "Skip to Featured Content": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.28173
+  },
+  "Skip to Content Feed": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.28173
+  },
+  "Asia Pacific": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.2975516
+  },
+  "Human Rights": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3134007
+  },
+  "Climate Crisis": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3134007
+  },
+  "Interactives": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3292384
+  },
+  "Science & Technology": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3292384
+  },
+  "Uncertainty persists as Trump says Iran deal not ‘fully negotiated’": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3453226
+  },
+  "Ecuador’s Noboa pledges to extradite criminals in State of the Union speech": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3453226
+  },
+  "Cuba thanks China for rice shipment amid worsening humanitarian conditions": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.361264
+  },
+  "Inside a Beirut barbershop shaped by war and crisis": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.361264
+  },
+  "After San Diego shooting, Muslim Americans aim to turn grief into action": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3770883
+  },
+  "Senegal parliament speaker steps down as political crisis worsens": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3770883
+  },
+  "‘Trump needs a deal, no matter how bad it is’": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3770883
+  },
+  "Israeli strikes kill six in southern Lebanon amid fresh evacuation orders": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3930976
+  },
+  "West Ham go down and Spurs stay up as Guardiola, Salah make emotional exits": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.3930976
+  },
+  "China’s Shenzhou-23 astronauts blast off on space station mission": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.4090197
+  },
+  "Iran recounts historic battles in response to Trump’s talk of agreement": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.4090197
+  },
+  "‘A paper city’: New York ‘library’ hosts 3.5 million pages of Epstein files": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.425077
+  },
+  "China sends aid to Cuba amid a harsh US blockade": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.425077
+  },
+  "Bahrain jails nine defendants for life for ‘cooperating’ with Iran’s IRGC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.440763
+  },
+  "France bans Ben-Gvir: Which other Israeli leaders have been penalised?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.440763
+  },
+  "For third year in a row, Israel blocks Hajj pilgrimage for Gaza Muslims": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.456633
+  },
+  "Will the Texas primary run-off give Democrats a chance to flip the state?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.456633
+  },
+  "Photos: Blast hits train in Pakistan’s Balochistan, killing at least 24": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.456633
+  },
+  "Photos: Clashes in Belgrade as student-led protests challenge Vucic": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.472456
+  },
+  "Code of Ethics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.488266
+  },
+  "Terms and Conditions": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.488266
+  },
+  "EU/EEA Regulatory Notice": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.488266
+  },
+  "Cookie Policy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5041158
+  },
+  "Cookie Preferences": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5197878
+  },
+  "Accessibility Statement": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5197878
+  },
+  "Work for us": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5356445
+  },
+  "Contact Us": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5356445
+  },
+  "User Accounts Help": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5514827
+  },
+  "Stay Connected": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5514827
+  },
+  "Channel Finder": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5673118
+  },
+  "TV Schedule": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5832527
+  },
+  "Submit a Tip": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5832527
+  },
+  "Paid Partner Content": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5993216
+  },
+  "Al Jazeera Arabic": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.5993216
+  },
+  "Al Jazeera English": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.615186
+  },
+  "Al Jazeera Investigative Unit": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.615186
+  },
+  "Al Jazeera Mubasher": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.631009
+  },
+  "Al Jazeera Documentary": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.631009
+  },
+  "Al Jazeera Balkans": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6468382
+  },
+  "Al Jazeera Centre for Studies": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6468382
+  },
+  "Al Jazeera Media Institute": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.662673
+  },
+  "Learn Arabic": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.662673
+  },
+  "Al Jazeera Centre for Public Liberties & Human Rights": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6785069
+  },
+  "Al Jazeera Forum": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6785069
+  },
+  "Al Jazeera Hotel Partners": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6941803
+  },
+  "instagram-colored-outline": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.6941803
+  },
+  "Skip to main content": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7101526
+  },
+  "Skip to news navigation, settings and search": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7101526
+  },
+  "Read our editorial guiding principles": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7258766
+  },
+  "Indigenous": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7415586
+  },
+  "Environment": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7576954
+  },
+  "Local news": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.7576954
+  },
+  "Relationships & Family": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.885821
+  },
+  "Food & Recipes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.885821
+  },
+  "Personal Finance": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.901914
+  },
+  "Home & Garden": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.901914
+  },
+  "TV & Movies": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9178245
+  },
+  "Pop Culture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.933772
+  },
+  "BERITA BAHASA INDONESIA": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.933772
+  },
+  "Please let us know": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9496129
+  },
+  "ABC Listen": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9496129
+  },
+  "ASIO boss says foreign interference under 'every rock' prior to Bondi attack": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9653795
+  },
+  "ABy Anton Rose": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9653795
+  },
+  "Topic:Royal Commissions": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9812987
+  },
+  "ASIO resourcing was 'sufficient'": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9812987
+  },
+  "Antisemitism left 'unchecked', intelligence boss says": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9971235
+  },
+  "Burgess defends change in priorities": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676711.9971235
+  },
+  "11 people shot within seconds of Bondi attack beginning, royal commission told": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.012793
+  },
+  "Albanese wedges opposition by tying $250 tax offset to CGT and negative gearing": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.012793
+  },
+  "Turnbull says independent party could fill 'vacuum' in Australian politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0304985
+  },
+  "Topic:Political Parties": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0304985
+  },
+  "Trump's deal-making leaves Iran in the driver's seat and Israel more vulnerable": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0444233
+  },
+  "LAnalysis by Laura Tingle": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0764313
+  },
+  "Topic:World Politics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0764313
+  },
+  "With an Iran deal looming, Republicans are turning on each other": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0921435
+  },
+  "Trump says 'not to rush into a deal' as potential Iran agreement emerges": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.0921435
+  },
+  "First Australian activist detained from Gaza flotilla returns home": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1081693
+  },
+  "Topic:Activism": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1081693
+  },
+  "How a container of hot chocolate put the spotlight on airport security": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1240282
+  },
+  "Topic:Air Transport Industry": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1240282
+  },
+  "The migration maths behind the housing crisis is not what politicians claim": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1398547
+  },
+  "AAnalysis by Alan Kohler": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.155614
+  },
+  "Child sex allegations against Dezi Freeman revealed": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.155614
+  },
+  "Topic:Police": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1715462
+  },
+  "'It's atrocious, the apathy': Survivor calls on governments to act": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.1715462
+  },
+  "By Tahnee Jash": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.187691
+  },
+  "Topic:Indigenous Australians": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.187691
+  },
+  "Travis Head and wife Jess cop social media abuse after IPL on-field incident": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2035482
+  },
+  "Topic:Cricket": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2035482
+  },
+  "McLaren 'looked like idiots', Brit feels fate is ruining his F1 title dream": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.219363
+  },
+  "Topic:Formula 1": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.219363
+  },
+  "No Ferry McFerryface: New name for Sydney suburb won't be by popular vote": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2352147
+  },
+  "NBy Nick Dole": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2510428
+  },
+  "Topic:Urban Development and Planning": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2510428
+  },
+  "Australian passenger recounts terror during turbulent flight": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2667236
+  },
+  "Topic:Air Incidents": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2667236
+  },
+  "ASX 200 rises after Dow closes at record high, oil falls under $US100": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2825613
+  },
+  "Death of 'drongo': Are Aussie insults and swearwords dying out?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2825613
+  },
+  "By Shalailah Medhora": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2986648
+  },
+  "triple j Hack": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.2986648
+  },
+  "A movie about mystery-hunting sheep delights this May": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3147497
+  },
+  "Topic:Movies": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3147497
+  },
+  "What life is like without alcohol": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.330574
+  },
+  "Topic:Alcohol": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3462548
+  },
+  "Quiz: Will you land a knockout punch on this week's history round?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3462548
+  },
+  "More stories": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3620894
+  },
+  "My dog Teddy was more than just a pet. We needed each other": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3620894
+  },
+  "More mood boosters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3779268
+  },
+  "Exhibition sheds fresh light on WA's pre-colonial history": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3779268
+  },
+  "More Lifestyle & Culture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3937557
+  },
+  "Surfing event in NZ issued 'code red' after animal attacks photographer": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.3937557
+  },
+  "Complete your Daily Mix": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4095936
+  },
+  "Federal budget": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4095936
+  },
+  "Five economists share opinions on Labor's budget and Coalition's reply": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4255307
+  },
+  "Nine charts that reveal who pays more under Labor's tax changes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4255307
+  },
+  "Entrepreneur says the rich should stop complaining about tax changes": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4416313
+  },
+  "Former actor Rachel Ward became a farmhand at 65 and found her purpose": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4574544
+  },
+  "Hayden has lobbied for bike lanes for years. Now he's given up": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4574544
+  },
+  "Maldives cave dive deaths leave us with many theories and one big question": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4732857
+  },
+  "'An absolutely pleasant surprise': Why single mums are moving in together": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.4732857
+  },
+  "Bones found by Thai villager belonged to 27m 'Nagatitan'": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.489103
+  },
+  "Plastic waste collected in Sydney Harbour during Vivid festival rising": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.489103
+  },
+  "Giant iceberg with shipping containers spotted off Antarctica": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.5049617
+  },
+  "Topic:Surfing": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.520635
+  },
+  "Topic:Language": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.536477
+  },
+  "Rider disqualified for headbutt, sprint teams call BS on controversial finish": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.568224
+  },
+  "Topic:Road Cycle Racing": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.568224
+  },
+  "More Just In": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.5840082
+  },
+  "Victim-survivor says her fight for justice was worth it despite court's ruling": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.5840082
+  },
+  "TBy Tahlia Roy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.5996678
+  },
+  "Trump's push for a ceasefire is good for peace but our wallets still feel the pain": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.5996678
+  },
+  "PAnalysis by Patricia Karvelas": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6155105
+  },
+  "'Shocked' water scientist sounds alarm over $300m irrigation plan": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6313436
+  },
+  "Topic:Irrigated Farming": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6313436
+  },
+  "Australia's opening times are world leading and researchers say it's a strength": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6471822
+  },
+  "By Claudia Williams": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6471822
+  },
+  "Topic:Community and Society": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6630197
+  },
+  "Link between terrorism and DV could be key to preventing homicide": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6630197
+  },
+  "Topic:Domestic Violence": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.6788044
+  },
+  "Data shows why Australians are stuck and not switching jobs or starting businesses": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.694572
+  },
+  "Topic:Economic Trends and Indicators": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.694572
+  },
+  "Farmers fight battery storage proposals on agricultural land": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7103786
+  },
+  "By Danielle Kutchel": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7103786
+  },
+  "ABC Gippsland": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7262099
+  },
+  "Alleged hit-and-run driver gave himself up after freeway death, police say": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.742025
+  },
+  "Topic:Road Accidents and Incidents": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.742025
+  },
+  "Ukrainian star fights back tears after missile almost hits family home": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7735627
+  },
+  "Topic:Tennis": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7735627
+  },
+  "Topic:Sport": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7893972
+  },
+  "When and how to watch State of Origin Game I between the Blues and Maroons": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.7893972
+  },
+  "Spurs save EPL status as legendary duo bids farewell on final day": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8052363
+  },
+  "Topic:Soccer": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8052363
+  },
+  "Vegemite banned, Tim Tams welcome: Baseballer brings Aussie flavour to US": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8210819
+  },
+  "LBy Lauren Day": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.837044
+  },
+  "Topic:Baseball": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.837044
+  },
+  "Victoria's new childcare watchdog says she took the job to protect kids": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8531132
+  },
+  "Topic:Early Childhood Education and Care Services": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8531132
+  },
+  "Turkish police raid opposition party HQ, fire tear gas at supporters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8689454
+  },
+  "Manual cars 'a dying race' but new drivers are not giving them up": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8847651
+  },
+  "By Owen Jacques": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.8847651
+  },
+  "ABC Sunshine Coast": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.9006069
+  },
+  "Slide 1 of 5Staying in jobsIn 1989, almost one in five people changed jobs. The most recent data shows job-switching has fallen to one in 13 people.Self-employment has fallen sharply to a 20-year low.The cost of housing and the risk in taking a mortgage are among the factors holding us back from changing jobs.Research economist Rachel Lee says the security and benefits of traditional employment have become more attractive.Leadership coach Kate McCready says self-employment has its benefits.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.9637985
+  },
+  "Slide 1 of 4Iceberg breaks awayEarlier this year, seven shipping containers atop an iceberg were spotted floating off Antarctica.The containers, filled with fuel and waste, had been placed near the Antarctic coast by staff at Germany's Neumayer Station III.Before a vessel could collect the containers, a blizzard caused a section of ice to break off.Officials have expressed regret, saying diesel would have leaked out of the container into the environment.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.9796321
+  },
+  "Slide 1 of 4Peru deathAn Australian man has died after falling from a path on the Inca Trail to Machu Picchu in Peru.He was identified as Victoria Police sergeant Matthew Paton, who was travelling with his wife.Local police said he tripped and fell through a damaged security barrier on a path, falling up to 400m.In a statement, his family said they were \"shattered\" by his death.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.9796321
+  },
+  "Slide 1 of 4TuvaluMost of the population of Tuvalu is applying to relocate to Australia.Climate change is threatening the Pacific island nation about 3,500km from Brisbane.The government is building land to try to hold back rising sea levels.In some places only a few metres separate lagoon from sea.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676712.995469
+  },
+  "Slide 1 of 3EV salesHigh petrol prices linked to conflict in the Middle East are driving EV sales around the world.Thirty per cent of all new cars sold this year are predicted to be electric.EVs accounted for a quarter of global sales in 2025, setting records in almost 100 countries, including Australia.": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0112956
+  },
+  "Around Australia": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0112956
+  },
+  "Is Canberra's CBD unsafe? It depends who you ask": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0269794
+  },
+  "Topic:Crime Prevention": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0269794
+  },
+  "Why the future of one of Queensland's last true fishing towns is on the brink": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0429342
+  },
+  "Topic:Fishing and Aquaculture Industry": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0429342
+  },
+  "Luxury apartments greenlit under affordable housing scheme": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0586739
+  },
+  "Topic:Housing Policy": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0768373
+  },
+  "The dead fish waste disaster that Tasmania failed to plan for": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0768373
+  },
+  "Truro businesses call for certainty on freight bypass project": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.0903249
+  },
+  "Topic:Roads": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.106026
+  },
+  "Pocock open to party of independents as One Nation support climbs": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.106026
+  },
+  "Topic:Federal Government": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.1218488
+  },
+  "Labor's tax defence is backfiring with young voters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.1376874
+  },
+  "CAnalysis by Clare Armstrong": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.1376874
+  },
+  "GAnalysis by Gareth Hutchens": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.15353
+  },
+  "Topic:Unrest, Conflict and War": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.169377
+  },
+  "At least 24 killed in Pakistan train blast claimed by separatist militants": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.185314
+  },
+  "Topic:Terrorist Attacks": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.185314
+  },
+  "Russian missile strike kills four people in Kyiv": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2013938
+  },
+  "Politics and faith collide over choice for Tibet's next Dalai Lama": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2170928
+  },
+  "Topic:Buddhism": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2170928
+  },
+  "Recent fall in auction clearance rates could be good news for first home buyers": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2328176
+  },
+  "Iran war lays bare overlooked holes in Australia's sovereign capability": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2489102
+  },
+  "Topic:Manufacturing": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2647426
+  },
+  "Perth's Cottesloe revamp to go ahead but warning more funding needed": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2647426
+  },
+  "Export name change coming for Australian prosecco": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2804255
+  },
+  "Topic:Grapevines": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.2962663
+  },
+  "Piastri suffers Canadian disaster, Antonelli wins as Russell retires": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.3120947
+  },
+  "Australian MLB star nails monster 125m home run in Guardians win": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.327933
+  },
+  "Aussie the first winner at French Open after injury retirement": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.3438258
+  },
+  "The perfect warm winter salad using crisp-roasted artichokes and grains": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.3599298
+  },
+  "Do robotic lawnmowers actually work and are they worth the investment?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.375767
+  },
+  "What are the signs of broken heart syndrome?": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.375767
+  },
+  "Entertainment & Culture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.391605
+  },
+  "'Live-streamed genocide': Palestinian poet writes from Gaza's frontline": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4074714
+  },
+  "Topic:Books": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4074714
+  },
+  "Meet the women turning bicycle tyres and timber offcuts into furniture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4232998
+  },
+  "Topic:Design": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4390993
+  },
+  "Topic:Culture": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4390993
+  },
+  "From farm gate to stage door, theatre is a release from life on the land": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4547977
+  },
+  "Topic:Theatre": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4706345
+  },
+  "Back to top": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.4706345
+  },
+  "ABC News homepage": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.486469
+  },
+  "Contact ABC News": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.50231
+  },
+  "Watch Live News": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.50231
+  },
+  "City & Local": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5182505
+  },
+  "Browse All Topics": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5343325
+  },
+  "Berita Bahasa Indonesia": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5501633
+  },
+  "Apple News": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5660071
+  },
+  "Triple J Unearthed": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5660071
+  },
+  "Live Radio": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5818458
+  },
+  "Hottest 100": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5818458
+  },
+  "List of ABC Shows": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.5976822
+  },
+  "Go to Newsletters": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6133475
+  },
+  "Editorial Policies": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6133475
+  },
+  "Accessibility": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6291955
+  },
+  "Commercial": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.645029
+  },
+  "About the ABC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.660864
+  },
+  "© 2026 ABC": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6787562
+  },
+  "BBC News,中文": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6787562
+  },
+  "白宫附近枪击案：嫌疑人与特勤局特工交火被击毙": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.6927838
+  },
+  "中国山西煤矿爆炸据报至少82死，我们目前已知道什么？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.70872
+  },
+  "在日本离婚导致父母与子女分离，法律改革能否终结单独监护的情况？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.70872
+  },
+  "分析：美中新建贸易、投资委员会，能否为关税战“加装防撞栏”？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.7245576
+  },
+  "足球世界杯2026：值得关注的黑马球队": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.740543
+  },
+  "未来“正被推入黑暗”：从缅甸到委内瑞拉，民间如何抵抗官方网络封锁": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.740543
+  },
+  "“我爱世界杯，但价格实在太离谱”：门票价暴涨五倍，球迷什么反应？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.7566924
+  },
+  "美国起诉卡斯特罗后，古巴局势的三种可能": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.7726007
+  },
+  "法航与空中巴士被裁定须为2009年空难过失杀人负责": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.7882614
+  },
+  "亚马逊英国负责人：别再因失业问题责怪年轻人": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.7882614
+  },
+  "特朗普前脚离开，普京后脚抵京：两场访问背后的中国外交密码": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.8040242
+  },
+  "《臺湾漫游录》夺布克文学奖：杨双子笔下的台湾美食与殖民记忆": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.8199277
+  },
+  "从“定义台独”到“有所收敛”的演说：赖清德如何论述台湾主权？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.8199277
+  },
+  "视频,伊波拉、新冠至汉他病毒：为何动物传染人类引发越来越多疫情？, 节目全长 6,32": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.83577
+  },
+  "视频,特朗普称不乐见“台独”，台湾民众怎么看？, 节目全长 5,59": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.851602
+  },
+  "视频,普京晤习近平：美俄元首“前后脚访华”隐含的外交讯号, 节目全长 4,18": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.851602
+  },
+  "视频,专访台湾作家杨双子：从美食探寻台湾殖民历史, 节目全长 8,21": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.8692877
+  },
+  "视频,文革发动60周年：那十年，中国经历了什么？, 节目全长 12,19": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.883121
+  },
+  "解读“中美建设性战略稳定关系”：习近平新词反映两国关系现实境遇": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.883121
+  },
+  "特朗普访华落幕：美中各取所需，台湾、关税等未解之事走向何方？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.8989527
+  },
+  "特朗普与习近平举行峰会数小时后，告诫台湾不要宣布独立": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9147794
+  },
+  "红毯、国宴、会谈、台湾、黄仁勋：特朗普重返北京后的几大关键时刻": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9147794
+  },
+  "“八年贸易战”后特朗普再访华：打破旧平衡，还是重构新底线？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9306202
+  },
+  "BBC俄罗斯编辑：普京享受了习近平的中式欢迎，却没把输油管合同带回家": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9463265
+  },
+  "普京访华：中俄关系现在有多紧密": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9463265
+  },
+  "特朗普访华结果分析：美国盯着3B，中国盯着3T，谁占了上风？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9623508
+  },
+  "特朗普发出警告后，台湾仍坚称本身就是主权独立的国家": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9784942
+  },
+  "习近平带特朗普参观中南海  强调这种安排“极为罕见”": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9784942
+  },
+  "中国“文化大革命”爆发60周年：学界详解被掩盖的文革真相 ——“集体杀戮”": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676713.9943216
+  },
+  "“文化大革命”60周年：从几大关键词看这场十年文化浩劫": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.010149
+  },
+  "特朗普时隔九年再度访华，中国年轻一代的“美国梦”在褪色吗？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.010149
+  },
+  "老鼠、选票与科学：拆解台北“安鼠之乱”背后的治理危机": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.025991
+  },
+  "中国爆发式增长的团播潮背后：情感诈骗、主播收入和隐秘活动": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0435748
+  },
+  "足球世界杯2026：美国大量酒店房间仍空置，盛事经济可能泡汤？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0435748
+  },
+  "谷歌时隔十余年再度推出智慧眼镜  私隐问题仍受关注": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0575228
+  },
+  "为何人们对斯沃琪的Royal Pop系列如此疯狂？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0733712
+  },
+  "幽灵鲨与食肉海绵：过去一年发现逾千种海洋新物种": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0733712
+  },
+  "日本由来已久的花粉过敏，源头竟是1950年代的一项政策？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.0892
+  },
+  "Facebook - 繁体": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.1050208
+  },
+  "BBC值得信赖的原因": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.1685047
+  },
+  "以其他语言阅览BBC新闻": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.184554
+  },
+  "阅读了解我们对待外部链接的做法。": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.200248
+  },
+  "<form method=\"post\" action=\"./showtext.aspx?strURL=https%3a%2f%2fcn.reuters.com%2f\" id=\"form1\">": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.2319005
+  },
+  "网上有害信息举报专区": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.263572
+  },
+  "票房｜《给阿嬷的情书》观影人次超3000万 于和伟、黄渤新片票房滑铁卢": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.263572
+  },
+  "今日开盘：两市双双高开 沪指涨幅0.33%": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.311107
+  },
+  "GPT周报｜腾讯推出AI助手Marvis；字节火山引擎上线一站式AIGC短剧平台；OpenAI将在新加坡开设第一个海外AI实验室；谷歌Gemini发布3.5模型": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.311107
+  },
+  "T早报｜闻泰科技在广东起诉安世荷兰；AI需求爆发促联想一季度营收增长27%；DeepSeek-V4上线并开源；神舟二十三号载人飞船发射升空": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.3270855
+  },
+  "刘再复：把人看作人，维护人的尊严和价值｜讣闻": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.3431349
+  },
+  "物业服务：从边缘到潮头｜构建房地产新模式（17）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.359029
+  },
+  "反腐记｜徐留平落马 三“虎”移送司法": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.359029
+  },
+  "财经早知道｜聚焦教育、住房！国务院推行常住地提供基本服务": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.37512
+  },
+  "分析｜商保创新药落地受阻 与医保如何衔接？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.390956
+  },
+  "中小学办学新增底线要求：每校必备心理辅导室": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.390956
+  },
+  "险企资管投资经理大做“老鼠仓” 禁业十年、判刑5年、共罚没9000万元": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4067996
+  },
+  "非洲埃博拉疫情报告病例攀升 中国发布旅行健康风险提示": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4226387
+  },
+  "特朗普称美伊协议“基本谈成” 区域停火解封与核问题拟分两步走": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4384868
+  },
+  "白宫因枪击案封锁数十分钟 嫌疑人中弹送医后死亡": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4384868
+  },
+  "APEC贸易部长会议闭幕 达成多项合作共识": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.454162
+  },
+  "闻泰科技在广东起诉安世荷兰 要求赔偿80亿元": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4700086
+  },
+  "人事观察｜北大换校长 62岁高松接替61岁龚旗煌": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4700086
+  },
+  "大疆谈低空经济：短期内无人机物流和eVTOL载人无法规模化运营": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.4858274
+  },
+  "山西煤矿瓦斯爆炸事故已致82人遇难 救援工作仍在进行": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5016572
+  },
+  "国产算力龙头冲刺创业板 超聚变IPO获受理拟募资80亿元": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5174737
+  },
+  "最新封面报道｜AI\"船票\"全球飞涨 资本市场争夺估值王": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5174737
+  },
+  "广东阳江特大暴雨破省纪录 全市转移1.3万人": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5332193
+  },
+  "备战升温 伊朗街头和电视台进行枪支教学": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5490124
+  },
+  "匈牙利新任总理毛焦尔首访波兰 寻求回归欧盟主流": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5648491
+  },
+  "【财新时间】邢自强：动荡中的增长": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5648491
+  },
+  "财新观察｜为农民增收提供有力法治保障": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.580694
+  },
+  "反腐记｜徐留平落马三“虎”移送司法": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.5965056
+  },
+  "AI“估值王”争夺战、楼市结构性回暖……": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6123602
+  },
+  "最新封面报道之二｜存储双雄叩关A股": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6280365
+  },
+  "徐留平被查 “霸道总裁”的汽车改革往事": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6280365
+  },
+  "刘再复：把人看作人，维护人的尊严和价值": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6438832
+  },
+  "最新财新周刊｜沃什上任：美联储将迎“三把火”": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.659706
+  },
+  "神舟二十三号飞船发射入轨 太空迎来香港航天员（更新）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.659706
+  },
+  "特稿｜“迷奸”案后续：管住麻精药物黑色交易": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6755857
+  },
+  "留神峪煤矿爆炸背后：矿工三个月未发工资，或有非法开采": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.6916323
+  },
+  "财新闻｜专门针对中国用户，“银狐”木马病毒出现新变种，官方预警": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.707582
+  },
+  "财新闻｜燃油车集体降价": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.7551017
+  },
+  "财新闻｜山西留神峪煤矿瓦斯爆炸事故已致82人遇难2人失联": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.7865977
+  },
+  "美国白宫附近再次发生枪击事件 枪手送医后死亡特朗普无恙": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.802433
+  },
+  "5月极端降水席卷南北 暴雨为何来得又早又强": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8341153
+  },
+  "61岁正部级徐留平被查 曾长期任职军工系统": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8499546
+  },
+  "创新药延续分化，聚焦关键临床数据｜医药股周报": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8659382
+  },
+  "国风｜彩礼额与结婚意愿": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8820157
+  },
+  "前瞻｜亚美尼亚将举行议会选举": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8978186
+  },
+  "老虎、富途共罚没23亿元 美股看跌期权现“抢跑”交易(含视频)": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.8978186
+  },
+  "华电集团“一把手”调整 原总经理叶向东升任董事长": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.9136436
+  },
+  "数十万亿元存款 到期何处去(含视频)｜特稿精选": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.9297874
+  },
+  "“躺平”子女矫正失败后(含视频)｜特稿精选": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.9458303
+  },
+  "从学霸到坠江：湘雅医院规培生的非正常死亡(含视频)｜特稿精选": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.9458303
+  },
+  "亿万富翁衡阳亡命脱逃记｜特稿精选": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.9615088
+  },
+  "体验式旅游流行中｜特稿精选": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.977363
+  },
+  "阅读｜所安一生 西传之路：将中国古典文学推向世界": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676714.993191
+  },
+  "专栏｜试试，查询你家民国档案": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0090048
+  },
+  "澳大利亚旅游局陆佳倩：从“看风景”到“重体验”，会奖旅行如何进阶？｜商旅对话": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0090048
+  },
+  "小登vs老登：资产之争": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0248399
+  },
+  "不想背房贷的年轻人，开始考虑全款买房": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0405178
+  },
+  "全球资本追逐AI“船票”，融资轮次之快、估值竞赛之热史无前例": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0563543
+  },
+  "如同化债问题一样，中国国企改革和民企发展，还面临诸多攻坚克难的课题": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0563543
+  },
+  "全球金融危机后的产业政策": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0722077
+  },
+  "反侵权公告（第45号）：关于摄影作品被恶意侵权的谴责": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.0880454
+  },
+  "反侵权公告（第44号）：对凤凰网科技、新浪微博擅改标题歪曲财新文章本意的强烈谴责": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1038742
+  },
+  "财新传媒获北京大学第九届终结结核病流行报道奖“年度专业精神机构”": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1038742
+  },
+  "休刊启事（《财新周刊》2026年第06期）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1197052
+  },
+  "财新邀你同行，以专业内容共建可信财经生态": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1354012
+  },
+  "《财新周刊》编辑更正": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.151237
+  },
+  "特别呈现 | 恒天然安佳专业乳品亮相2026中国国际焙烤展": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1670732
+  },
+  "财报公告 | 当百度AI收入跨越过半门槛：DAA驱动下的估值奇点与价值重构": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.182902
+  },
+  "特别呈现 | 供给侧改革与全球化纵深发展并进，华住集团一季度财报出炉": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1987498
+  },
+  "特别呈现 | 锚定“十五五”蓝图 中原银行全力护航河南发展大局": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.1987498
+  },
+  "特别呈现 | 北京银行：以特色金融作答“五篇大文章”，从规模竞速迈向韧性生长": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2144248
+  },
+  "特别呈现 | 圆满收官：九方智投以5场直播课，22H全程直播解读致敬“2026巴菲特股东大会”": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2302535
+  },
+  "特别呈现 | 量化“具身智能”新风向！首届人工智能高质量发展大会即将召开": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2460852
+  },
+  "研报集纳 | 禀赋筑底 错位制胜：息差收窄时代的股份行突围之路": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2460852
+  },
+  "特别呈现 | “兴火·燎原”创新马拉松大赛2025年度活动总结暨2026年启动仪式在福州举行": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2619483
+  },
+  "特别呈现 | 稳守根基，智启新程，从山西汾酒Q1业绩看年轻化破局之路": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2777798
+  },
+  "漫闻｜“钓绩”：一场关于“指标”与“底线”的荒诞剧": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2934425
+  },
+  "五一短途游推荐！北京周边被低估的4个燕赵小城｜纪行": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.2934425
+  },
+  "高薪指南：用最短时间获得最大回报｜热议": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.3093145
+  },
+  "爷爷的焦虑与孙子的对抗｜教育": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.32513
+  },
+  "如何识别并应对“有毒的人”？｜带着问题去读书": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.340958
+  },
+  "京ICP证090880号": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.340958
+  },
+  "京ICP备10026701号-8": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.3567932
+  },
+  "网信算备110105862729401250013号": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.372636
+  },
+  "京公网安备 11010502034662号": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.3883114
+  },
+  "广播电视节目制作经营许可证：京第01015号": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4042866
+  },
+  "出版物经营许可证：第直100013号": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4042866
+  },
+  "ENGLISH (英文)": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4201403
+  },
+  "ESPAÑOL (西班牙语)": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4358425
+  },
+  "移动应用 • Apps": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4518745
+  },
+  "山西矿难已致82人死亡": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4678476
+  },
+  "仍有人失踪，习近平要求加大救援力度": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4678476
+  },
+  "特朗普称将与赖清德通话，或激怒中国": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.4836764
+  },
+  "北京为何拒绝购买英伟达芯片？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.499506
+  },
+  "谁是伊朗如今真正的统治者？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.5153458
+  },
+  "中国房地产市场有望复苏吗？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.5153458
+  },
+  "习近平称中俄关系进入“更有作为”阶段": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.53119
+  },
+  "习近平谈的“修昔底德陷阱”是什么意思": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.546866
+  },
+  "中国警告美国不要对华加征新关税": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.562698
+  },
+  "美司法部起诉古巴前总统卡斯特罗": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.5785353
+  },
+  "普京访华，伊朗战争给俄罗斯带来契机": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.5785353
+  },
+  "中国多地遭遇强降雨和山洪暴发": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.5943909
+  },
+  "特朗普向中国示好引发印度担忧": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6102517
+  },
+  "美国绿卡申请流程突变引发困惑与焦虑": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6260667
+  },
+  "访华高管“各怀心事”，中美博弈下的跨国公司困局": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6417406
+  },
+  "战争引发供应危机，台湾被迫摆脱“塑料依赖症”？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6417406
+  },
+  "文革幸存者、《鸿：三代中国女人的故事》主人公逝世": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6575787
+  },
+  "观点与评论 •OPINION": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.673401
+  },
+  "特朗普和他的顾问们显然根本没读过修昔底德": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6892457
+  },
+  "前美国国安局长：如何击败中国黑客军团": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.6892457
+  },
+  "美国衰落中国崛起？没这么简单": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.705092
+  },
+  "特朗普和习近平需要“性格移植”才能达成协议": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7207704
+  },
+  "民主死于平庸打工人？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7366242
+  },
+  "伊朗的能源出口如何继续流向中国": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7524564
+  },
+  "“高空猫鼠游戏”：赖清德秘密非洲行": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7682838
+  },
+  "习近平特朗普峰会折射中美新均势": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7841213
+  },
+  "从肢体语言看习近平与特朗普迥异风格": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7841213
+  },
+  "习近平如何与外国领导人打交道": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.7999444
+  },
+  "中国“棋局”：从尼克松到特朗普": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.8156188
+  },
+  "习近平是如何对军方领导层失去信任的": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.8314576
+  },
+  "梁朝伟谈《寂静的朋友》": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.847298
+  },
+  "你应该担心汉坦病毒吗？": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.847298
+  },
+  "图集：图片中的2025年（下）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.8631492
+  },
+  "图集：图片中的2025年（上）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.8791463
+  },
+  "图集：中国“九三”阅兵现场": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.8951373
+  },
+  "图片中的2024年（上）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.9110024
+  },
+  "图片中的2024年（下）": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.9110024
+  },
+  "点击下载iOS APP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.926824
+  },
+  "点击下载Android APP": {
+    "value": {
+      "geopolitical_risk": 3,
+      "market_impact": 3,
+      "social_stability": 3
+    },
+    "timestamp": 1779676715.942749
+  }
+}

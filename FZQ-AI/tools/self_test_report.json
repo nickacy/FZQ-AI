@@ -1,0 +1,47 @@
+{
+  "system_health": 50.0,
+  "passed": 4,
+  "total": 8,
+  "details": {
+    "database": {
+      "ok": true,
+      "missing_tables": [],
+      "time": 0.057
+    },
+    "fetch_news": {
+      "ok": true,
+      "count": 3,
+      "time": 6.092
+    },
+    "item_bias": {
+      "ok": true,
+      "count": 0,
+      "time": 0.0
+    },
+    "cluster_news": {
+      "ok": true,
+      "count": 0,
+      "time": 0.0
+    },
+    "tension_matrix": {
+      "ok": false,
+      "error": "no such column: region",
+      "time": 0.0
+    },
+    "daily_brief": {
+      "ok": false,
+      "error": "no such column: tension_value",
+      "time": 0.0
+    },
+    "synthesis": {
+      "ok": false,
+      "error": "no such table: geo_hotspots",
+      "time": 0.0
+    },
+    "run_daily": {
+      "ok": false,
+      "error": "'NewsFetcher' object is not callable",
+      "time": 0.0
+    }
+  }
+}
