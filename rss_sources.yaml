@@ -1,0 +1,63 @@
+sources:
+  - id: reuters
+    name: Reuters
+    region: western
+    language: en
+    url: https://www.reuters.com/rssFeed/worldNews
+    topic_tags: ["geopolitics", "macro", "tech"]
+
+  - id: bbc
+    name: BBC World
+    region: western
+    language: en
+    url: http://feeds.bbci.co.uk/news/world/rss.xml
+    topic_tags: ["geopolitics", "macro"]
+
+  - id: nhk
+    name: NHK Japan
+    region: east_asia
+    language: ja
+    url: https://www3.nhk.or.jp/rss/news/cat0.xml
+    topic_tags: ["geopolitics", "tech"]
+
+  - id: yonhap
+    name: Yonhap News
+    region: east_asia
+    language: ko
+    url: https://en.yna.co.kr/RSS/news.xml
+    topic_tags: ["geopolitics"]
+
+  - id: rt
+    name: RT Russia
+    region: russia
+    language: ru
+    url: https://www.rt.com/rss/news/
+    topic_tags: ["geopolitics"]
+
+  - id: telesur
+    name: Telesur
+    region: latin_america
+    language: es
+    url: https://www.telesurenglish.net/rss/RssNews.xml
+    topic_tags: ["geopolitics"]
+
+  - id: news24
+    name: News24 Africa
+    region: africa
+    language: en
+    url: https://feeds.news24.com/articles/news24/World/rss
+    topic_tags: ["geopolitics"]
+
+  - id: xinhuanet
+    name: Xinhua English
+    region: china
+    language: en
+    url: http://www.xinhuanet.com/english/rss/worldrss.xml
+    topic_tags: ["geopolitics", "macro", "tech"]
+
+  - id: globaltimes
+    name: Global Times
+    region: china
+    language: en
+    url: https://www.globaltimes.cn/rss/world.xml
+    topic_tags: ["geopolitics"]

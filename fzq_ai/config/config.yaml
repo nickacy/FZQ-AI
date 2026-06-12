@@ -1,0 +1,22 @@
+{
+  "models": {
+    "deepseek": {
+      "model": "deepseek-chat"
+    },
+    "openai": {
+      "model": "gpt-4o-mini"
+    },
+    "gemini": {
+      "model": "gemini-1.5-flash"
+    }
+  },
+
+  "news": {
+    "max_items": 50
+  },
+
+  "daily_report": {
+    "include_risk": true,
+    "include_narrative": true
+  }
+}
