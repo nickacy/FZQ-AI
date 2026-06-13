@@ -93,3 +93,11 @@ class RiskPipeline:
         }
 
         return ServiceResult.ok(result)
+    
+
+        if __name__ == "__main__":
+            print("Running RiskPipeline test...")
+            pipeline = RiskPipeline()
+            result = pipeline.run("澳洲房地产风险")
+            print("Result:")
+            print(result)

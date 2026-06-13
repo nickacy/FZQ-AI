@@ -1,87 +1,85 @@
 # api_server.py
+# FZQ-AI Intelligence API Server
 
 import os
-import yaml
-from typing import List, Any
+from dotenv import load_dotenv
+
+# ============================
+#  加载环境变量
+# ============================
+load_dotenv(override=True)
 
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
-from fzq_ai.agent_hub import AgentHub
-
-
-# -----------------------------
-# 配置加载
-# -----------------------------
-def load_config():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.join(base_dir, "fzq_ai", "config", "config.yaml")
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+from fzq_ai.pipelines.news_pipeline import NewsPipeline
+from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
+from fzq_ai.pipelines.risk_pipeline import RiskPipeline
+from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
+from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 
 
-config = load_config()
-hub = AgentHub(config)
+# ============================
+#  FastAPI 初始化
+# ============================
+app = FastAPI(title="FZQ-AI Intelligence API", version="1.0")
 
-app = FastAPI(title="FZQ-AI Agent API", version="1.0.0")
-
-
-# -----------------------------
-# 请求模型
-# -----------------------------
-class NewsRequest(BaseModel):
-    items: List[str]
-
-
-class DailyReportRequest(BaseModel):
-    items: List[str]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-# -----------------------------
-# 健康检查
-# -----------------------------
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+# ============================
+#  API 路由
+# ============================
+
+@app.get("/")
+def root():
+    return {"status": "ok", "message": "FZQ-AI API Server is running"}
 
 
-# -----------------------------
-# 新闻摘要
-# -----------------------------
-@app.post("/news/summary")
-def news_summary(req: NewsRequest):
-    merged = "\n".join(req.items)
-    result = hub.run_news(merged)
-    return {"summary": result}
+@app.get("/news")
+def news(topic: str):
+    pipeline = NewsPipeline()
+    result = pipeline.run(topic)
+    return {"success": True, "data": result}
 
 
-# -----------------------------
-# 叙事分析
-# -----------------------------
-@app.post("/narrative/analyze")
-def narrative_analyze(req: NewsRequest):
-    return hub.run_narrative(req.items)
+@app.get("/narrative")
+def narrative(text: str):
+    pipeline = NarrativePipeline()
+    result = pipeline.run(text)
+    return {"success": True, "data": result}
 
 
-# -----------------------------
-# 风险分析
-# -----------------------------
-@app.post("/risk/analyze")
-def risk_analyze(req: NewsRequest):
-    return hub.run_risk(req.items)
+@app.get("/risk")
+def risk(topic: str):
+    pipeline = RiskPipeline()
+    result = pipeline.run(topic)
+    return {"success": True, "data": result}
 
 
-# -----------------------------
-# 每日简报
-# -----------------------------
-@app.post("/daily/report")
-def daily_report(req: DailyReportRequest):
-    return hub.run_daily_report(req.items)
+@app.get("/daily")
+def daily():
+    pipeline = DailyReportPipeline()
+    result = pipeline.run()
+    return {"success": True, "data": result}
 
 
-# -----------------------------
-# Metrics
-# -----------------------------
-@app.get("/metrics")
-def metrics():
-    return {"metrics": hub.get_metrics()}
+@app.get("/task")
+def task(cmd: str):
+    orchestrator = TaskOrchestrator()
+    result = orchestrator.run(cmd)
+    return {"success": True, "data": result}
+
+
+# ============================
+#  启动提示
+# ============================
+if __name__ == "__main__":
+    print("FZQ-AI API Server starting...")
+    print("Visit: http://localhost:8000")
+    print("Use: uvicorn api_server:app --reload --port 8000")

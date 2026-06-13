@@ -1,141 +1,134 @@
-# ---------------------------------------------------------
-#  FZQ-AI UI APP (最新版) — 强制加载 .env + Key Debug 输出
-# ---------------------------------------------------------
-
-from dotenv import load_dotenv
-load_dotenv(override=True)   # ★★★ 强制覆盖所有已有环境变量 ★★★
+# ui_app.py
+# FZQ-AI Intelligence Dashboard (Streamlit UI)
 
 import os
-import json
+import sys
+from dotenv import load_dotenv
+
+# ============================
+#  加载环境变量（强制覆盖）
+# ============================
+load_dotenv(override=True)
+
 import streamlit as st
 
-from fzq_ai.agent_hub import AgentHub
-from fzq_ai.task_orchestrator import TaskOrchestrator
-from fzq_ai.llm.key_manager import KeyManager
+# 将项目根目录加入 sys.path（确保 fzq_ai 可被 import）
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# ============================
+#  导入 FZQ-AI 核心模块
+# ============================
+from fzq_ai.pipelines.news_pipeline import NewsPipeline
+from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
+from fzq_ai.pipelines.risk_pipeline import RiskPipeline
+from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
+from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 
 
-# ---------------------------------------------------------
-#  加载配置
-# ---------------------------------------------------------
-def load_config() -> dict:
-    config_path = "config.json"
-    if not os.path.exists(config_path):
-        raise RuntimeError(f"配置文件不存在: {config_path}")
-    with open(config_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-config = load_config()
-hub = AgentHub(config)
-orchestrator = TaskOrchestrator(hub)
-km = KeyManager()
-
-
-# ---------------------------------------------------------
-#  DEBUG：显示程序真正使用的 Key（前 10 位）
-# ---------------------------------------------------------
-st.sidebar.markdown("### 🔍 DEBUG：程序实际使用的 Key（前 10 位）")
-
-def mask(v):
-    if not v:
-        return "(None)"
-    return v[:10] + "..."
-
-st.sidebar.write("DeepSeek =", mask(os.getenv("DEEPSEEK_API_KEY")))
-st.sidebar.write("OpenAI   =", mask(os.getenv("OPENAI_API_KEY")))
-st.sidebar.write("Gemini   =", mask(os.getenv("GEMINI_API_KEY")))
-
-
-# ---------------------------------------------------------
-#  UI 主界面
-# ---------------------------------------------------------
-st.set_page_config(page_title="FZQ-AI 智能分析系统", layout="wide")
-
-st.title("📊 FZQ-AI 智能分析系统")
-st.markdown(
-    "支持：新闻摘要、叙事分析、风险扫描、每日简报生成，"
-    "并具备多模型自动路由与 API Key 健康检测。"
+# ============================
+#  Streamlit 页面配置
+# ============================
+st.set_page_config(
+    page_title="FZQ-AI Intelligence Dashboard",
+    page_icon="🛰️",
+    layout="wide"
 )
 
-
-# ---------------------------------------------------------
-#  API Key 健康检查
-# ---------------------------------------------------------
-st.subheader("🔐 API Key 健康状态")
-
-cols = st.columns(3)
-models = ["deepseek", "openai", "gemini"]
-
-for i, model in enumerate(models):
-    ok, msg = km.health.get(model, (False, "未检测"))
-    with cols[i]:
-        st.markdown(
-            f"**{model.capitalize()}**：{'🟢 正常' if ok else '🔴 异常'}  \n{msg}"
-        )
-
-st.markdown("---")
+st.title("🛰️ FZQ-AI Intelligence Dashboard")
+st.caption("多模型情报分析系统 · 新闻 · 叙事 · 风险 · 日报")
 
 
-# ---------------------------------------------------------
-#  任务选择
-# ---------------------------------------------------------
-st.subheader("🧠 任务选择")
+# ============================
+#  DEBUG Key 状态（安全版本）
+# ============================
+if os.getenv("DEBUG", "").lower() == "true":
+    st.sidebar.markdown("### 🔍 DEBUG：Key 状态")
 
-task = st.selectbox(
-    "选择任务类型：",
+    def mask(v: str | None) -> str:
+        return "✅ 已配置" if v else "❌ 未配置"
+
+    st.sidebar.write("DeepSeek =", mask(os.getenv("DEEPSEEK_API_KEY")))
+    st.sidebar.write("OpenAI   =", mask(os.getenv("OPENAI_API_KEY")))
+    st.sidebar.write("Gemini   =", mask(os.getenv("GEMINI_API_KEY")))
+
+
+# ============================
+#  侧边栏导航
+# ============================
+st.sidebar.header("📡 功能导航")
+
+page = st.sidebar.radio(
+    "选择功能",
     [
-        "每日简报（Daily Report）",
-        "新闻摘要（News Summary）",
-        "叙事分析（Narrative Analysis）",
-        "风险扫描（Risk Scan）",
-    ],
+        "📰 新闻情报分析",
+        "🧠 叙事分析",
+        "⚠️ 风险扫描",
+        "📅 每日报告生成",
+        "🧩 任务编排（Orchestrator）"
+    ]
 )
 
 
-# ---------------------------------------------------------
-#  输入新闻
-# ---------------------------------------------------------
-st.markdown("### 📰 输入新闻列表")
-text_input = st.text_area(
-    "每行一条新闻，可以是标题或简短描述：",
-    height=200,
-    placeholder="例如：\n澳洲房地产市场在 2026 年持续升温，悉尼房价同比上涨 8%。\n澳洲生活成本指数本季度上涨 2.1%，食品和能源价格是主要推动因素。",
-)
+# ============================
+#  页面逻辑
+# ============================
+
+# --- 新闻情报分析 ---
+if page == "📰 新闻情报分析":
+    st.subheader("📰 新闻情报分析")
+    query = st.text_input("输入新闻主题或关键词：", "")
+    if st.button("开始分析"):
+        with st.spinner("正在分析新闻情报..."):
+            pipeline = NewsPipeline()
+            result = pipeline.run(query)
+        st.success("分析完成")
+        st.write(result)
 
 
-# ---------------------------------------------------------
-#  执行任务
-# ---------------------------------------------------------
-if st.button("🚀 运行任务"):
-    if not text_input.strip():
-        st.warning("请输入至少一条新闻。")
-    else:
-        items = [x.strip() for x in text_input.split("\n") if x.strip()]
-
-        try:
-            if task.startswith("每日简报"):
-                result = orchestrator.run("daily_report", items)
-                st.subheader("📅 每日简报")
-                st.markdown(result["result"]["report"])
-
-            elif task.startswith("新闻摘要"):
-                result = orchestrator.run("news", items)
-                st.subheader("📰 新闻摘要")
-                st.markdown(result["result"])
-
-            elif task.startswith("叙事分析"):
-                result = orchestrator.run("narrative", items)
-                st.subheader("📚 叙事分析（结构化结果）")
-                st.markdown(result["result"])
-
-            elif task.startswith("风险扫描"):
-                result = orchestrator.run("risk", items)
-                st.subheader("⚠️ 风险扫描（结构化结果）")
-                st.markdown(result["result"])
-
-        except Exception as e:
-            st.error(f"❌ 运行失败：{e}")
+# --- 叙事分析 ---
+elif page == "🧠 叙事分析":
+    st.subheader("🧠 叙事分析")
+    text = st.text_area("输入需要分析的叙事文本：", "")
+    if st.button("开始分析"):
+        with st.spinner("正在分析叙事结构..."):
+            pipeline = NarrativePipeline()
+            result = pipeline.run(text)
+        st.success("分析完成")
+        st.write(result)
 
 
-st.markdown("---")
-st.caption("FZQ-AI Agent · 多模型路由 · 自动 Key 检测 · 实验性版本")
+# --- 风险扫描 ---
+elif page == "⚠️ 风险扫描":
+    st.subheader("⚠️ 风险扫描")
+    topic = st.text_input("输入风险主题：", "")
+    if st.button("开始扫描"):
+        with st.spinner("正在执行风险扫描..."):
+            pipeline = RiskPipeline()
+            result = pipeline.run(topic)
+        st.success("扫描完成")
+        st.write(result)
+
+
+# --- 每日报告 ---
+elif page == "📅 每日报告生成":
+    st.subheader("📅 每日报告生成")
+    if st.button("生成今日情报报告"):
+        with st.spinner("正在生成每日报告..."):
+            pipeline = DailyReportPipeline()
+            result = pipeline.run()
+        st.success("报告生成完成")
+        st.write(result)
+
+
+# --- Orchestrator ---
+elif page == "🧩 任务编排（Orchestrator）":
+    st.subheader("🧩 任务编排中心")
+    task = st.text_input("输入任务指令：", "")
+    if st.button("执行任务"):
+        with st.spinner("正在执行任务编排..."):
+            orchestrator = TaskOrchestrator()
+            result = orchestrator.run(task)
+        st.success("任务执行完成")
+        st.write(result)

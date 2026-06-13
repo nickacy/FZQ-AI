@@ -52,3 +52,18 @@ class NewsPipeline:
             return result.data
         else:
             return {"error": result.error}
+
+
+if __name__ == "__main__":
+    print("Running NewsPipeline test...")
+    pipeline = NewsPipeline()
+    result = pipeline.run("澳洲房地产趋势")
+    print("Result:")
+    print(result)
+
+if __name__ == "__main__":
+    print("Running NewsPipeline test...")
+    pipeline = NewsPipeline()
+    result = pipeline.run("澳洲房地产趋势")
+    print("Result:")
+    print(result)

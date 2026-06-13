@@ -129,3 +129,11 @@ class DailyReportPipeline:
         md += "---\n由 FZQ-AI 自动生成（语义新闻 + 基础叙事 + 风险扫描）\n"
 
         return ServiceResult.ok(md)
+
+
+        if __name__ == "__main__":
+            print("Running DailyReportPipeline test...")
+            pipeline = DailyReportPipeline()
+            result = pipeline.run()
+            print("Result:")
+            print(result)
