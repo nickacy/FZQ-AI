@@ -1,5 +1,6 @@
 # tui/news_view.py
 
+
 class NewsListView:
     """
     新闻列表视图（支持分页、翻页、查看详情）

@@ -39,15 +39,11 @@ async def estimate_walking_time(distance_meters: float) -> ToolResult[Dict[str, 
         }
 
         return ToolResult(
-            success=True,
-            data=result,
-            metadata={"tool": "estimate_walking_time"}
+            success=True, data=result, metadata={"tool": "estimate_walking_time"}
         )
 
     except Exception as e:
         logger.error("estimate_walking_time failed: %s", e, exc_info=True)
         return ToolResult(
-            success=False,
-            error=str(e),
-            metadata={"tool": "estimate_walking_time"}
+            success=False, error=str(e), metadata={"tool": "estimate_walking_time"}
         )

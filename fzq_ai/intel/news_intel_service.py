@@ -151,9 +151,7 @@ class NewsIntelService:
 
         # 3. 翻译（并行执行）
         translator = TranslationManager()
-        await asyncio.gather(*[
-            translator.process_article(a) for a in articles
-        ])
+        await asyncio.gather(*[translator.process_article(a) for a in articles])
 
         # 4. 可信度 / 偏见 / 宣传标签
         for a in articles:

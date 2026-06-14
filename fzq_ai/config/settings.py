@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        extra = "allow"   # ⭐⭐ 关键修复：允许 .env 中的额外字段
+        extra = "allow"  # ⭐⭐ 关键修复：允许 .env 中的额外字段
 
 
 settings = Settings()

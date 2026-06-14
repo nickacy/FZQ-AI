@@ -45,6 +45,7 @@ class NarrativeEngine:
     # 兼容旧同步接口（news_intel_service 目前是同步风格）
     def generate(self, articles: List[Article], event_id: str) -> Narrative:
         import asyncio
+
         return asyncio.run(self.generate_async(articles, event_id))
 
     # ---------------------------------------------------------
@@ -64,8 +65,7 @@ class NarrativeEngine:
     # 构造 Prompt
     # ---------------------------------------------------------
     def _build_prompt(self, corpus: str) -> str:
-        return dedent(
-            f"""
+        return dedent(f"""
             你是一名地缘政治情报分析员，任务是从多来源新闻中提炼多阵营叙事。
 
             请基于以下新闻内容（已尽量翻译为中文）进行分析：
@@ -107,8 +107,7 @@ class NarrativeEngine:
                 "missing 2"
               ]
             }}
-            """
-        )
+            """)
 
     # ---------------------------------------------------------
     # LLM 调用（带 fallback）

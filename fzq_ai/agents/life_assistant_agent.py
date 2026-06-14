@@ -7,6 +7,7 @@ Author: Nick + Copilot
 from typing import Dict, Any, List
 import json
 
+
 class LifeAssistantAgent:
     """
     统一的生活助手 Agent：
@@ -33,7 +34,9 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     # 主入口：用户问一句话 → 返回结构化结果
     # ---------------------------------------------------------
-    def answer(self, user_query: str, user_profile: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    def answer(
+        self, user_query: str, user_profile: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
         """
         1. DeepSeek 做意图识别 + 工具规划
         2. 调用对应工具
@@ -53,13 +56,19 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     # Step 1：DeepSeek 生成工具规划
     # ---------------------------------------------------------
-    def plan_tools(self, user_query: str, user_profile: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    def plan_tools(
+        self, user_query: str, user_profile: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
         prompt = self.build_planning_prompt(user_query, user_profile)
         response = self.llm.run("life_planning", prompt)
         return self.parse_json_safe(response, default={"tools": [], "params": {}})
 
-    def build_planning_prompt(self, user_query: str, user_profile: Dict[str, Any] | None) -> str:
-        profile_text = json.dumps(user_profile, ensure_ascii=False) if user_profile else "{}"
+    def build_planning_prompt(
+        self, user_query: str, user_profile: Dict[str, Any] | None
+    ) -> str:
+        profile_text = (
+            json.dumps(user_profile, ensure_ascii=False) if user_profile else "{}"
+        )
 
         return f"""
 你是一个生活助手 Agent，负责根据用户需求选择合适的工具。
@@ -113,11 +122,15 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     # Step 3：DeepSeek 整合最终回答
     # ---------------------------------------------------------
-    def compose_answer(self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]) -> str:
+    def compose_answer(
+        self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]
+    ) -> str:
         prompt = self.build_answer_prompt(user_query, plan, tool_results)
         return self.llm.run("life_answer", prompt)
 
-    def build_answer_prompt(self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]) -> str:
+    def build_answer_prompt(
+        self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]
+    ) -> str:
         return f"""
 你是一个生活助手 Agent，请根据工具执行结果给用户一个自然语言回答。
 

@@ -29,7 +29,7 @@ class FZQAgent:
             summary=narrative["global_summary"],
             clusters=narrative["clusters"],
             tension_matrix=narrative["tension_matrix"],
-            articles=articles
+            articles=articles,
         )
 
         return narrative

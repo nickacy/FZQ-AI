@@ -21,16 +21,41 @@ NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "").strip()
 
 # 多源 RSS 配置（可扩展至 50+ 源）
 RSS_SOURCES = [
-    {"id": "bbc", "name": "BBC World", "region": "western", "language": "en",
-     "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
-    {"id": "reuters", "name": "Reuters World", "region": "western", "language": "en",
-     "url": "https://feeds.reuters.com/Reuters/worldNews"},
-    {"id": "ap", "name": "AP World", "region": "western", "language": "en",
-     "url": "https://apnews.com/rss/apf-worldnews"},
-    {"id": "aljazeera", "name": "Al Jazeera", "region": "middle_east", "language": "en",
-     "url": "https://www.aljazeera.com/xml/rss/all.xml"},
-    {"id": "nhk", "name": "NHK Japan", "region": "east_asia", "language": "ja",
-     "url": "https://www3.nhk.or.jp/rss/news/cat0.xml"},
+    {
+        "id": "bbc",
+        "name": "BBC World",
+        "region": "western",
+        "language": "en",
+        "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    },
+    {
+        "id": "reuters",
+        "name": "Reuters World",
+        "region": "western",
+        "language": "en",
+        "url": "https://feeds.reuters.com/Reuters/worldNews",
+    },
+    {
+        "id": "ap",
+        "name": "AP World",
+        "region": "western",
+        "language": "en",
+        "url": "https://apnews.com/rss/apf-worldnews",
+    },
+    {
+        "id": "aljazeera",
+        "name": "Al Jazeera",
+        "region": "middle_east",
+        "language": "en",
+        "url": "https://www.aljazeera.com/xml/rss/all.xml",
+    },
+    {
+        "id": "nhk",
+        "name": "NHK Japan",
+        "region": "east_asia",
+        "language": "ja",
+        "url": "https://www3.nhk.or.jp/rss/news/cat0.xml",
+    },
 ]
 
 
@@ -46,19 +71,21 @@ def _parse_rss_source(cfg: Dict[str, Any]) -> List[Article]:
             summary = entry.get("summary") or ""
             if not url and not title:
                 continue
-            articles.append(Article(
-                id=f"{cfg['id']}-{idx}",
-                url=url,
-                source_id=cfg["id"],
-                source_name=cfg["name"],
-                region=cfg.get("region", ""),
-                language=cfg.get("language", ""),
-                fetched_at=now,
-                title_original=title,
-                content_original=summary,
-                credibility=0.9,
-                bias=0.1,
-            ))
+            articles.append(
+                Article(
+                    id=f"{cfg['id']}-{idx}",
+                    url=url,
+                    source_id=cfg["id"],
+                    source_name=cfg["name"],
+                    region=cfg.get("region", ""),
+                    language=cfg.get("language", ""),
+                    fetched_at=now,
+                    title_original=title,
+                    content_original=summary,
+                    credibility=0.9,
+                    bias=0.1,
+                )
+            )
     except Exception:
         pass  # 单个源失败不影响整体
     return articles
@@ -74,7 +101,8 @@ def fetch_from_rss(query: str = "") -> List[Article]:
     if query:
         q_en = translate_to_english(query).lower()
         all_articles = [
-            a for a in all_articles
+            a
+            for a in all_articles
             if q_en in (a.title_original or "").lower()
             or q_en in (a.content_original or "").lower()
         ]
@@ -95,7 +123,9 @@ def fetch_from_newsapi(query: str) -> List[Article]:
             "sortBy": "publishedAt",
             "apiKey": NEWSAPI_KEY,
         }
-        resp = requests.get("https://newsapi.org/v2/everything", params=params, timeout=30)
+        resp = requests.get(
+            "https://newsapi.org/v2/everything", params=params, timeout=30
+        )
         resp.raise_for_status()
         data = resp.json()
     except Exception:
@@ -109,19 +139,21 @@ def fetch_from_newsapi(query: str) -> List[Article]:
         desc = item.get("description") or ""
         if not url and not title:
             continue
-        articles.append(Article(
-            id=f"newsapi-{hash(url) % 100000}",
-            url=url,
-            source_id=src.get("id") or "newsapi",
-            source_name=src.get("name") or "NewsAPI",
-            region="western",
-            language="en",
-            fetched_at=datetime.now(timezone.utc),
-            title_original=title,
-            content_original=desc,
-            credibility=0.85,
-            bias=0.1,
-        ))
+        articles.append(
+            Article(
+                id=f"newsapi-{hash(url) % 100000}",
+                url=url,
+                source_id=src.get("id") or "newsapi",
+                source_name=src.get("name") or "NewsAPI",
+                region="western",
+                language="en",
+                fetched_at=datetime.now(timezone.utc),
+                title_original=title,
+                content_original=desc,
+                credibility=0.85,
+                bias=0.1,
+            )
+        )
     return articles
 
 
@@ -135,7 +167,9 @@ def fetch_from_gdelt_doc(query: str) -> List[Article]:
             "maxrecords": 50,
             "format": "json",
         }
-        resp = requests.get("https://api.gdeltproject.org/api/v2/doc/doc", params=params, timeout=30)
+        resp = requests.get(
+            "https://api.gdeltproject.org/api/v2/doc/doc", params=params, timeout=30
+        )
         resp.raise_for_status()
         data = resp.json()
     except Exception:
@@ -143,18 +177,20 @@ def fetch_from_gdelt_doc(query: str) -> List[Article]:
 
     articles: List[Article] = []
     for item in data.get("articles", []):
-        articles.append(Article(
-            id=f"gdelt-doc-{item.get('url', '')[:50]}",
-            url=item.get("url") or "",
-            source_name=item.get("source") or "GDELT",
-            source_id="gdelt",
-            region="global",
-            language="en",
-            fetched_at=datetime.now(timezone.utc),
-            title_original=item.get("title") or "",
-            credibility=0.7,
-            bias=0.1,
-        ))
+        articles.append(
+            Article(
+                id=f"gdelt-doc-{item.get('url', '')[:50]}",
+                url=item.get("url") or "",
+                source_name=item.get("source") or "GDELT",
+                source_id="gdelt",
+                region="global",
+                language="en",
+                fetched_at=datetime.now(timezone.utc),
+                title_original=item.get("title") or "",
+                credibility=0.7,
+                bias=0.1,
+            )
+        )
     return articles
 
 
@@ -168,7 +204,11 @@ def fetch_from_gdelt_event(query: str) -> List[Article]:
             "format": "json",
             "maxrecords": 50,
         }
-        resp = requests.get("https://api.gdeltproject.org/api/v2/events/events", params=params, timeout=30)
+        resp = requests.get(
+            "https://api.gdeltproject.org/api/v2/events/events",
+            params=params,
+            timeout=30,
+        )
         resp.raise_for_status()
         data = resp.json()
     except Exception:
@@ -177,18 +217,20 @@ def fetch_from_gdelt_event(query: str) -> List[Article]:
     articles: List[Article] = []
     for idx, item in enumerate(data.get("events", [])):
         title = f"{item.get('Actor1Name', '')} - {item.get('EventRootCode', '')}"
-        articles.append(Article(
-            id=f"gdelt-ev-{idx}",
-            url=item.get("SOURCEURL") or "",
-            source_name=item.get("SOURCE") or "GDELT",
-            source_id="gdelt",
-            region="global",
-            language="en",
-            fetched_at=datetime.now(timezone.utc),
-            title_original=title or "GDELT 事件",
-            credibility=0.6,
-            bias=0.1,
-        ))
+        articles.append(
+            Article(
+                id=f"gdelt-ev-{idx}",
+                url=item.get("SOURCEURL") or "",
+                source_name=item.get("SOURCE") or "GDELT",
+                source_id="gdelt",
+                region="global",
+                language="en",
+                fetched_at=datetime.now(timezone.utc),
+                title_original=title or "GDELT 事件",
+                credibility=0.6,
+                bias=0.1,
+            )
+        )
     return articles
 
 
@@ -202,7 +244,9 @@ def fetch_all_news(query: str) -> List[Article]:
     gdelt_doc_articles = fetch_from_gdelt_doc(query)
     gdelt_event_articles = fetch_from_gdelt_event(query)
 
-    all_articles = rss_articles + newsapi_articles + gdelt_doc_articles + gdelt_event_articles
+    all_articles = (
+        rss_articles + newsapi_articles + gdelt_doc_articles + gdelt_event_articles
+    )
 
     # 去重（按 url 或 title）
     seen: Dict[str, bool] = {}

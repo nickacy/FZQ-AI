@@ -1,4 +1,5 @@
 """Convert all non-UTF-8 files in project to UTF-8."""
+
 import os, shutil
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -11,11 +12,13 @@ TARGET_DIRS = [
 EXTRA = [os.path.join(BASE, "structure.txt")]
 ENCODINGS = ["utf-8", "gbk", "gb18030", "latin-1"]
 
+
 def is_chinese(text):
     for ch in text:
-        if '\u4e00' <= ch <= '\u9fff':
+        if "\u4e00" <= ch <= "\u9fff":
             return True
     return False
+
 
 def detect_encoding(fpath):
     for enc in ENCODINGS:
@@ -33,6 +36,7 @@ def detect_encoding(fpath):
                 pass
         return enc
     return None
+
 
 def collect():
     files = []
@@ -53,6 +57,7 @@ def collect():
                 files.append((fp, enc))
     return files
 
+
 def convert(fp, enc):
     with open(fp, "r", encoding=enc) as f:
         content = f.read()
@@ -60,6 +65,7 @@ def convert(fp, enc):
     shutil.copy2(fp, os.path.join(BACKUP, os.path.basename(fp)))
     with open(fp, "w", encoding="utf-8") as f:
         f.write(content)
+
 
 def main():
     files = collect()
@@ -80,6 +86,7 @@ def main():
             print(f"  FAIL {fp}: {e}")
             fail += 1
     print(f"\nDone: {ok} ok, {fail} fail.")
+
 
 if __name__ == "__main__":
     main()

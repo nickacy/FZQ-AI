@@ -48,7 +48,15 @@ class DailyReportPipeline:
                 other.append(a.title_original)
 
         # 3. 风险扫描（关键词）
-        risk_words = ["war", "conflict", "attack", "missile", "crisis", "sanction", "inflation"]
+        risk_words = [
+            "war",
+            "conflict",
+            "attack",
+            "missile",
+            "crisis",
+            "sanction",
+            "inflation",
+        ]
         risk_hits = []
 
         for a in articles:
@@ -129,7 +137,6 @@ class DailyReportPipeline:
         md += "---\n由 FZQ-AI 自动生成（语义新闻 + 基础叙事 + 风险扫描）\n"
 
         return ServiceResult.ok(md)
-
 
         if __name__ == "__main__":
             print("Running DailyReportPipeline test...")

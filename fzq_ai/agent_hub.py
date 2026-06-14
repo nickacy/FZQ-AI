@@ -41,34 +41,33 @@ class AgentHub:
     def run_narrative(self, items: List[str]) -> Dict[str, Any]:
         """叙事分析：将字符串列表转为文章列表后分析"""
         from fzq_ai.domain.models import Article
+
         articles = [
-            Article(title_original=item, content_original=item)
-            for item in items
+            Article(title_original=item, content_original=item) for item in items
         ]
         # NarrativePipeline.run 是 async，这里用同步包装
         import asyncio
+
         result = asyncio.run(self.narrative_pipeline.run(articles=articles))
         return {"success": result.success, "data": result.data, "error": result.error}
 
     def run_risk(self, items: List[str]) -> Dict[str, Any]:
         """风险分析：将字符串列表转为文章列表后分析"""
         from fzq_ai.domain.models import Article
-        articles = [
-            Article(title_original=item)
-            for item in items
-        ]
+
+        articles = [Article(title_original=item) for item in items]
         import asyncio
+
         result = asyncio.run(self.risk_pipeline.run(articles=articles))
         return {"success": result.success, "data": result.data, "error": result.error}
 
     def run_daily_report(self, items: List[str]) -> Dict[str, Any]:
         """每日报告：将字符串列表转为文章列表后生成报告"""
         from fzq_ai.domain.models import Article
-        articles = [
-            Article(title_original=item)
-            for item in items
-        ]
+
+        articles = [Article(title_original=item) for item in items]
         import asyncio
+
         result = asyncio.run(self.daily_report_pipeline.run(articles=articles))
         return {"success": result.success, "data": result.data, "error": result.error}
 

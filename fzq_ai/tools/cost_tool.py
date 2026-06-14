@@ -44,15 +44,11 @@ async def estimate_trip_cost(
         }
 
         return ToolResult(
-            success=True,
-            data=result,
-            metadata={"tool": "estimate_trip_cost"}
+            success=True, data=result, metadata={"tool": "estimate_trip_cost"}
         )
 
     except Exception as e:
         logger.error("estimate_trip_cost failed: %s", e, exc_info=True)
         return ToolResult(
-            success=False,
-            error=str(e),
-            metadata={"tool": "estimate_trip_cost"}
+            success=False, error=str(e), metadata={"tool": "estimate_trip_cost"}
         )

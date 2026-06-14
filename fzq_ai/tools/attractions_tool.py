@@ -49,7 +49,7 @@ async def get_attractions_by_suburb(suburb: str) -> ToolResult[List[Dict[str, An
         return ToolResult(
             success=True,
             data=attractions,
-            metadata={"tool": "get_attractions_by_suburb", "suburb": suburb}
+            metadata={"tool": "get_attractions_by_suburb", "suburb": suburb},
         )
 
     except Exception as e:
@@ -57,5 +57,5 @@ async def get_attractions_by_suburb(suburb: str) -> ToolResult[List[Dict[str, An
         return ToolResult(
             success=False,
             error=str(e),
-            metadata={"tool": "get_attractions_by_suburb", "suburb": suburb}
+            metadata={"tool": "get_attractions_by_suburb", "suburb": suburb},
         )

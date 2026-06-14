@@ -38,7 +38,7 @@ async def check_metro_status(line: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=True,
             data=status,
-            metadata={"tool": "check_metro_status", "line": line}
+            metadata={"tool": "check_metro_status", "line": line},
         )
 
     except Exception as e:
@@ -46,5 +46,5 @@ async def check_metro_status(line: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=False,
             error=str(e),
-            metadata={"tool": "check_metro_status", "line": line}
+            metadata={"tool": "check_metro_status", "line": line},
         )

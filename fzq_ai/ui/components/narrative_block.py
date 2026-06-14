@@ -3,7 +3,6 @@
 import streamlit as st
 from fzq_ai.intel.models import Narrative
 
-
 BLOC_COLORS = {
     "western": "#4A90E2",
     "china": "#D0021B",

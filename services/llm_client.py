@@ -23,8 +23,7 @@ class LLMClient:
         if self.provider == "deepseek":
             # ❗ 正确的 DeepSeek API URL（不能加 /v1）
             self.client = OpenAI(
-                api_key=config.api_key,
-                base_url="https://api.deepseek.com"
+                api_key=config.api_key, base_url="https://api.deepseek.com"
             )
 
         # -----------------------------
@@ -33,16 +32,14 @@ class LLMClient:
         elif self.provider == "qwen":
             self.client = OpenAI(
                 api_key=config.api_key,
-                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
             )
 
         # -----------------------------
         # OpenAI GPT
         # -----------------------------
         elif self.provider == "openai":
-            self.client = OpenAI(
-                api_key=config.api_key
-            )
+            self.client = OpenAI(api_key=config.api_key)
 
         else:
             raise ValueError(f"未知的 LLM provider: {self.provider}")
@@ -56,7 +53,7 @@ class LLMClient:
                 model=self.config.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
-                max_tokens=2000
+                max_tokens=2000,
             )
             return response.choices[0].message.content
 

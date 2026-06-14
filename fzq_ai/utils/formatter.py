@@ -27,13 +27,11 @@ class RiskFormatter:
         """
         try:
             import json
+
             data = json.loads(raw)
             return data
         except Exception:
-            return {
-                "summary": "LLM 输出非 JSON 格式，已返回原始文本",
-                "raw": raw
-            }
+            return {"summary": "LLM 输出非 JSON 格式，已返回原始文本", "raw": raw}
 
 
 class DailyReportFormatter:
@@ -42,15 +40,9 @@ class DailyReportFormatter:
         """
         生成最终日报 Markdown 文本
         """
-        narrative_text = (
-            narrative if isinstance(narrative, str)
-            else str(narrative)
-        )
+        narrative_text = narrative if isinstance(narrative, str) else str(narrative)
 
-        risk_text = (
-            risk if isinstance(risk, str)
-            else str(risk)
-        )
+        risk_text = risk if isinstance(risk, str) else str(risk)
 
         return f"""
 # 📅 每日简报（Daily Report）

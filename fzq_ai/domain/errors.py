@@ -34,24 +34,29 @@ class FZQAIError(Exception):
 
 class LLMError(FZQAIError):
     """LLM 调用相关异常（如超时、限流、模型不可用）"""
+
     pass
 
 
 class ToolExecutionError(FZQAIError):
     """工具执行相关异常（如参数错误、外部 API 失败）"""
+
     pass
 
 
 class NewsFetchError(FZQAIError):
     """新闻抓取相关异常（如网络错误、数据源不可用）"""
+
     pass
 
 
 class PipelineError(FZQAIError):
     """Pipeline 执行相关异常（如数据格式错误、步骤失败）"""
+
     pass
 
 
 class ServiceError(FZQAIError):
     """服务层异常（如 orchestrator 逻辑错误）"""
+
     pass

@@ -43,7 +43,7 @@ async def plan_route(start: str, end: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=True,
             data=route,
-            metadata={"tool": "plan_route", "start": start, "end": end}
+            metadata={"tool": "plan_route", "start": start, "end": end},
         )
 
     except Exception as e:
@@ -51,5 +51,5 @@ async def plan_route(start: str, end: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=False,
             error=str(e),
-            metadata={"tool": "plan_route", "start": start, "end": end}
+            metadata={"tool": "plan_route", "start": start, "end": end},
         )

@@ -18,7 +18,6 @@ from fzq_ai.pipelines.risk_pipeline import RiskPipeline
 from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
 from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 
-
 # ============================
 #  FastAPI 初始化
 # ============================
@@ -35,6 +34,7 @@ app.add_middleware(
 # ============================
 #  API 路由
 # ============================
+
 
 @app.get("/")
 def root():

@@ -31,7 +31,9 @@ class Dashboard:
         while True:
             self.render_main()
 
-            user_input = console.input("\n[bold cyan]输入新闻编号查看详情，或按 q 返回退出：[/] ")
+            user_input = console.input(
+                "\n[bold cyan]输入新闻编号查看详情，或按 q 返回退出：[/] "
+            )
 
             if user_input.lower() == "q":
                 break
@@ -94,7 +96,10 @@ class Dashboard:
             cluster_text += "\n"
 
         layout["clusters"].update(
-            Panel(cluster_text or "No clusters", title="[bold yellow]Narrative Clusters[/]")
+            Panel(
+                cluster_text or "No clusters",
+                title="[bold yellow]Narrative Clusters[/]",
+            )
         )
 
         # Tension Matrix
@@ -138,6 +143,4 @@ class Dashboard:
         )
 
         console.clear()
-        console.print(
-            Panel(detail_text, title=f"[bold green]News Detail — #{idx}[/]")
-        )
+        console.print(Panel(detail_text, title=f"[bold green]News Detail — #{idx}[/]"))

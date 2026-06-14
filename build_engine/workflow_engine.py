@@ -7,7 +7,6 @@ from build_engine.plan_builder import build_plan
 from build_engine.plan_renderer import render_plan
 from build_engine.skeleton_writer import safe_write_skeleton
 
-
 # === v1.2：标准骨架模板 ===
 
 SKELETONS = {
@@ -18,7 +17,6 @@ SKELETONS = {
         # TODO: 添加你的全局配置
         pass
 """,
-
     "core/logging_utils.py": """import logging
 
 def setup_logging():
@@ -26,7 +24,6 @@ def setup_logging():
     logging.basicConfig(level=logging.INFO)
     logging.info("Logging initialized.")
 """,
-
     "agents/fzq_agent.py": """class FZQAgent:
     \"\"\"FZQ 主代理模块（标准骨架）\"\"\"
 
@@ -38,7 +35,6 @@ def setup_logging():
         # TODO: 实现 orchestrator 逻辑
         print("FZQAgent running...")
 """,
-
     "pipelines/news_pipeline.py": """class NewsPipeline:
     \"\"\"新闻聚合 Pipeline（标准骨架）\"\"\"
 
@@ -46,7 +42,6 @@ def setup_logging():
         # TODO: 实现新闻抓取与处理
         pass
 """,
-
     "pipelines/narrative_pipeline.py": """class NarrativePipeline:
     \"\"\"叙事分析 Pipeline（标准骨架）\"\"\"
 
@@ -54,7 +49,6 @@ def setup_logging():
         # TODO: 实现叙事分析逻辑
         pass
 """,
-
     "data/sources.py": """class DataSources:
     \"\"\"数据源定义（标准骨架）\"\"\"
 
@@ -62,7 +56,6 @@ def setup_logging():
         # TODO: 返回数据源列表
         return []
 """,
-
     "ui/dashboard_stub.py": """class DashboardStub:
     \"\"\"UI / Dashboard 桥接层（标准骨架）\"\"\"
 

@@ -1,5 +1,6 @@
 # test_news_pipeline.py
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
 
 import yaml
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     items = [
         "澳洲股市今日上涨 1.2%，科技股领涨。",
         "悉尼房价连续第三个月上涨，需求强劲。",
-        "澳洲央行表示将维持利率不变。"
+        "澳洲央行表示将维持利率不变。",
     ]
 
     pipeline = NewsPipeline(llm_router=router)

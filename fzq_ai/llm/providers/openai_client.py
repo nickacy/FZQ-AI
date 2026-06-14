@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 import asyncio
 
+
 class OpenAIClient:
     """
     OpenAI API 的最小可运行客户端。

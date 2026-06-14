@@ -24,8 +24,14 @@ class DenoisingEngine:
 
         # 去广告关键词
         blacklist = [
-            "click here", "read more", "subscribe", "广告", "赞助",
-            "follow us", "breaking:", "update:"
+            "click here",
+            "read more",
+            "subscribe",
+            "广告",
+            "赞助",
+            "follow us",
+            "breaking:",
+            "update:",
         ]
         for b in blacklist:
             text = text.replace(b, "")
@@ -58,13 +64,18 @@ class CredibilityScorer:
     }
 
     EMOTION_WORDS = [
-        "shocking", "outrage", "furious", "disaster", "crisis",
-        "令人震惊", "愤怒", "灾难", "危机"
+        "shocking",
+        "outrage",
+        "furious",
+        "disaster",
+        "crisis",
+        "令人震惊",
+        "愤怒",
+        "灾难",
+        "危机",
     ]
 
-    EXAGGERATION = [
-        "never before", "史无前例", "前所未有", "彻底崩溃"
-    ]
+    EXAGGERATION = ["never before", "史无前例", "前所未有", "彻底崩溃"]
 
     @staticmethod
     def score(article) -> float:
@@ -96,8 +107,14 @@ class BiasScorer:
     """
 
     BIAS_WORDS = [
-        "clearly", "obviously", "显然", "毫无疑问",
-        "must", "必须", "should", "应该",
+        "clearly",
+        "obviously",
+        "显然",
+        "毫无疑问",
+        "must",
+        "必须",
+        "should",
+        "应该",
     ]
 
     @staticmethod

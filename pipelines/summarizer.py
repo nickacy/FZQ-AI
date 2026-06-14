@@ -1,5 +1,6 @@
 # pipelines/summarizer.py
 
+
 class NewsSummarizer:
     """
     使用 DeepSeek 为新闻生成 1–2 句摘要

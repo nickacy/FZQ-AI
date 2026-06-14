@@ -5,10 +5,12 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 EXCLUDE_DIRS = {"venv", "venv311", ".git", ".vscode", "__pycache__"}
 
+
 def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
         print(f"[创建目录] {path}")
+
 
 def move_file(src, dst_dir):
     if os.path.exists(src):
@@ -17,10 +19,12 @@ def move_file(src, dst_dir):
         shutil.move(src, dst)
         print(f"[移动] {src} → {dst}")
 
+
 def remove_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
         print(f"[删除目录] {path}")
+
 
 print("\n=== Nick‑Agent 项目自动清理开始 ===\n")
 

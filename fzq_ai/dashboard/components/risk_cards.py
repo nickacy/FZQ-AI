@@ -2,11 +2,12 @@ import streamlit as st
 
 # 风险等级颜色
 RISK_COLORS = {
-    "高": "#D32F2F",      # 红
-    "中": "#F57C00",      # 橙
-    "低": "#FBC02D",      # 黄
-    "极低": "#388E3C"     # 绿
+    "高": "#D32F2F",  # 红
+    "中": "#F57C00",  # 橙
+    "低": "#FBC02D",  # 黄
+    "极低": "#388E3C",  # 绿
 }
+
 
 def render_risk_card(risk: dict, index: int):
     """渲染单个风险卡片（左侧彩色条 + 折叠面板）"""
@@ -31,7 +32,7 @@ def render_risk_card(risk: dict, index: int):
                 </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
         # 折叠面板

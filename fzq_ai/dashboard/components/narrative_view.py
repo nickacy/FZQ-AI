@@ -28,5 +28,9 @@ def render_narrative_view(bundle):
                 st.markdown(f"#### 📰 {a.title_original}")
                 st.caption(f"来源: {a.source_name} | 可信度: {a.credibility:.2f}")
                 if a.content_original:
-                    st.write(a.content_original[:300] + "..." if len(a.content_original or "") > 300 else a.content_original)
+                    st.write(
+                        a.content_original[:300] + "..."
+                        if len(a.content_original or "") > 300
+                        else a.content_original
+                    )
                 st.markdown("---")

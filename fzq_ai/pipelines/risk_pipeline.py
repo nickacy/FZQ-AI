@@ -18,24 +18,54 @@ class RiskPipeline:
         self.llm_router = llm_router
         self.risk_keywords: Dict[str, List[str]] = {
             "political": [
-                "election", "government", "sanction", "policy", "parliament",
-                "protest", "coup", "regime",
+                "election",
+                "government",
+                "sanction",
+                "policy",
+                "parliament",
+                "protest",
+                "coup",
+                "regime",
             ],
             "economic": [
-                "inflation", "recession", "market", "stock", "bond",
-                "unemployment", "gdp", "tariff",
+                "inflation",
+                "recession",
+                "market",
+                "stock",
+                "bond",
+                "unemployment",
+                "gdp",
+                "tariff",
             ],
             "military": [
-                "war", "conflict", "attack", "missile", "strike",
-                "troop", "drone", "airstrike", "invasion",
+                "war",
+                "conflict",
+                "attack",
+                "missile",
+                "strike",
+                "troop",
+                "drone",
+                "airstrike",
+                "invasion",
             ],
             "social": [
-                "riot", "violence", "crime", "unrest", "migration",
-                "refugee", "protesters", "clash",
+                "riot",
+                "violence",
+                "crime",
+                "unrest",
+                "migration",
+                "refugee",
+                "protesters",
+                "clash",
             ],
             "technology": [
-                "cyber", "hack", "data breach", "ai", "chip",
-                "sanctioned technology", "export control",
+                "cyber",
+                "hack",
+                "data breach",
+                "ai",
+                "chip",
+                "sanctioned technology",
+                "export control",
             ],
         }
 
@@ -93,7 +123,6 @@ class RiskPipeline:
         }
 
         return ServiceResult.ok(result)
-    
 
         if __name__ == "__main__":
             print("Running RiskPipeline test...")

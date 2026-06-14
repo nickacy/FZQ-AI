@@ -39,7 +39,7 @@ async def get_weather(location: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=True,
             data=weather,
-            metadata={"tool": "get_weather", "location": location}
+            metadata={"tool": "get_weather", "location": location},
         )
 
     except Exception as e:
@@ -47,5 +47,5 @@ async def get_weather(location: str) -> ToolResult[Dict[str, Any]]:
         return ToolResult(
             success=False,
             error=str(e),
-            metadata={"tool": "get_weather", "location": location}
+            metadata={"tool": "get_weather", "location": location},
         )

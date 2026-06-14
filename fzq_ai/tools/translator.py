@@ -4,6 +4,7 @@ from fzq_ai.config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
+
 def translate_to_english(text: str) -> str:
     if not text:
         return ""
@@ -11,7 +12,10 @@ def translate_to_english(text: str) -> str:
     payload = {
         "model": DEEPSEEK_MODEL,
         "messages": [
-            {"role": "system", "content": "You are a professional translator. Translate the user query into concise English for news search."},
+            {
+                "role": "system",
+                "content": "You are a professional translator. Translate the user query into concise English for news search.",
+            },
             {"role": "user", "content": text},
         ],
         "temperature": 0.2,

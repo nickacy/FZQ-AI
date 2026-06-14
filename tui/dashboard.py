@@ -61,9 +61,11 @@ def render_tension_matrix(matrix):
     print("-" * 80)
 
     for row in matrix:
-        print("{:<20} {:<20} {:<40}".format(
-            row["actor1"], row["actor2"], row["description"][:40]
-        ))
+        print(
+            "{:<20} {:<20} {:<40}".format(
+                row["actor1"], row["actor2"], row["description"][:40]
+            )
+        )
 
     print("\n" + "=" * 80)
 

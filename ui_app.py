@@ -26,14 +26,11 @@ from fzq_ai.pipelines.risk_pipeline import RiskPipeline
 from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
 from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 
-
 # ============================
 #  Streamlit 页面配置
 # ============================
 st.set_page_config(
-    page_title="FZQ-AI Intelligence Dashboard",
-    page_icon="🛰️",
-    layout="wide"
+    page_title="FZQ-AI Intelligence Dashboard", page_icon="🛰️", layout="wide"
 )
 
 st.title("🛰️ FZQ-AI Intelligence Dashboard")
@@ -66,8 +63,8 @@ page = st.sidebar.radio(
         "🧠 叙事分析",
         "⚠️ 风险扫描",
         "📅 每日报告生成",
-        "🧩 任务编排（Orchestrator）"
-    ]
+        "🧩 任务编排（Orchestrator）",
+    ],
 )
 
 

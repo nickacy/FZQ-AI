@@ -32,7 +32,9 @@ class NewsPipeline:
 
         # 缓存系统
         self.news_cache = CacheManager("data/cache/news_cache.json", expire_hours=6)
-        self.summary_cache = CacheManager("data/cache/summary_cache.json", expire_hours=24)
+        self.summary_cache = CacheManager(
+            "data/cache/summary_cache.json", expire_hours=24
+        )
         self.risk_cache = CacheManager("data/cache/risk_cache.json", expire_hours=24)
 
         # 通用浏览器 UA
@@ -42,7 +44,7 @@ class NewsPipeline:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/123.0.0.0 Safari/537.36"
             ),
-            "Accept-Language": "en-US,en;q=0.9"
+            "Accept-Language": "en-US,en;q=0.9",
         }
 
     # ------------------------------------------------------------
@@ -75,12 +77,9 @@ class NewsPipeline:
             if href.startswith("/"):
                 href = f"https://{source_name}{href}"
 
-            items.append({
-                "title": title,
-                "url": href,
-                "summary": "",
-                "source": source_name
-            })
+            items.append(
+                {"title": title, "url": href, "summary": "", "source": source_name}
+            )
 
         return items
 
@@ -143,8 +142,7 @@ class NewsPipeline:
                 item["summary"] = cached_summary
             else:
                 summary = self.summarizer.summarize(
-                    title=item["title"],
-                    url=item["url"]
+                    title=item["title"], url=item["url"]
                 )
                 item["summary"] = summary
                 self.summary_cache.set(title, summary)
@@ -157,11 +155,12 @@ class NewsPipeline:
                 item.update(cached_risk)
             else:
                 scores = self.risk_scorer.score(
-                    title=item["title"],
-                    summary=item["summary"]
+                    title=item["title"], summary=item["summary"]
                 )
                 item.update(scores)
                 self.risk_cache.set(title, scores)
 
-        print(f"[NewsPipeline] 全部处理完成，共 {len(all_news)} 条新闻（含摘要 + 风险评分）")
+        print(
+            f"[NewsPipeline] 全部处理完成，共 {len(all_news)} 条新闻（含摘要 + 风险评分）"
+        )
         return all_news

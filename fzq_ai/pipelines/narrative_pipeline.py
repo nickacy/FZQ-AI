@@ -7,12 +7,43 @@ import re
 
 from fzq_ai.domain.models import Article, ServiceResult
 
-
 STOPWORDS = {
-    "the", "and", "of", "to", "in", "for", "on", "at", "a", "an",
-    "is", "are", "was", "were", "by", "with", "from", "as", "that",
-    "this", "it", "its", "be", "has", "have", "had", "will", "would",
-    "about", "over", "after", "before", "into", "out", "up", "down",
+    "the",
+    "and",
+    "of",
+    "to",
+    "in",
+    "for",
+    "on",
+    "at",
+    "a",
+    "an",
+    "is",
+    "are",
+    "was",
+    "were",
+    "by",
+    "with",
+    "from",
+    "as",
+    "that",
+    "this",
+    "it",
+    "its",
+    "be",
+    "has",
+    "have",
+    "had",
+    "will",
+    "would",
+    "about",
+    "over",
+    "after",
+    "before",
+    "into",
+    "out",
+    "up",
+    "down",
 }
 
 
@@ -77,15 +108,23 @@ class NarrativePipeline:
 
         result = {
             "western": {
-                "themes": extract_themes(buckets["western"]) if buckets["western"] else [],
+                "themes": (
+                    extract_themes(buckets["western"]) if buckets["western"] else []
+                ),
                 "articles": to_brief_list(buckets["western"]),
             },
             "east_asia": {
-                "themes": extract_themes(buckets["east_asia"]) if buckets["east_asia"] else [],
+                "themes": (
+                    extract_themes(buckets["east_asia"]) if buckets["east_asia"] else []
+                ),
                 "articles": to_brief_list(buckets["east_asia"]),
             },
             "middle_east": {
-                "themes": extract_themes(buckets["middle_east"]) if buckets["middle_east"] else [],
+                "themes": (
+                    extract_themes(buckets["middle_east"])
+                    if buckets["middle_east"]
+                    else []
+                ),
                 "articles": to_brief_list(buckets["middle_east"]),
             },
             "other": {
@@ -102,4 +141,3 @@ class NarrativePipeline:
             result = pipeline.run("澳洲房地产市场正在经历结构性变化")
             print("Result:")
             print(result)
-

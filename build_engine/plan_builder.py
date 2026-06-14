@@ -16,7 +16,9 @@ class BuildPlan:
     items: List[PlanItem]
 
 
-def build_plan(root_dir: str, scan_result: Dict[str, bool], target_structure: Dict[str, str]) -> BuildPlan:
+def build_plan(
+    root_dir: str, scan_result: Dict[str, bool], target_structure: Dict[str, str]
+) -> BuildPlan:
     items = []
     for path, desc in target_structure.items():
         exists = scan_result.get(path, False)

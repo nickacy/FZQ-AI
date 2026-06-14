@@ -1,5 +1,6 @@
 # pipelines/risk_scorer.py
 
+
 class RiskScorer:
     """
     使用 DeepSeek 为新闻生成 3 个风险评分：
@@ -36,10 +37,7 @@ class RiskScorer:
         try:
             result = self.llm.ask(prompt)
             import json
+
             return json.loads(result)
         except:
-            return {
-                "geopolitical_risk": 3,
-                "market_impact": 3,
-                "social_stability": 3
-            }
+            return {"geopolitical_risk": 3, "market_impact": 3, "social_stability": 3}

@@ -28,10 +28,14 @@ class BasePipeline(ABC):
     """
 
     @abstractmethod
-    async def run(self, input_data: Any = None, trace_id: Optional[str] = None) -> ServiceResult:
+    async def run(
+        self, input_data: Any = None, trace_id: Optional[str] = None
+    ) -> ServiceResult:
         raise NotImplementedError
 
-    async def execute(self, input_data: Any = None, trace_id: Optional[str] = None) -> ServiceResult:
+    async def execute(
+        self, input_data: Any = None, trace_id: Optional[str] = None
+    ) -> ServiceResult:
         """
         包装 run()：
         - 记录耗时
@@ -56,10 +60,7 @@ class BasePipeline(ABC):
             elapsed = time.time() - start
             metrics.record(pipeline_name, elapsed, success=False)
 
-            logger.error(
-                f"[{trace_id}] {pipeline_name} failed: {e}",
-                exc_info=True
-            )
+            logger.error(f"[{trace_id}] {pipeline_name} failed: {e}", exc_info=True)
 
             return ServiceResult(
                 success=False,

@@ -5,10 +5,10 @@ from typing import List, Optional, Any, Dict
 from dataclasses import dataclass
 from datetime import datetime
 
-
 # ============================================================
 # ServiceResult —— 所有 Pipeline 的统一返回结构
 # ============================================================
+
 
 @dataclass
 class ServiceResult:
@@ -28,6 +28,7 @@ class ServiceResult:
 # ============================================================
 # Article —— 新闻的标准结构
 # ============================================================
+
 
 @dataclass
 class Article:
@@ -60,6 +61,7 @@ class Article:
 # IntelMeta —— 元数据（主题、地区等）
 # ============================================================
 
+
 @dataclass
 class IntelMeta:
     topics: List[str] = None  # type: ignore
@@ -76,6 +78,7 @@ class IntelMeta:
 # ============================================================
 # IntelBundle —— 新闻 + 元数据
 # ============================================================
+
 
 @dataclass
 class IntelBundle:

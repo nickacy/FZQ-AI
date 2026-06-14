@@ -44,11 +44,13 @@ class NarrativePipeline:
     def build_narrative_clusters(self, articles):
         items = []
         for a in articles[: self.config.max_articles]:
-            items.append({
-                "title": a["title"],
-                "summary": a.get("summary", ""),
-                "source": a.get("source", "")
-            })
+            items.append(
+                {
+                    "title": a["title"],
+                    "summary": a.get("summary", ""),
+                    "source": a.get("source", ""),
+                }
+            )
 
         prompt = f"""
 你是一名叙事分析专家。请根据以下新闻（标题 + 摘要），进行“叙事聚类”（Narrative Clustering）。
@@ -78,6 +80,7 @@ class NarrativePipeline:
 
         text = self.llm.ask(prompt)
         import json
+
         try:
             clusters = json.loads(text)
         except Exception:
@@ -90,11 +93,13 @@ class NarrativePipeline:
     def build_tension_matrix(self, articles):
         items = []
         for a in articles[: self.config.max_articles]:
-            items.append({
-                "title": a["title"],
-                "summary": a.get("summary", ""),
-                "source": a.get("source", "")
-            })
+            items.append(
+                {
+                    "title": a["title"],
+                    "summary": a.get("summary", ""),
+                    "source": a.get("source", ""),
+                }
+            )
 
         prompt = f"""
 你是一名国际关系分析师。请从以下新闻中，提取“关键行为体之间的张力关系”（Tension Matrix）。
@@ -122,6 +127,7 @@ class NarrativePipeline:
 
         text = self.llm.ask(prompt)
         import json
+
         try:
             matrix = json.loads(text)
         except Exception:
@@ -143,5 +149,5 @@ class NarrativePipeline:
         return {
             "global_summary": summary,
             "clusters": clusters,
-            "tension_matrix": tension_matrix
+            "tension_matrix": tension_matrix,
         }

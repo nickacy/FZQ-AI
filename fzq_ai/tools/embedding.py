@@ -18,7 +18,9 @@ class EmbeddingModel:
         """
         批量生成向量
         """
-        return self.model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
+        return self.model.encode(
+            texts, convert_to_numpy=True, normalize_embeddings=True
+        )
 
     def similarity(self, v1: np.ndarray, v2: np.ndarray) -> float:
         """

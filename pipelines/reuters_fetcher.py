@@ -21,7 +21,7 @@ class ReutersFetcher:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/123.0.0.0 Safari/537.36"
             ),
-            "Accept-Language": "en-US,en;q=0.9"
+            "Accept-Language": "en-US,en;q=0.9",
         }
 
     # ------------------------------------------------------------
@@ -58,12 +58,14 @@ class ReutersFetcher:
             feed = feedparser.parse(rss_url)
             items = []
             for entry in feed.entries:
-                items.append({
-                    "title": entry.title,
-                    "url": entry.link,
-                    "summary": entry.summary if hasattr(entry, "summary") else "",
-                    "source": "Reuters RSS"
-                })
+                items.append(
+                    {
+                        "title": entry.title,
+                        "url": entry.link,
+                        "summary": entry.summary if hasattr(entry, "summary") else "",
+                        "source": "Reuters RSS",
+                    }
+                )
             return items
         except:
             return []
@@ -78,12 +80,14 @@ class ReutersFetcher:
         prompt = f"Summarize the latest Reuters world news from: {url}"
         try:
             summary = llm.ask(prompt)
-            return [{
-                "title": "Reuters Summary (LLM Fallback)",
-                "url": url,
-                "summary": summary,
-                "source": "DeepSeek Fallback"
-            }]
+            return [
+                {
+                    "title": "Reuters Summary (LLM Fallback)",
+                    "url": url,
+                    "summary": summary,
+                    "source": "DeepSeek Fallback",
+                }
+            ]
         except:
             return []
 
@@ -100,12 +104,14 @@ class ReutersFetcher:
                 title = a.get_text(strip=True)
                 href = a.get("href", "")
                 if title and "/world" in href:
-                    articles.append({
-                        "title": title,
-                        "url": "https://www.reuters.com" + href,
-                        "summary": "",
-                        "source": "Reuters HTML"
-                    })
+                    articles.append(
+                        {
+                            "title": title,
+                            "url": "https://www.reuters.com" + href,
+                            "summary": "",
+                            "source": "Reuters HTML",
+                        }
+                    )
             if articles:
                 return articles
 
@@ -116,12 +122,14 @@ class ReutersFetcher:
             articles = []
             for line in lines:
                 if "http" in line and len(line) < 200:
-                    articles.append({
-                        "title": line.strip()[:120],
-                        "url": url,
-                        "summary": "",
-                        "source": "Reuters Textise"
-                    })
+                    articles.append(
+                        {
+                            "title": line.strip()[:120],
+                            "url": url,
+                            "summary": "",
+                            "source": "Reuters Textise",
+                        }
+                    )
             if articles:
                 return articles
 

@@ -16,7 +16,7 @@ class KeyHealth:
         payload = {
             "model": "deepseek-chat",
             "messages": [{"role": "user", "content": "ping"}],
-            "stream": False
+            "stream": False,
         }
 
         try:
@@ -37,8 +37,7 @@ class KeyHealth:
         try:
             client = OpenAI(api_key=key)
             client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": "ping"}]
+                model="gpt-4o-mini", messages=[{"role": "user", "content": "ping"}]
             )
             return True, "OpenAI Key 正常"
         except Exception as e:
@@ -52,10 +51,7 @@ class KeyHealth:
 
         try:
             client = genai.Client(api_key=key)
-            client.models.generate_content(
-                model="gemini-1.5-flash",
-                contents="ping"
-            )
+            client.models.generate_content(model="gemini-1.5-flash", contents="ping")
             return True, "Gemini Key 正常"
         except Exception as e:
             return False, f"Gemini Key 无效：{e}"

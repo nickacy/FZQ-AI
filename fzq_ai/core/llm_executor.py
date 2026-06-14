@@ -81,9 +81,7 @@ class LLMExecutor:
         # ---------------------------------------------------------
         # 所有 provider 都失败 → fallback 到 Fake 输出
         # ---------------------------------------------------------
-        logger.error(
-            f"Real LLM call failed → fallback to Fake: {last_error}"
-        )
+        logger.error(f"Real LLM call failed → fallback to Fake: {last_error}")
 
         return self.fake_llm_output(prompt, provider, model_name)
 

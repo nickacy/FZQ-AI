@@ -41,6 +41,7 @@ class TaskOrchestrator:
             items = []
 
         from fzq_ai.domain.models import Article
+
         articles = [Article(title_original=str(i)) for i in items]
 
         if agent_name == "daily_report":
@@ -53,11 +54,17 @@ class TaskOrchestrator:
             return self.run_agent("risk", articles=articles, **kwargs)
         elif agent_name == "news-intel":
             result = self.pipelines["news-intel"].run(topic=" ".join(items))
-            return {"success": result.success, "data": result.data, "error": result.error}
+            return {
+                "success": result.success,
+                "data": result.data,
+                "error": result.error,
+            }
         else:
             return {"error": f"Unknown agent: {agent_name}"}
 
-    def run_agent(self, agent_name: str, articles: list = None, **kwargs) -> Dict[str, Any]:
+    def run_agent(
+        self, agent_name: str, articles: list = None, **kwargs
+    ) -> Dict[str, Any]:
         """
         底层调用：以 Article 列表调用 Pipeline。
         """
@@ -68,10 +75,15 @@ class TaskOrchestrator:
 
         try:
             import asyncio
+
             result: ServiceResult = asyncio.run(
                 pipeline.run(articles=articles, **kwargs)
             )
-            return {"success": result.success, "data": result.data, "error": result.error}
+            return {
+                "success": result.success,
+                "data": result.data,
+                "error": result.error,
+            }
 
         except Exception as e:
             return {"success": False, "error": str(e)}
