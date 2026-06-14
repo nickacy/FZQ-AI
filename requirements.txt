@@ -23,3 +23,5 @@ pytest==8.2.2
 
 # Optional (if you want async pipelines)
 aiohttp==3.9.5
+
+feedparser
