@@ -38,3 +38,6 @@ if __name__ == "__main__":
 
     print("=== FZQ-AI Agent 新闻摘要（多模型协同） ===")
     print(result)
+
+def test_dummy():
+    assert True
