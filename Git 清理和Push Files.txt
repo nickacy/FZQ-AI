@@ -1,3 +1,8 @@
+git push origin --force --all （Windows Powershell）
+
+
+
+
 1： clean_git_history.ps1
 
 # 清理 Git 历史中的大文件（包括 FZQ-AI.zip）

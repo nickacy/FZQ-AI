@@ -1,15 +1,12 @@
 # main.py
-# FZQ-AI Intelligence Dashboard Launcher
+# 正确的启动器，不会递归启动 Streamlit
 
 import os
 from dotenv import load_dotenv
-
-# ============================
-#  加载环境变量
-# ============================
 load_dotenv(override=True)
 
 import subprocess
 
-print("Launching FZQ-AI Intelligence Dashboard...")
-subprocess.run(["streamlit", "run", "ui_app.py"])
+if __name__ == "__main__":
+    print("Launching FZQ-AI Intelligence Dashboard...")
+    subprocess.run(["streamlit", "run", "ui_app.py"])
