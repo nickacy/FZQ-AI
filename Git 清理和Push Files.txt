@@ -1,0 +1,31 @@
+1： clean_git_history.ps1
+
+# 清理 Git 历史中的大文件（包括 FZQ-AI.zip）
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch FZQ-AI.zip" --prune-empty --tag-name-filter cat -- --all
+
+# 清理 Git 缓存
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+# 强制推送覆盖远程历史
+git push origin --force --all
+
+Write-Host "Git 历史清理完成，已成功移除大文件。"
+
+
+运行方式： 
+powershell -ExecutionPolicy Bypass -File clean_git_history.ps1
+
+2. detect_large_files.ps1
+
+# 检测超过 50MB 的文件
+$threshold = 50MB
+
+Write-Host "扫描仓库中超过 $threshold 的文件..."
+
+Get-ChildItem -Recurse | Where-Object { $_.Length -gt $threshold } | ForEach-Object {
+    Write-Host "发现大文件：" $_.FullName "大小：" ($_.Length / 1MB) "MB"
+}
+
+Write-Host "扫描完成。"
+
