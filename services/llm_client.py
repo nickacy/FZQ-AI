@@ -1,62 +1,64 @@
-# services/llm_client.py
+"""
+Multi-model LLM client (standalone service layer).
+Uses fzq_ai.llm for actual provider calls.
+"""
+
+from __future__ import annotations
+
+import os
+from typing import Optional
 
 from openai import OpenAI
-from core.config import Config
 
 
 class LLMClient:
-    """
-    多模型 LLM 客户端
-    支持：
-    - DeepSeek
-    - Qwen
-    - OpenAI GPT
-    """
+    """Standalone LLM client supporting DeepSeek, OpenAI, and Qwen."""
 
-    def __init__(self, config: Config):
-        self.config = config
-        self.provider = config.llm_provider.lower()
+    def __init__(
+        self,
+        provider: str = "deepseek",
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
+        base_url: Optional[str] = None,
+    ):
+        self.provider = provider.lower()
 
-        # -----------------------------
-        # DeepSeek
-        # -----------------------------
         if self.provider == "deepseek":
-            # ❗ 正确的 DeepSeek API URL（不能加 /v1）
-            self.client = OpenAI(
-                api_key=config.api_key, base_url="https://api.deepseek.com"
-            )
+            self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
+            self.model = model or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+            raw_url = (base_url or os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")).rstrip("/")
+            if not raw_url.endswith("/v1"):
+                raw_url += "/v1"
+            self.base_url = raw_url
 
-        # -----------------------------
-        # Qwen（阿里 DashScope）
-        # -----------------------------
-        elif self.provider == "qwen":
-            self.client = OpenAI(
-                api_key=config.api_key,
-                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-            )
-
-        # -----------------------------
-        # OpenAI GPT
-        # -----------------------------
         elif self.provider == "openai":
-            self.client = OpenAI(api_key=config.api_key)
+            self.api_key = api_key or os.getenv("OPENAI_API_KEY", "")
+            self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o")
+            self.base_url = base_url or "https://api.openai.com/v1"
+
+        elif self.provider == "qwen":
+            self.api_key = api_key or os.getenv("QWEN_API_KEY", "")
+            self.model = model or os.getenv("QWEN_MODEL", "qwen-plus")
+            self.base_url = base_url or "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
         else:
-            raise ValueError(f"未知的 LLM provider: {self.provider}")
+            raise ValueError(f"Unknown LLM provider: {self.provider}")
 
-    # ------------------------------------------------------------
-    # 统一 ask() 接口（所有模型都走这里）
-    # ------------------------------------------------------------
-    def ask(self, prompt: str) -> str:
+        if not self.api_key:
+            raise ValueError(f"API key not set for provider '{self.provider}'. Check .env file.")
+
+        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+
+    def ask(self, prompt: str, temperature: float = 0.3, max_tokens: int = 2000) -> str:
+        """Synchronous chat completion."""
         try:
             response = self.client.chat.completions.create(
-                model=self.config.model,
+                model=self.model,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=2000,
+                temperature=temperature,
+                max_tokens=max_tokens,
             )
-            return response.choices[0].message.content
+            return response.choices[0].message.content or ""
 
         except Exception as e:
-            print(f"[LLM ERROR] {e}")
-            return ""
+            raise RuntimeError(f"[LLM ERROR] {self.provider}: {e}") from e

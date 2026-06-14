@@ -56,12 +56,18 @@ if run_btn and query:
         topic=query,
     )
 
-    if not news_result.success:
-        st.error(f"NewsPipeline 错误：{news_result.error}")
+    if not news_result["success"]:
+        st.error(f"NewsPipeline 错误：{news_result['error']}")
         st.stop()
 
-    bundle = news_result.data
-    articles = bundle.articles
+    bundle = news_result["data"]
+    # bundle could be dict or IntelBundle
+    if hasattr(bundle, "articles"):
+        articles = bundle.articles
+    elif isinstance(bundle, dict) and "intel_bundle" in bundle:
+        articles = bundle["intel_bundle"].articles
+    else:
+        articles = getattr(bundle, "articles", [])
 
     st.write("### 新闻摘要")
     st.write(f"共抓取 {len(articles)} 条新闻")
@@ -81,10 +87,10 @@ if run_btn and query:
         articles=articles,
     )
 
-    if not narrative_result.success:
-        st.error(f"NarrativePipeline 错误：{narrative_result.error}")
+    if not narrative_result["success"]:
+        st.error(f"NarrativePipeline 错误：{narrative_result['error']}")
     else:
-        render_narrative_block(narrative_result.data)
+        render_narrative_block(narrative_result["data"])
 
     # -----------------------------
     # 3. 风险分析
@@ -97,10 +103,10 @@ if run_btn and query:
         articles=articles,
     )
 
-    if not risk_result.success:
-        st.error(f"RiskPipeline 错误：{risk_result.error}")
+    if not risk_result["success"]:
+        st.error(f"RiskPipeline 错误：{risk_result['error']}")
     else:
-        render_risk_block(risk_result.data)
+        render_risk_block(risk_result["data"])
 
     # -----------------------------
     # 4. 每日报告
@@ -113,8 +119,8 @@ if run_btn and query:
         articles=articles,
     )
 
-    if not report_result.success:
-        st.error(f"DailyReportPipeline 错误：{report_result.error}")
+    if not report_result["success"]:
+        st.error(f"DailyReportPipeline 错误：{report_result['error']}")
     else:
-        # 假设 data 是 markdown 文本
-        st.markdown(report_result.data)
+        # data is markdown text
+        st.markdown(report_result["data"])

@@ -134,10 +134,3 @@ class NarrativePipeline:
         }
 
         return ServiceResult.ok(result)
-
-        if __name__ == "__main__":
-            print("Running NarrativePipeline test...")
-            pipeline = NarrativePipeline()
-            result = pipeline.run("澳洲房地产市场正在经历结构性变化")
-            print("Result:")
-            print(result)
