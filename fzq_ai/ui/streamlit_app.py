@@ -94,18 +94,41 @@ st.markdown(f"""
 # Sidebar — Key Status + Function Navigation
 # ═══════════════════════════════════════════════════════════════
 with st.sidebar:
-    # ── Brand ──
+    # ── Brand Logo ──
     st.markdown(
-        '<div style="text-align:center;padding:12px 0 6px 0;">'
-        '<div style="font-size:28px;letter-spacing:2px;font-weight:700;'
-        f'color:#fff;">FZQ<span style="color:{COLORS["accent"]};">·</span>AI</div>'
-        '<div style="font-size:11px;color:rgba(255,255,255,0.45);'
-        'letter-spacing:1px;text-transform:uppercase;">Intelligence Platform v2.6</div>'
-        '</div>',
+        '<div style="text-align:center;padding:16px 4px 8px 4px;">'
+        '<svg width="220" height="72" viewBox="0 0 220 72" xmlns="http://www.w3.org/2000/svg">'
+        '<defs>'
+        '<linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">'
+        '<stop offset="0%" stop-color="#4FC3F7"/>'
+        f'<stop offset="100%" stop-color="#E85D2C"/>'
+        '</linearGradient>'
+        '<linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">'
+        '<stop offset="0%" stop-color="#fff" stop-opacity="0.12"/>'
+        '<stop offset="100%" stop-color="#fff" stop-opacity="0.04"/>'
+        '</linearGradient>'
+        '</defs>'
+        '<circle cx="36" cy="36" r="28" fill="url(#logoBg)" stroke="url(#logoGrad)" stroke-width="1.2" opacity="0.9"/>'
+        '<polygon points="36,15 52,23 52,49 36,57 20,49 20,23" fill="none" stroke="url(#logoGrad)" stroke-width="0.8" opacity="0.3"/>'
+        '<circle cx="36" cy="15" r="2.5" fill="#4FC3F7" opacity="0.8"/>'
+        '<circle cx="52" cy="36" r="2.5" fill="#E85D2C" opacity="0.8"/>'
+        '<circle cx="20" cy="36" r="2.5" fill="#E85D2C" opacity="0.8"/>'
+        '<polygon points="36,22 42,36 36,50 30,36" fill="url(#logoGrad)" opacity="0.6"/>'
+        '<polygon points="36,26 40,36 36,46 32,36" fill="#fff" opacity="0.85"/>'
+        '<rect x="54" y="44" width="2" height="4" rx="1" fill="#E85D2C" opacity="0.5"/>'
+        '<rect x="57" y="40" width="2" height="8" rx="1" fill="#E85D2C" opacity="0.7"/>'
+        '<rect x="60" y="36" width="2" height="12" rx="1" fill="#E85D2C" opacity="0.8"/>'
+        '<rect x="63" y="32" width="2" height="16" rx="1" fill="#E85D2C" opacity="0.9"/>'
+        '<text x="78" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" letter-spacing="3">FZQ</text>'
+        f'<text x="144" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#E85D2C">AI</text>'
+        '<text x="80" y="52" font-family="Inter,system-ui,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.3)" letter-spacing="3">INTELLIGENCE PLATFORM</text>'
+        '<line x1="6" y1="6" x2="14" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
+        '<line x1="6" y1="6" x2="6" y2="14" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
+        '<line x1="214" y1="6" x2="206" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
+        '<line x1="214" y1="6" x2="214" y2="14" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
+        '</svg></div>',
         unsafe_allow_html=True,
     )
-
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
 
     # ── Key Status ──
     st.markdown(
