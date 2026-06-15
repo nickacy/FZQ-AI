@@ -138,7 +138,23 @@ def inject_theme() -> None:
         color: rgba(255,255,255,0.85) !important;
     }}
 
-    /* ── Buttons ── */
+    /* ── Bloomberg-style nav indicators ── */
+.fzq-nav-pill::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border: 1.5px solid rgba(255,255,255,0.35);
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.fzq-nav-pill.active::before {
+    border-color: #E85D2C;
+    background: #E85D2C;
+    box-shadow: 0 0 8px rgba(232,93,44,0.4);
+}
+
+/* ── Buttons ── */
     .stButton > button {{
         background: {COLORS["accent"]} !important;
         color: #fff !important;

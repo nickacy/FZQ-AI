@@ -28,7 +28,7 @@ load_dotenv()
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="FZQ-AI · Intelligence Dashboard",
-    page_icon="⬡",
+    page_icon="■",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -94,74 +94,28 @@ st.markdown(f"""
 # Sidebar — Key Status + Function Navigation
 # ═══════════════════════════════════════════════════════════════
 with st.sidebar:
-    # ── Brand Logo ──
+    # ── Brand Logo (Bloomberg-style) ──
     st.markdown(
-        '<div style="text-align:center;padding:16px 4px 8px 4px;">'
-        '<svg width="220" height="72" viewBox="0 0 220 72" xmlns="http://www.w3.org/2000/svg">'
+        '<div style="text-align:center;padding:18px 4px 10px 4px;">'
+        '<svg width="220" height="68" viewBox="0 0 220 68" xmlns="http://www.w3.org/2000/svg">'
         '<defs>'
-        '<linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">'
-        '<stop offset="0%" stop-color="#4FC3F7"/>'
-        f'<stop offset="100%" stop-color="#E85D2C"/>'
-        '</linearGradient>'
-        '<linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">'
-        '<stop offset="0%" stop-color="#fff" stop-opacity="0.12"/>'
-        '<stop offset="100%" stop-color="#fff" stop-opacity="0.04"/>'
+        '<linearGradient id="blGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
+        '<stop offset="0%" stop-color="#fff"/>'
+        '<stop offset="100%" stop-color="#E85D2C"/>'
         '</linearGradient>'
         '</defs>'
-        '<circle cx="36" cy="36" r="28" fill="url(#logoBg)" stroke="url(#logoGrad)" stroke-width="1.2" opacity="0.9"/>'
-        '<polygon points="36,15 52,23 52,49 36,57 20,49 20,23" fill="none" stroke="url(#logoGrad)" stroke-width="0.8" opacity="0.3"/>'
-        '<circle cx="36" cy="15" r="2.5" fill="#4FC3F7" opacity="0.8"/>'
-        '<circle cx="52" cy="36" r="2.5" fill="#E85D2C" opacity="0.8"/>'
-        '<circle cx="20" cy="36" r="2.5" fill="#E85D2C" opacity="0.8"/>'
-        '<polygon points="36,22 42,36 36,50 30,36" fill="url(#logoGrad)" opacity="0.6"/>'
-        '<polygon points="36,26 40,36 36,46 32,36" fill="#fff" opacity="0.85"/>'
-        '<rect x="54" y="44" width="2" height="4" rx="1" fill="#E85D2C" opacity="0.5"/>'
-        '<rect x="57" y="40" width="2" height="8" rx="1" fill="#E85D2C" opacity="0.7"/>'
-        '<rect x="60" y="36" width="2" height="12" rx="1" fill="#E85D2C" opacity="0.8"/>'
-        '<rect x="63" y="32" width="2" height="16" rx="1" fill="#E85D2C" opacity="0.9"/>'
-        '<text x="78" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" letter-spacing="3">FZQ</text>'
-        f'<text x="144" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#E85D2C">AI</text>'
-        '<text x="80" y="52" font-family="Inter,system-ui,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.3)" letter-spacing="3">INTELLIGENCE TERMINAL</text>'
-        '<line x1="6" y1="6" x2="14" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
-        '<line x1="6" y1="6" x2="6" y2="14" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
-        '<line x1="214" y1="6" x2="206" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
-        '<line x1="214" y1="6" x2="214" y2="14" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
+        '<rect x="14" y="16" width="38" height="38" rx="3" fill="none" stroke="url(#blGrad)" stroke-width="1.8" opacity="0.9"/>'
+        '<rect x="19" y="21" width="28" height="28" rx="1.5" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.15"/>'
+        '<line x1="22" y1="38" x2="44" y2="38" stroke="#E85D2C" stroke-width="2" opacity="0.9"/>'
+        '<line x1="22" y1="44" x2="40" y2="44" stroke="#E85D2C" stroke-width="1.2" opacity="0.5"/>'
+        '<line x1="22" y1="48" x2="36" y2="48" stroke="#E85D2C" stroke-width="1.2" opacity="0.25"/>'
+        '<circle cx="33" cy="33" r="2" fill="#E85D2C" opacity="0.8"/>'
+        '<text x="62" y="34" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#fff" letter-spacing="4">FZQ</text>'
+        '<text x="132" y="34" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#E85D2C" letter-spacing="3">AI</text>'
+        '<text x="64" y="51" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" letter-spacing="3.5">INTELLIGENCE TERMINAL</text>'
         '</svg></div>',
         unsafe_allow_html=True,
     )
-
-    # ── Key Status ──
-    st.markdown(
-        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
-        'text-transform:uppercase;margin-bottom:6px;">Key Status</div>',
-        unsafe_allow_html=True,
-    )
-
-    # Read actual API key status
-    dsk_key = os.getenv("DEEPSEEK_API_KEY", "")
-    oai_key = os.getenv("OPENAI_API_KEY", "")
-    gem_key = os.getenv("GEMINI_API_KEY", "")
-
-    for name, key, color in [
-        ("DeepSeek", dsk_key, COLORS["success"]),
-        ("OpenAI",   oai_key, COLORS["info"]),
-        ("Gemini",   gem_key, COLORS["warning"]),
-    ]:
-        has_key = bool(key and len(key) > 5 and not key.startswith("your-") and not key.startswith("sk-your-"))
-        dot_color = COLORS["success"] if has_key else COLORS["danger"]
-        status_text = "Configured" if has_key else "Missing"
-        status_color = COLORS["success"] if has_key else COLORS["danger"]
-
-        st.markdown(
-            f'<div class="fzq-key-row">'
-            f'<span class="fzq-key-dot" style="background:{dot_color};'
-            f'box-shadow:0 0 6px {dot_color}80;"></span>'
-            f'<span class="label">{name}</span>'
-            f'<span class="status" style="color:{status_color};">{status_text}</span>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-
     st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
 
     # ── Function Navigation ──
