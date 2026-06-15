@@ -34,71 +34,199 @@ st.set_page_config(
 )
 inject_theme()
 
+# ── Inject extra sidebar & nav styling ──
+st.markdown(f"""
+<style>
+/* ── Sidebar badge glow ── */
+.fzq-key-dot {{
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    box-shadow: 0 0 6px var(--dot-color);
+}}
+.fzq-key-row {{
+    display: flex;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+}}
+.fzq-key-row .label {{ width: 70px; }}
+.fzq-key-row .status {{ font-weight: 500; }}
+
+/* ── Nav pills ── */
+.fzq-nav-pill {{
+    display: block;
+    padding: 10px 16px;
+    margin: 4px 0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8) !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+}}
+.fzq-nav-pill:hover {{
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.15);
+}}
+.fzq-nav-pill.active {{
+    background: rgba(255,255,255,0.12) !important;
+    border-color: {COLORS["accent"]} !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px rgba(232,93,44,0.2);
+}}
+.fzq-nav-pill .icon {{ font-size: 16px; margin-right: 8px; }}
+
+/* ── Compact divider ── */
+.fzq-sidebar-div {{
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 14px 0;
+}}
+</style>
+""", unsafe_allow_html=True)
+
 # ═══════════════════════════════════════════════════════════════
-# Sidebar
+# Sidebar — Key Status + Function Navigation
 # ═══════════════════════════════════════════════════════════════
 with st.sidebar:
+    # ── Brand ──
     st.markdown(
-        '<div style="text-align:center;padding:12px 0;">'
-        '<h2 style="color:#fff;margin:0;">🔍 FZQ-AI</h2>'
-        '<p style="color:rgba(255,255,255,0.6);font-size:13px;">'
-        'Multi-Source Intelligence Platform v2.6</p></div>',
+        '<div style="text-align:center;padding:12px 0 6px 0;">'
+        '<div style="font-size:28px;letter-spacing:2px;font-weight:700;'
+        f'color:#fff;">FZQ<span style="color:{COLORS["accent"]};">·</span>AI</div>'
+        '<div style="font-size:11px;color:rgba(255,255,255,0.45);'
+        'letter-spacing:1px;text-transform:uppercase;">Intelligence Platform v2.6</div>'
+        '</div>',
         unsafe_allow_html=True,
     )
-    st.markdown("---")
 
+    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+
+    # ── Key Status ──
     st.markdown(
-        '<p style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;">'
-        '📋 Analysis Mode</p>',
+        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
+        'text-transform:uppercase;margin-bottom:6px;">Key Status</div>',
         unsafe_allow_html=True,
     )
-    analysis_mode = st.selectbox(
-        "Mode",
-        ["Full Analysis (All Pipelines)", "News Only", "Risk + Sentiment", "Narrative Deep-Dive"],
-        label_visibility="collapsed",
+
+    # Read actual API key status
+    dsk_key = os.getenv("DEEPSEEK_API_KEY", "")
+    oai_key = os.getenv("OPENAI_API_KEY", "")
+    gem_key = os.getenv("GEMINI_API_KEY", "")
+
+    for name, key, color in [
+        ("DeepSeek", dsk_key, COLORS["success"]),
+        ("OpenAI",   oai_key, COLORS["info"]),
+        ("Gemini",   gem_key, COLORS["warning"]),
+    ]:
+        has_key = bool(key and len(key) > 5 and not key.startswith("your-") and not key.startswith("sk-your-"))
+        dot_color = COLORS["success"] if has_key else COLORS["danger"]
+        status_text = "Configured" if has_key else "Missing"
+        status_color = COLORS["success"] if has_key else COLORS["danger"]
+
+        st.markdown(
+            f'<div class="fzq-key-row">'
+            f'<span class="fzq-key-dot" style="background:{dot_color};'
+            f'box-shadow:0 0 6px {dot_color}80;"></span>'
+            f'<span class="label">{name}</span>'
+            f'<span class="status" style="color:{status_color};">{status_text}</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+
+    # ── Function Navigation ──
+    st.markdown(
+        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
+        'text-transform:uppercase;margin-bottom:8px;">Function Navigation</div>',
+        unsafe_allow_html=True,
     )
 
+    # Session state for active nav
+    if "active_nav" not in st.session_state:
+        st.session_state.active_nav = "full"
+
+    nav_items = [
+        ("full",    "🔍", "Full Intelligence"),
+        ("news",    "📰", "News Intel Analysis"),
+        ("narr",    "🧭", "Narrative Analysis"),
+        ("risk",    "⚠️", "Risk Scanner"),
+        ("report",  "📋", "Daily Report"),
+    ]
+
+    for key, icon, label in nav_items:
+        active_cls = "active" if st.session_state.active_nav == key else ""
+        if st.button(
+            f"{icon}  {label}",
+            key=f"nav_{key}",
+            use_container_width=True,
+        ):
+            st.session_state.active_nav = key
+
+    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+
+    # ── Query Input ──
     st.markdown(
-        '<p style="color:rgba(255,255,255,0.8);font-size:14px;font-weight:500;'
-        'margin-top:12px;">🎯 Query Topic</p>',
+        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
+        'text-transform:uppercase;margin-bottom:6px;">Query</div>',
         unsafe_allow_html=True,
     )
     query = st.text_input(
         "Topic",
-        placeholder="e.g. US election sentiment risk...",
+        placeholder="e.g. US election, Taiwan strait...",
         label_visibility="collapsed",
     )
-    run_btn = st.button("▶ Run Analysis", use_container_width=True)
+    run_btn = st.button("▶  Execute Analysis", use_container_width=True)
 
-    st.markdown("---")
+    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+
+    # ── Footer ──
     st.markdown(
-        '<p style="color:rgba(255,255,255,0.5);font-size:12px;">'
-        'Sources: 17 RSS · GDELT · NewsAPI<br>'
-        'LLM: DeepSeek → OpenAI → Gemini</p>',
+        '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;'
+        'line-height:1.6;">'
+        '17 RSS · GDELT · NewsAPI<br>'
+        'LLM: DeepSeek → OpenAI → Gemini<br>'
+        'Global South ≥30% guaranteed'
+        '</div>',
         unsafe_allow_html=True,
     )
 
 # ═══════════════════════════════════════════════════════════════
-# Main Area — Header
+# Main — Header
 # ═══════════════════════════════════════════════════════════════
-col_title, col_status = st.columns([3, 1])
-with col_title:
-    st.markdown(
-        f'<h1 style="color:{COLORS["primary"]};margin-bottom:4px;">'
-        f'FZQ-AI Intelligence Dashboard</h1>'
-        f'<p style="color:{COLORS["text_secondary"]};font-size:15px;">'
-        f'Cross-region · Multi-source · AI-powered analysis</p>',
-        unsafe_allow_html=True,
-    )
-with col_status:
-    st.markdown(
-        f'<div style="background:{COLORS["bg_light"]};border-radius:10px;'
-        f'padding:12px;text-align:center;margin-top:10px;">'
-        f'<div style="font-size:24px;font-weight:700;color:{COLORS["success"]};">●</div>'
-        f'<div style="font-size:13px;color:{COLORS["text_secondary"]};">System Ready</div>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
+active_label = {
+    "full": "Full Intelligence Suite",
+    "news": "News Intel Analysis",
+    "narr": "Narrative Deep-Dive",
+    "risk": "Risk Scanner",
+    "report": "Daily Report Generator",
+}.get(st.session_state.active_nav, "Dashboard")
+
+active_desc = {
+    "full": "All pipelines · news → narrative → risk → sentiment → report",
+    "news": "Multi-source RSS + GDELT news aggregation with relevance ranking",
+    "narr": "Cross-blocs narrative comparison with theme extraction",
+    "risk": "Multi-dimensional risk scoring with category breakdown",
+    "report": "Structured Markdown intelligence brief with key events",
+}.get(st.session_state.active_nav, "")
+
+st.markdown(
+    f'<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px;">'
+    f'<h1 style="color:{COLORS["primary"]};font-weight:700;margin:0;'
+    f'font-size:26px;">FZQ-AI Intelligence Dashboard</h1>'
+    f'<span style="font-size:13px;color:{COLORS["accent"]};font-weight:500;'
+    f'background:{COLORS["accent"]}15;padding:2px 10px;border-radius:10px;">'
+    f'{active_label}</span></div>'
+    f'<p style="color:{COLORS["text_secondary"]};font-size:14px;margin-top:4px;">'
+    f'{active_desc}</p>',
+    unsafe_allow_html=True,
+)
 
 orchestrator = TaskOrchestrator()
 
@@ -106,38 +234,35 @@ orchestrator = TaskOrchestrator()
 # Idle State
 # ═══════════════════════════════════════════════════════════════
 if not run_btn or not query:
-    col_a, col_b, col_c = st.columns(3)
-    with col_a:
-        st.markdown(
-            f'<div class="fzq-card"><div style="font-size:28px;">📰</div>'
-            f'<h4>Multi-Source News</h4>'
-            f'<p style="color:{COLORS["text_secondary"]};">17 RSS feeds across 8 regions</p></div>',
-            unsafe_allow_html=True,
-        )
-    with col_b:
-        st.markdown(
-            f'<div class="fzq-card"><div style="font-size:28px;">🧠</div>'
-            f'<h4>AI-Powered Analysis</h4>'
-            f'<p style="color:{COLORS["text_secondary"]};">DeepSeek / OpenAI / Gemini</p></div>',
-            unsafe_allow_html=True,
-        )
-    with col_c:
-        st.markdown(
-            f'<div class="fzq-card"><div style="font-size:28px;">🌍</div>'
-            f'<h4>Global Balance</h4>'
-            f'<p style="color:{COLORS["text_secondary"]};">Cross-region, 30%+ Global South</p></div>',
-            unsafe_allow_html=True,
-        )
+    features = [
+        ("📰", "Multi-Source", "17 RSS feeds · 8 regions · GDELT · NewsAPI"),
+        ("🧠", "AI Engines", "DeepSeek · OpenAI · Gemini · Auto-failover"),
+        ("🌍", "Global Balance", "30%+ Global South · Cross-region rebalancing"),
+        ("📊", "Visual Analytics", "Radar · Sentiment · Timeline · Narrative graph"),
+    ]
+    cols = st.columns(4)
+    for col, (icon, title, desc) in zip(cols, features):
+        with col:
+            st.markdown(
+                f'<div class="fzq-card" style="text-align:center;padding:20px 12px;">'
+                f'<div style="font-size:30px;margin-bottom:8px;">{icon}</div>'
+                f'<div style="font-weight:600;font-size:14px;color:{COLORS["text_primary"]};">'
+                f'{title}</div>'
+                f'<div style="font-size:11px;color:{COLORS["text_secondary"]};'
+                f'margin-top:4px;line-height:1.5;">{desc}</div></div>',
+                unsafe_allow_html=True,
+            )
     st.stop()
 
 # ═══════════════════════════════════════════════════════════════
-# Execute: News Pipeline
+# Execute: News Pipeline (always runs first)
 # ═══════════════════════════════════════════════════════════════
+nav = st.session_state.active_nav
 section_header("📰 News Intelligence", "")
 news_result = orchestrator.run_agent(agent_name="news-intel", task="news", topic=query)
 
 if not news_result["success"]:
-    st.error(f"NewsPipeline: {news_result['error']}")
+    status_strip(f"NewsPipeline error: {news_result['error']}", "danger")
     st.stop()
 
 bundle = news_result["data"]
@@ -149,74 +274,73 @@ elif isinstance(bundle, dict) and "intel_bundle" in bundle:
 else:
     articles = getattr(bundle, "articles", [])
 
-# ── News metrics ──
 regions = list(set(a.region for a in articles if a.region))
 metric_row({
-    "Articles Found": len(articles),
+    "Articles": len(articles),
     "Regions": len(regions),
     "Sources": len(set(a.source_name for a in articles)),
-    "Avg Credibility": f"{sum(a.credibility for a in articles)/max(len(articles),1):.1f}",
+    "Credibility": f"{sum(a.credibility for a in articles)/max(len(articles),1):.1f}",
 })
 
 if len(articles) == 0:
-    status_strip(f"No articles matched '{query}'. Try a broader keyword.", "warning")
+    status_strip(f"No articles matched '{query}'. Broaden your search.", "warning")
     st.stop()
 
-# ── News cards in grid ──
-cols = st.columns(2)
-for i, a in enumerate(articles[:20]):
-    with cols[i % 2]:
-        render_news_card(a)
+# ── News cards ──
+if nav in ("full", "news"):
+    cols = st.columns(2)
+    for i, a in enumerate(articles[:20]):
+        with cols[i % 2]:
+            render_news_card(a)
+    if len(articles) > 20:
+        st.caption(f"Showing 20 of {len(articles)} articles")
 
 # ═══════════════════════════════════════════════════════════════
-# Analysis Pipelines (conditional on mode)
+# Narrative (nav: full, narr)
 # ═══════════════════════════════════════════════════════════════
-run_all = analysis_mode == "Full Analysis (All Pipelines)"
-run_risk = run_all or "Risk" in analysis_mode
-run_narrative = run_all or "Narrative" in analysis_mode
-
-if run_narrative:
+if nav in ("full", "narr"):
     st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
     section_header("🧭 Narrative Analysis", "")
-    narrative_result = orchestrator.run_agent(agent_name="narrative", task="narrative", articles=articles)
-    if narrative_result["success"]:
-        tab1, tab2 = st.tabs(["📊 Narrative Blocks", "🕸️ Graph View"])
-        with tab1:
-            render_narrative_block(narrative_result["data"])
-        with tab2:
-            render_narrative_graph(narrative_result.get("data", {}))
+    narr_result = orchestrator.run_agent(agent_name="narrative", task="narrative", articles=articles)
+    if narr_result["success"]:
+        t1, t2 = st.tabs(["📊 Blocs View", "🕸️ Graph View"])
+        with t1: render_narrative_block(narr_result["data"])
+        with t2: render_narrative_graph(narr_result.get("data", {}))
     else:
-        status_strip(f"Narrative: {narrative_result['error']}", "warning")
+        status_strip(f"Narrative: {narr_result['error']}", "warning")
 
-if run_risk:
+# ═══════════════════════════════════════════════════════════════
+# Risk (nav: full, risk)
+# ═══════════════════════════════════════════════════════════════
+if nav in ("full", "risk"):
     st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
     section_header("⚠️ Risk Analysis", "")
     risk_result = orchestrator.run_agent(agent_name="risk", task="risk", articles=articles)
     if risk_result["success"]:
-        col_risk, col_radar = st.columns([1, 1])
-        with col_risk:
-            render_risk_block(risk_result["data"])
-        with col_radar:
-            render_radar_chart(risk_result["data"])
+        c1, c2 = st.columns([1, 1])
+        with c1: render_risk_block(risk_result["data"])
+        with c2: render_radar_chart(risk_result["data"])
     else:
         status_strip(f"Risk: {risk_result['error']}", "warning")
 
+# ═══════════════════════════════════════════════════════════════
+# Sentiment + Timeline (always shown)
+# ═══════════════════════════════════════════════════════════════
 st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
 section_header("📊 Sentiment & Timeline", "")
-
-sentiment_result = orchestrator.run_agent(agent_name="sentiment", task="sentiment", articles=articles)
-if sentiment_result["success"]:
-    render_sentiment_trend(sentiment_result["data"])
-
+sent_result = orchestrator.run_agent(agent_name="sentiment", task="sentiment", articles=articles)
+if sent_result["success"]:
+    render_sentiment_trend(sent_result["data"])
 st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
 section_header("📅 Event Timeline", "")
 render_timeline(articles)
 
 # ═══════════════════════════════════════════════════════════════
-# Daily Report
+# Daily Report (nav: full, report)
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-section_header("📋 Daily Intelligence Report", "")
-report_result = orchestrator.run_agent(agent_name="daily-report", task="daily-report", articles=articles)
-if report_result["success"]:
-    st.markdown(report_result["data"])
+if nav in ("full", "report"):
+    st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
+    section_header("📋 Daily Intelligence Report", "")
+    rep_result = orchestrator.run_agent(agent_name="daily-report", task="daily-report", articles=articles)
+    if rep_result["success"]:
+        st.markdown(rep_result["data"])
