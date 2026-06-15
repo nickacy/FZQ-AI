@@ -27,7 +27,7 @@ load_dotenv()
 # Page Config & Theme
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
-    page_title="FZQ-AI · Intelligence Dashboard",
+    page_title="FZQ-AI · Terminal",
     page_icon="■",
     layout="wide",
     initial_sidebar_state="expanded",

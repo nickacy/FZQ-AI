@@ -1,244 +1,250 @@
 """
-fzq_ai/ui/theme.py — v2.6 Unified Design System
-
-Professional color palette, typography, card styles, and CSS injection.
-All components import THEME for consistent visual language.
+fzq_ai/ui/theme.py — Bloomberg Terminal Dark Design System
+Pure dark theme: industrial edges, amber accents, terminal aesthetic.
 """
 
 from __future__ import annotations
-
 import streamlit as st
 
-# ── Color Palette ──────────────────────────────────────────────
+# ── Bloomberg Terminal Color Palette ───────────────────────────
 COLORS = {
-    # Primary / brand
-    "primary": "#1E3A5F",       # Deep navy
-    "primary_light": "#2E5A8F",
-    "accent": "#E85D2C",        # Warm orange
-    "accent_light": "#F0805A",
+    # Core
+    "bg":          "#0D0D0D",  # Terminal black
+    "bg_panel":    "#141414",  # Slightly lighter panel
+    "bg_card":     "#1A1A1A",  # Card background
+    "bg_hover":    "#222222",  # Hover state
 
-    # Semantic
-    "success": "#10B981",       # Emerald green
-    "warning": "#F59E0B",       # Amber
-    "danger": "#EF4444",        # Red
-    "info": "#3B82F6",          # Blue
+    # Text
+    "text":        "#B0B0B0",  # Dim white (terminal text)
+    "text_bright": "#E0E0E0",  # Bright text
+    "text_dim":    "#606060",  # Dimmed text
 
-    # Neutrals
-    "bg_light": "#F8FAFC",
-    "bg_card": "#FFFFFF",
-    "text_primary": "#1E293B",
-    "text_secondary": "#64748B",
-    "border": "#E2E8F0",
-    "shadow": "rgba(0,0,0,0.06)",
+    # Accent (Bloomberg orange)
+    "accent":       "#FF6600",
+    "accent_dim":   "#CC5500",
 
-    # Region colors
-    "western": "#4A90E2",
-    "china": "#E02424",
-    "russia": "#7C3AED",
-    "middle_east": "#059669",
-    "east_asia": "#D97706",
-    "africa": "#65A30D",
-    "latin_america": "#0891B2",
-    "southeast_asia": "#C2410C",
+    # Semantic (terminal-style)
+    "success":      "#00CC66",  # Green
+    "warning":      "#FFAA00",  # Amber
+    "danger":       "#FF3333",  # Red
+    "info":         "#3399FF",  # Blue
+
+    # Borders
+    "border":       "#2A2A2A",
+    "border_light": "#3A3A3A",
+
+    # Region
+    "western":       "#4488CC",
+    "china":         "#DD3333",
+    "russia":        "#8855DD",
+    "middle_east":   "#22AA66",
+    "east_asia":     "#CC8833",
+    "africa":        "#66AA22",
+    "latin_america": "#2288AA",
+    "southeast_asia":"#CC5522",
 }
 
-# ── Risk level colors ──────────────────────────────────────────
 RISK_COLORS = {
-    1: "#10B981", 2: "#84CC16", 3: "#F59E0B", 4: "#F97316", 5: "#EF4444",
+    1: "#00CC66", 2: "#88CC22", 3: "#FFAA00", 4: "#FF6600", 5: "#FF3333",
 }
 
-# ── CSS Injection ──────────────────────────────────────────────
 
 def inject_theme() -> None:
-    """Inject global CSS for consistent styling across all components."""
+    """Inject Bloomberg Terminal dark CSS."""
     st.markdown(f"""
     <style>
-    /* ── Global ── */
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+    /* ── Global Reset ── */
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
-    html, body, [class*="css"] {{
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        letter-spacing: -0.01em;
+    html, body, [class*="css"], .stApp {{
+        font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+        background: {COLORS["bg"]};
+        color: {COLORS["text"]};
     }}
 
-    /* ── Cards ── */
-    .fzq-card {{
-        background: {COLORS["bg_card"]};
-        border: 1px solid {COLORS["border"]};
-        border-radius: 10px;
-        padding: 16px 20px;
-        margin: 8px 0;
-        box-shadow: 0 1px 3px {COLORS["shadow"]};
-        transition: box-shadow 0.2s;
-    }}
-    .fzq-card:hover {{
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* ── Main content background ── */
+    .stApp, .main .block-container {{
+        background: {COLORS["bg"]};
     }}
 
     /* ── Section headers ── */
     .fzq-section {{
-        border-left: 2px solid {COLORS["primary"]};
-        padding-left: 14px;
-        margin: 24px 0 12px 0;
+        border-left: 2px solid {COLORS["accent"]};
+        padding-left: 10px;
+        margin: 20px 0 10px 0;
     }}
     .fzq-section h2, .fzq-section h3 {{
-        margin: 0;
-        color: {COLORS["text_primary"]};
-        font-weight: 600;
+        margin: 0; color: {COLORS["text_bright"]};
+        font-weight: 500; font-size: 15px;
+        text-transform: uppercase; letter-spacing: 1px;
     }}
 
-    /* ── Metrics badge ── */
-    .fzq-badge {{
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #fff;
+    /* ── Cards (terminal panels) ── */
+    .fzq-card {{
+        background: {COLORS["bg_card"]};
+        border: 1px solid {COLORS["border"]};
+        border-radius: 0;
+        padding: 12px 16px;
+        margin: 4px 0;
     }}
-    .fzq-badge-success {{ background: {COLORS["success"]}; }}
-    .fzq-badge-warning {{ background: {COLORS["warning"]}; }}
-    .fzq-badge-danger  {{ background: {COLORS["danger"]}; }}
-    .fzq-badge-info    {{ background: {COLORS["info"]}; }}
-
-    /* ── Region tags ── */
-    .fzq-tag {{
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 500;
-        color: #fff;
-        margin: 0 2px;
+    .fzq-card:hover {{
+        border-color: {COLORS["border_light"]};
     }}
 
     /* ── Status strip ── */
     .fzq-status {{
-        padding: 10px 16px;
-        border-radius: 8px;
-        margin: 8px 0;
-        font-weight: 500;
-        font-size: 14px;
+        padding: 8px 14px; margin: 6px 0;
+        font-size: 13px; font-weight: 500;
+        border-radius: 0; border-left: 3px solid;
     }}
 
-    /* ── Divider ── */
-    .fzq-divider {{
-        height: 1px;
-        background: linear-gradient(90deg, {COLORS["primary"]}, {COLORS["border"]});
-        margin: 20px 0;
+    /* ── Tags ── */
+    .fzq-tag {{
+        display: inline-block; padding: 1px 8px;
+        border-radius: 0; font-size: 10px;
+        font-weight: 600; color: {COLORS["bg"]};
+        margin: 0 2px; text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }}
+    .fzq-badge {{
+        display: inline-block; padding: 2px 8px;
+        border-radius: 0; font-size: 11px; font-weight: 600;
     }}
 
     /* ── Sidebar ── */
     section[data-testid="stSidebar"] {{
-        background: linear-gradient(180deg, {COLORS["primary"]} 0%, #0F2640 100%);
+        background: {COLORS["bg_panel"]};
+        border-right: 1px solid {COLORS["border"]};
     }}
-    section[data-testid="stSidebar"] .stMarkdown,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] p {{
-        color: rgba(255,255,255,0.85) !important;
+    section[data-testid="stSidebar"] * {{
+        color: {COLORS["text"]} !important;
+        font-family: 'IBM Plex Sans', sans-serif;
     }}
 
-    /* ── Bloomberg-style nav indicators ── */
-.fzq-nav-pill::before {
-    content: '';
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border: 1.5px solid rgba(255,255,255,0.35);
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-.fzq-nav-pill.active::before {
-    border-color: #E85D2C;
-    background: #E85D2C;
-    box-shadow: 0 0 8px rgba(232,93,44,0.4);
-}
+    /* ── Sidebar key status ── */
+    .fzq-key-dot {{
+        display: inline-block; width: 6px; height: 6px;
+        border-radius: 50%; margin-right: 8px;
+    }}
+    .fzq-key-row {{
+        display: flex; align-items: center;
+        padding: 2px 0; font-size: 11px;
+    }}
+    .fzq-key-row .label {{ width: 65px; }}
+    .fzq-key-row .status {{ font-weight: 500; }}
 
-/* ── Buttons ── */
+    /* ── Nav pills ── */
+    .fzq-nav-pill {{
+        display: block; padding: 8px 14px; margin: 2px 0;
+        font-size: 13px; font-weight: 400; cursor: pointer;
+        border: 1px solid transparent; border-radius: 0;
+        background: transparent; color: {COLORS["text"]} !important;
+        transition: background 0.15s;
+    }}
+    .fzq-nav-pill:hover {{
+        background: {COLORS["bg_card"]}; border-color: {COLORS["border"]};
+    }}
+    .fzq-nav-pill.active {{
+        background: {COLORS["bg_card"]};
+        border-color: {COLORS["accent"]};
+        color: {COLORS["accent"]} !important;
+    }}
+    .fzq-nav-pill::before {{
+        content: ''; display: inline-block;
+        width: 6px; height: 6px; margin-right: 10px;
+        border: 1px solid {COLORS["text_dim"]}; flex-shrink: 0;
+    }}
+    .fzq-nav-pill.active::before {{
+        background: {COLORS["accent"]}; border-color: {COLORS["accent"]};
+    }}
+
+    /* ── Divider ── */
+    .fzq-sidebar-div {{
+        height: 1px; background: {COLORS["border"]}; margin: 12px 0;
+    }}
+    .fzq-divider {{
+        height: 1px; background: {COLORS["border"]}; margin: 16px 0;
+    }}
+
+    /* ── Buttons ── */
     .stButton > button {{
         background: {COLORS["accent"]} !important;
-        color: #fff !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        padding: 8px 24px !important;
-        transition: all 0.2s;
+        color: {COLORS["bg"]} !important;
+        border: none !important; border-radius: 0 !important;
+        font-weight: 600 !important; padding: 8px 20px !important;
+        font-size: 13px !important; text-transform: uppercase;
+        letter-spacing: 0.5px;
     }}
     .stButton > button:hover {{
-        background: {COLORS["accent_light"]} !important;
-        box-shadow: 0 4px 12px rgba(232,93,44,0.3);
+        background: {COLORS["accent_dim"]} !important;
     }}
 
     /* ── Inputs ── */
     .stTextInput > div > div > input {{
-        border-radius: 8px !important;
-        border: 2px solid {COLORS["border"]} !important;
-        font-size: 15px !important;
-        padding: 10px 14px !important;
+        border-radius: 0 !important;
+        border: 1px solid {COLORS["border"]} !important;
+        background: {COLORS["bg_card"]} !important;
+        color: {COLORS["text_bright"]} !important;
     }}
     .stTextInput > div > div > input:focus {{
-        border-color: {COLORS["primary_light"]} !important;
-        box-shadow: 0 0 0 3px rgba(30,58,95,0.1) !important;
+        border-color: {COLORS["accent"]} !important;
+        outline: none !important;
+    }}
+
+    /* ── Metrics ── */
+    [data-testid="stMetricValue"] {{
+        color: {COLORS["text_bright"]} !important;
+        font-weight: 600 !important;
+    }}
+    [data-testid="stMetricLabel"] {{
+        color: {COLORS["text_dim"]} !important;
+    }}
+
+    /* ── Expanders ── */
+    .streamlit-expanderHeader {{
+        background: {COLORS["bg_card"]} !important;
+        border: 1px solid {COLORS["border"]} !important;
+        border-radius: 0 !important;
+    }}
+
+    /* ── Tabs ── */
+    .stTabs [data-baseweb="tab"] {{
+        background: transparent !important;
+        color: {COLORS["text"]} !important;
+        border-radius: 0 !important;
+        border-bottom: 2px solid transparent !important;
+    }}
+    .stTabs [aria-selected="true"] {{
+        border-bottom-color: {COLORS["accent"]} !important;
+        color: {COLORS["accent"]} !important;
     }}
     </style>
     """, unsafe_allow_html=True)
 
 
-# ── Helper Functions ───────────────────────────────────────────
-
 def section_header(title: str, icon: str = "") -> None:
-    """Render a consistent section header."""
-    icon_str = f"{icon} " if icon else ""
+    i = f"{icon} " if icon else ""
     st.markdown(
-        f'<div class="fzq-section"><h3>{icon_str}{title}</h3></div>',
-        unsafe_allow_html=True,
-    )
-
-
-def metric_row(metrics: dict) -> None:
-    """Render a row of key metrics."""
-    cols = st.columns(len(metrics))
-    for col, (label, value) in zip(cols, metrics.items()):
-        with col:
-            st.metric(label=label, value=value)
-
+        f'<div class="fzq-section"><h3>{i}{title}</h3></div>',
+        unsafe_allow_html=True)
 
 def status_strip(text: str, level: str = "info") -> None:
-    """Render a colored status strip."""
-    bg_colors = {
-        "info": "#EFF6FF", "success": "#ECFDF5",
-        "warning": "#FFFBEB", "danger": "#FEF2F2",
-    }
-    text_colors = {
-        "info": "#1E40AF", "success": "#065F46",
-        "warning": "#92400E", "danger": "#991B1B",
-    }
+    bg_map = {"info": "#1A2A3A", "success": "#1A2A1A",
+              "warning": "#2A2A1A", "danger": "#2A1A1A"}
+    border_map = {"info": COLORS["info"], "success": COLORS["success"],
+                  "warning": COLORS["warning"], "danger": COLORS["danger"]}
     st.markdown(
-        f'<div class="fzq-status" style="background:{bg_colors.get(level, bg_colors["info"])};'
-        f'color:{text_colors.get(level, text_colors["info"])};">'
-        f'{text}</div>',
-        unsafe_allow_html=True,
-    )
-
+        f'<div class="fzq-status" style="background:{bg_map.get(level,bg_map["info"])};'
+        f'border-left-color:{border_map.get(level,border_map["info"])};">{text}</div>',
+        unsafe_allow_html=True)
 
 def region_tag(region: str) -> str:
-    """Return an HTML tag for a region."""
-    color = COLORS.get(region, COLORS["text_secondary"])
-    labels = {
-        "western": "West", "china": "China", "russia": "Russia",
-        "middle_east": "Mid East", "east_asia": "E Asia",
-        "africa": "Africa", "latin_america": "LatAm",
-        "southeast_asia": "SE Asia",
-    }
-    label = labels.get(region, region.replace("_", " ").title())
-    return f'<span class="fzq-tag" style="background:{color}">{label}</span>'
-
+    c = COLORS.get(region, COLORS["text_dim"])
+    lb = {"western":"WEST","china":"CN","russia":"RU","middle_east":"ME",
+          "east_asia":"EA","africa":"AF","latin_america":"LA","southeast_asia":"SEA"}
+    l = lb.get(region, region[:4].upper())
+    return f'<span class="fzq-tag" style="background:{c}">{l}</span>'
 
 def card(*content: str, title: str = "", **kwargs) -> None:
-    """Render a card container."""
-    title_html = f'<div style="font-weight:600;margin-bottom:8px;color:{COLORS["text_primary"]}">{title}</div>' if title else ""
-    inner = "".join(content)
-    st.markdown(
-        f'<div class="fzq-card">{title_html}{inner}</div>',
-        unsafe_allow_html=True,
-    )
+    th = f'<div style="font-weight:500;margin-bottom:6px;color:{COLORS["text_bright"]}">{title}</div>' if title else ""
+    st.markdown(f'<div class="fzq-card">{th}{"".join(content)}</div>', unsafe_allow_html=True)

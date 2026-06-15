@@ -360,10 +360,6 @@ class TaskOrchestrator:
         """向后兼容包装。"""
         return self.run(agent_name, items=None, articles=articles, **kwargs)
 
-    # ── 信息查询 ──────────────────────────────────────────────
-
-    @staticmethod
-
     # ── v3.0: Scenario runner ─────────────────────────────────
 
     SCENARIO_MAP: Dict[str, str] = {
@@ -386,7 +382,7 @@ class TaskOrchestrator:
         query = self.SCENARIO_MAP.get(scenario_name, scenario_name)
         return self.run_nl(query)
 
-    def list_pipelines() -> List[Dict[str, str]]:
+    def list_pipelines(self) -> List[Dict[str, str]]:
         """
         返回所有可用 Pipeline 的名称和简要说明。
 
