@@ -19,43 +19,42 @@ from fzq_ai.domain.models import Article
 
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "").strip()
 
-# 多源 RSS 配置（可扩展至 50+ 源）
+# 多源 RSS 配置 (v2.6: 跨区域平衡 19 sources)
 RSS_SOURCES = [
-    {
-        "id": "bbc",
-        "name": "BBC World",
-        "region": "western",
-        "language": "en",
-        "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
-    },
-    {
-        "id": "reuters",
-        "name": "Reuters World",
-        "region": "western",
-        "language": "en",
-        "url": "https://feeds.reuters.com/Reuters/worldNews",
-    },
-    {
-        "id": "ap",
-        "name": "AP World",
-        "region": "western",
-        "language": "en",
-        "url": "https://apnews.com/rss/apf-worldnews",
-    },
-    {
-        "id": "aljazeera",
-        "name": "Al Jazeera",
-        "region": "middle_east",
-        "language": "en",
-        "url": "https://www.aljazeera.com/xml/rss/all.xml",
-    },
-    {
-        "id": "nhk",
-        "name": "NHK Japan",
-        "region": "east_asia",
-        "language": "ja",
-        "url": "https://www3.nhk.or.jp/rss/news/cat0.xml",
-    },
+    {"id": "bbc", "name": "BBC World", "region": "western", "language": "en",
+     "url": "https://feeds.bbci.co.uk/news/world/rss.xml"},
+    {"id": "cnn", "name": "CNN World", "region": "western", "language": "en",
+     "url": "http://rss.cnn.com/rss/edition_world.rss"},
+    {"id": "guardian", "name": "The Guardian", "region": "western", "language": "en",
+     "url": "https://www.theguardian.com/world/rss"},
+    {"id": "aljazeera", "name": "Al Jazeera", "region": "middle_east", "language": "en",
+     "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+    {"id": "arabnews", "name": "Arab News", "region": "middle_east", "language": "en",
+     "url": "https://www.arabnews.com/rss.xml"},
+    {"id": "nhk", "name": "NHK Japan", "region": "east_asia", "language": "ja",
+     "url": "https://www3.nhk.or.jp/rss/news/cat0.xml"},
+    {"id": "yonhap", "name": "Yonhap News", "region": "east_asia", "language": "en",
+     "url": "https://en.yna.co.kr/RSS/news.xml"},
+    {"id": "straitstimes", "name": "Straits Times", "region": "east_asia", "language": "en",
+     "url": "https://www.straitstimes.com/news/asia/rss.xml"},
+    {"id": "xinhuanet", "name": "Xinhua English", "region": "china", "language": "en",
+     "url": "http://www.xinhuanet.com/english/rss/worldrss.xml"},
+    {"id": "scmp", "name": "SCMP", "region": "china", "language": "en",
+     "url": "https://www.scmp.com/rss/91/feed"},
+    {"id": "globaltimes", "name": "Global Times", "region": "china", "language": "en",
+     "url": "https://www.globaltimes.cn/rss/world.xml"},
+    {"id": "rt", "name": "RT News", "region": "russia", "language": "en",
+     "url": "https://www.rt.com/rss/news/"},
+    {"id": "tass", "name": "TASS", "region": "russia", "language": "en",
+     "url": "https://tass.com/rss/v2.xml"},
+    {"id": "telesur", "name": "Telesur English", "region": "latin_america", "language": "en",
+     "url": "https://www.telesurenglish.net/rss/RssNews.xml"},
+    {"id": "mercopress", "name": "MercoPress", "region": "latin_america", "language": "en",
+     "url": "https://en.mercopress.com/rss/index.xml"},
+    {"id": "news24", "name": "News24 Africa", "region": "africa", "language": "en",
+     "url": "https://feeds.news24.com/articles/news24/World/rss"},
+    {"id": "allafrica", "name": "AllAfrica", "region": "africa", "language": "en",
+     "url": "https://allafrica.com/tools/headlines/rss/latest/headlines.rss"},
 ]
 
 
@@ -131,9 +130,16 @@ def fetch_from_rss(query: str = "") -> List[Article]:
                     )
                 ]
 
-        # 第3级：宽泛回退（前20条）
+        # 第3级：宽泛回退（前30条）
         if not matched:
-            matched = all_articles[:20]
+            matched = all_articles[:30]
+
+        # 第4级：数量不足时补齐至50（v2.6）
+        if len(matched) < 50:
+            # 添加尚未匹配的文章（按顺序）
+            remaining = [a for a in all_articles if a not in matched]
+            needed = 50 - len(matched)
+            matched.extend(remaining[:needed])
 
         all_articles = matched
 
@@ -265,10 +271,10 @@ def fetch_from_gdelt_event(query: str) -> List[Article]:
     return articles
 
 
-def fetch_all_news(query: str) -> List[Article]:
+def fetch_all_news(query: str, min_results: int = 50) -> List[Article]:
     """
     核心融合函数：RSS + NewsAPI + GDELT DOC + GDELT Event
-    去重返回统一的 Article 列表
+    去重 -> 平衡重排 -> 翻译预览 -> 返回 Article 列表 (v2.6)
     """
     rss_articles = fetch_from_rss(query)
     newsapi_articles = fetch_from_newsapi(query)
@@ -279,7 +285,7 @@ def fetch_all_news(query: str) -> List[Article]:
         rss_articles + newsapi_articles + gdelt_doc_articles + gdelt_event_articles
     )
 
-    # 去重（按 url 或 title）
+    # 去重
     seen: Dict[str, bool] = {}
     unique: List[Article] = []
     for a in all_articles:
@@ -289,7 +295,88 @@ def fetch_all_news(query: str) -> List[Article]:
         seen[key] = True
         unique.append(a)
 
+    # v2.6: 区域平衡重排
+    unique = rebalance_articles(unique, min_count=min_results)
+
+    # v2.6: 非中英内容翻译预览
+    for a in unique:
+        if a.language not in ("zh", "en", "") and a.content_original:
+            a.content_snippet_en = translate_snippet_to_chinese(
+                a.content_original[:1000]
+            )
+
     return unique
+
+
+def rebalance_articles(articles: List[Article], min_count: int = 50) -> List[Article]:
+    """
+    v2.6: 区域平衡重排 - 从每个地区轮流取一篇，
+    确保 Western / Global South / China / Russia / Africa 多样性。
+    """
+    if len(articles) <= min_count:
+        return articles
+
+    buckets: Dict[str, List[Article]] = {}
+    for a in articles:
+        region = a.region or "other"
+        buckets.setdefault(region, []).append(a)
+
+    result: List[Article] = []
+    region_order = list(buckets.keys())
+    idx: Dict[str, int] = {r: 0 for r in region_order}
+    round_idx = 0
+
+    if len(region_order) == 1:
+        return articles[:max(len(articles), min_count)]
+
+    while len(result) < min_count and len(result) < len(articles):
+        region = region_order[round_idx % len(region_order)]
+        if idx[region] < len(buckets[region]):
+            result.append(buckets[region][idx[region]])
+            idx[region] += 1
+        round_idx += 1
+        all_done = all(idx[r] >= len(buckets[r]) for r in region_order)
+        if all_done:
+            break
+
+    # 追加剩余
+    for region in region_order:
+        while idx[region] < len(buckets[region]) and len(result) < len(articles):
+            result.append(buckets[region][idx[region]])
+            idx[region] += 1
+
+    return result
+
+
+def translate_snippet_to_chinese(text: str) -> str:
+    """
+    v2.6: 将非中英内容翻译为中文预览（前 1000 字符）。
+    使用 DeepSeek API，失败时返回原文前 200 字符。
+    """
+    if not text:
+        return ""
+    has_cjk = any("\u4e00" <= c <= "\u9fff" for c in text[:50])
+    if has_cjk:
+        return text[:200]
+    try:
+        from fzq_ai.config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL
+        import requests as _r
+        if not DEEPSEEK_API_KEY:
+            return text[:200]
+        payload = {
+            "model": DEEPSEEK_MODEL,
+            "messages": [
+                {"role": "system", "content": "Translate to Chinese. Only return translation, no explanation."},
+                {"role": "user", "content": text[:800]},
+            ],
+            "temperature": 0.2,
+        }
+        headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
+        resp = _r.post("https://api.deepseek.com/v1/chat/completions", json=payload, headers=headers, timeout=15)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"].strip()
+    except Exception:
+        return text[:200]
 
 
 def fetch_all_news_async(query: str) -> List[Article]:
