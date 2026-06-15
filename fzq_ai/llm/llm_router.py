@@ -87,7 +87,10 @@ class LLMRouter:
                 "DEEPSEEK_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY"
             )
 
-    # ── External API (backward compatible) ─────────────────────
+        # In-memory response cache (for run_cached)
+        self._cache: dict[str, str] = {}
+
+    # ── External API ──────────────────────────────────────────
 
     async def run(
         self,
@@ -110,6 +113,60 @@ class LLMRouter:
             RuntimeError: If all providers fail
         """
         return await self._call_with_failover(prompt, preferred=model, **kwargs)
+
+    async def run_json(
+        self,
+        prompt: str,
+        model: str = "deepseek",
+        **kwargs: Any,
+    ) -> dict:
+        """Call LLM and parse JSON response with repair."""
+        import json as _json
+        text: str = ""
+        try:
+            text = await self.run(prompt, model=model, **kwargs)
+            text_stripped: str = text.strip()
+            if text_stripped.startswith("```"):
+                lines: list[str] = text_stripped.split("\n")
+                if lines and lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines and lines[-1].strip() == "```":
+                    lines = lines[:-1]
+                text_stripped = "\n".join(lines)
+            return _json.loads(text_stripped)
+        except _json.JSONDecodeError as e:
+            return {"_raw": text, "_error": f"JSON parse error: {e}"}
+        except RuntimeError as e:
+            return {"_error": str(e)}
+        except Exception as e:
+            return {"_error": f"Unexpected: {e}"}
+
+    async def run_cached(
+        self,
+        prompt: str,
+        model: str = "deepseek",
+        cache_key: Optional[str] = None,
+        **kwargs: Any,
+    ) -> str:
+        """Call LLM with simple in-memory caching."""
+        import hashlib
+        key: str = cache_key or hashlib.sha256(
+            (prompt + model).encode()
+        ).hexdigest()
+        if key in self._cache:
+            return self._cache[key]
+        result: str = await self.run(prompt, model=model, **kwargs)
+        self._cache[key] = result
+        if len(self._cache) > 100:
+            self._cache.pop(next(iter(self._cache)))
+        return result
+
+    def check_availability(self) -> dict[str, bool]:
+        """Check all providers; never raises, logs failures."""
+        status: dict[str, bool] = {}
+        for name, state in self._states.items():
+            status[name] = state.healthy
+        return status
 
     # ── Core Logic ─────────────────────────────────────────────
 

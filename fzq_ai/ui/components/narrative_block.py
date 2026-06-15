@@ -1,99 +1,94 @@
 # fzq_ai/ui/components/narrative_block.py
+"""
+叙事分析展示组件 (v2.5)
+
+使用统一的防御性渲染模式：
+- 成功：展示结构化叙事卡片（按阵营分区）
+- 失败：展示友好错误提示
+- 空结果：显示提示信息
+"""
+
+from __future__ import annotations
+
+from typing import Any, Dict, List
 
 import streamlit as st
-from fzq_ai.intel.models import Narrative
 
-BLOC_COLORS = {
+BLOC_COLORS: Dict[str, str] = {
     "western": "#4A90E2",
-    "china": "#D0021B",
-    "russia": "#9013FE",
-    "global_south": "#7ED321",
+    "east_asia": "#D0021B",
+    "middle_east": "#9013FE",
+    "other": "#7ED321",
+}
+
+BLOC_LABELS: Dict[str, str] = {
+    "western": "西方",
+    "east_asia": "东亚",
+    "middle_east": "中东",
+    "other": "其他",
 }
 
 
-def render_narrative_block(narratives: list[Narrative]):
-    st.header("🧭 多阵营叙事对比")
+def render_narrative_block(narrative_data: Any) -> None:
+    st.markdown("## 多阵营叙事分析")
 
-    if not narratives:
+    if narrative_data is None:
         st.info("暂无叙事数据")
         return
 
-    for n in narratives:
-        st.markdown(f"## 🧩 事件 {n.event_id}")
+    data: Dict[str, Any] = {}
+    if isinstance(narrative_data, dict):
+        data = narrative_data
+    elif hasattr(narrative_data, "data"):
+        raw = getattr(narrative_data, "data", {})
+        if isinstance(raw, dict):
+            data = raw
+        else:
+            data = {}
+    else:
+        st.info("叙事数据格式暂不支持")
+        return
 
-        # -----------------------------
-        # 四阵营横向卡片布局
-        # -----------------------------
-        st.markdown("### 🌍 多阵营叙事")
+    if not data:
+        st.info("暂无叙事数据")
+        return
 
-        cols = st.columns(4)
+    has_any = False
+    for bloc in ["western", "east_asia", "middle_east", "other"]:
+        bloc_data: Dict[str, Any] = data.get(bloc, {})
+        if not bloc_data:
+            continue
 
-        for idx, (bloc, text) in enumerate(n.narratives.items()):
-            with cols[idx]:
-                color = BLOC_COLORS.get(bloc, "#333")
+        label = BLOC_LABELS.get(bloc, bloc)
+        themes: List[str] = bloc_data.get("themes", [])
+        articles: List[Dict[str, Any]] = bloc_data.get("articles", [])
 
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color:{color};
-                        padding:8px 12px;
-                        border-radius:6px;
-                        color:white;
-                        font-weight:bold;
-                        text-align:center;
-                        margin-bottom:8px;">
-                        {bloc.replace('_', ' ').title()}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+        if not themes and not articles:
+            continue
+        has_any = True
 
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color:#F7F7F7;
-                        padding:12px;
-                        border-radius:6px;
-                        min-height:180px;
-                        border:1px solid #E0E0E0;
-                        font-size:14px;
-                        line-height:1.45;">
-                        {text}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+        color = BLOC_COLORS.get(bloc, "#333")
+        st.markdown(
+            f"""<div style="background-color:{color};padding:6px 12px;
+            border-radius:4px;color:white;font-weight:bold;margin-bottom:8px;">
+            {label} 阵营</div>""",
+            unsafe_allow_html=True,
+        )
+
+        if themes:
+            st.markdown(f"**核心主题:** {' | '.join(themes[:6])}")
+
+        if articles:
+            for a in articles[:5]:
+                title = a.get("title", "无标题")
+                source = a.get("source", "")
+                url = a.get("url", "")
+                if url:
+                    st.markdown(f"- [{title[:80]}]({url}) ({source})")
+                else:
+                    st.markdown(f"- {title[:80]} ({source})")
 
         st.markdown("---")
 
-        # -----------------------------
-        # 共识事实
-        # -----------------------------
-        st.markdown("### 📌 共识事实")
-        if n.consensus_facts:
-            for f in n.consensus_facts:
-                st.markdown(f"- {f}")
-        else:
-            st.markdown("（无）")
-
-        # -----------------------------
-        # 争议点
-        # -----------------------------
-        st.markdown("### ⚠ 争议点")
-        if n.contested_claims:
-            for c in n.contested_claims:
-                st.markdown(f"- {c}")
-        else:
-            st.markdown("（无）")
-
-        # -----------------------------
-        # 缺失视角
-        # -----------------------------
-        st.markdown("### ❓ 缺失视角")
-        if n.missing_perspectives:
-            for m in n.missing_perspectives:
-                st.markdown(f"- {m}")
-        else:
-            st.markdown("（无）")
-
-        st.markdown("---")
+    if not has_any:
+        st.info("各阵营暂无显著叙事数据")
