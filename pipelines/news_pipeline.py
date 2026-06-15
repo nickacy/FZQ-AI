@@ -1,6 +1,6 @@
 import feedparser
 from fzq_ai.domain.models import Article, IntelBundle, IntelMeta
-from fzq_ai.tools.service_result import ServiceResult
+from fzq_ai.domain.models import ServiceResult
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.utils.logger import get_logger
 from fzq_ai.config import get_config
