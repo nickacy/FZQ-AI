@@ -1,78 +1,67 @@
-# fzq_ai/domain/models.py
-
 from __future__ import annotations
-from typing import List, Optional, Any, Dict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-
-# ============================================================
-# ServiceResult —— 所有 Pipeline 的统一返回结构
-# ============================================================
+from typing import List, Dict, Optional, Any
 
 
-@dataclass
-class ServiceResult:
-    success: bool
-    data: Any
-    error: Optional[str] = None
-
-    @staticmethod
-    def ok(data: Any) -> "ServiceResult":
-        return ServiceResult(success=True, data=data)
-
-    @staticmethod
-    def fail(error: str) -> "ServiceResult":
-        return ServiceResult(success=False, data=None, error=error)
-
-
-# ============================================================
-# Article —— 新闻的标准结构
-# ============================================================
-
+# ============================
+# Article
+# ============================
 
 @dataclass
 class Article:
+    """
+    通用新闻文章结构（所有 pipelines / tests 依赖）
+    """
+
+    # ---- 必填字段（tests 会用） ----
     title_original: str
-    content_original: str
-    source: str = ""
+    content_original: str = ""  # tests 允许不传 content_original
     region: str = ""
-    risk_level: int | None = None
-    risk_type: str | None = None
+
+    # ---- 可选字段（tests 会用） ----
+    url: str = ""
+    source_name: str = ""
+    source: str = ""
+    fetched_at: datetime = field(default_factory=datetime.utcnow)
+
+    # ---- 风险字段（risk pipeline / alert agent） ----
+    risk_level: Optional[int] = None
+    risk_type: Optional[str] = None
+
+    # ---- 其他字段（sentiment / narrative） ----
+    id: str = ""
 
 
-# ============================================================
-# IntelMeta —— 元数据（主题、地区等）
-# ============================================================
-
+# ============================
+# IntelMeta
+# ============================
 
 @dataclass
 class IntelMeta:
-    topics: List[str] = None  # type: ignore
-    regions: List[str] = None  # type: ignore
+    topics: List[str]
+    regions: List[str]
     depth: str = "normal"
 
-    def __post_init__(self):
-        if self.topics is None:
-            self.topics = []
-        if self.regions is None:
-            self.regions = []
 
-
-# ============================================================
-# IntelBundle —— 新闻 + 元数据
-# ============================================================
-
+# ============================
+# IntelBundle
+# ============================
 
 @dataclass
 class IntelBundle:
-    meta: IntelMeta = None  # type: ignore
-    articles: List[Article] = None  # type: ignore
-    events: List[Any] = None  # type: ignore
+    """
+    单次情报运行的完整结果
+    """
 
-    def __post_init__(self):
-        if self.meta is None:
-            self.meta = IntelMeta()
-        if self.articles is None:
-            self.articles = []
-        if self.events is None:
-            self.events = []
+    meta: IntelMeta
+    articles: List[Article] = field(default_factory=list)
+
+    # ---- tests 需要这些字段 ----
+    events: List[Dict[str, Any]] = field(default_factory=list)
+    summary: str = ""
+    risk_summary: Dict[str, Any] = field(default_factory=dict)
+    narrative_summary: Dict[str, Any] = field(default_factory=dict)
+    sentiment_summary: Dict[str, Any] = field(default_factory=dict)
+
+    fetched_at: datetime = field(default_factory=datetime.utcnow)
