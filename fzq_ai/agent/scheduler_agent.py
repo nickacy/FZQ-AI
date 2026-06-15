@@ -7,7 +7,6 @@ from __future__ import annotations
 import time
 from typing import Any, Dict, List, Optional
 
-
 class ScheduledTask:
     """A named task with cron-like spec and scenario mapping."""
     def __init__(self, name: str, cron: str, scenario: str):
@@ -20,15 +19,9 @@ class ScheduledTask:
         # Simplified: always due for demo; real impl would parse cron
         return True
 
-
 class SchedulerAgent:
     """
-    v3.0 — Periodic task scheduler.
 
-    Usage:
-        s = SchedulerAgent()
-        s.register_job("daily_risk", "0 8 * * *", "daily_global_risk")
-        s.run_pending()
     """
 
     def __init__(self, orchestrator: Any = None):
@@ -41,7 +34,6 @@ class SchedulerAgent:
 
     def list_jobs(self) -> List[Dict[str, str]]:
         return [
-            {"name": t.name, "cron": t.cron, "scenario": t.scenario}
             for t in self._jobs.values()
         ]
 
@@ -53,6 +45,4 @@ class SchedulerAgent:
                 results[name] = {
                     "scenario": task.scenario,
                     "status": "pending",  # real impl would call orchestrator
-                }
-                task.last_run = time.time()
         return results

@@ -8,7 +8,4 @@ import sys
 
 if __name__ == "__main__" or True:
     # 确保项目根目录在 path
-    ROOT = os.path.abspath(os.path.dirname(__file__))
     if ROOT not in sys.path:
-        sys.path.insert(0, ROOT)
-    runpy.run_path(os.path.join(ROOT, "main.py"), run_name="__main__")

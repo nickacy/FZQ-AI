@@ -18,12 +18,9 @@ from fzq_ai.domain.errors import ToolExecutionError
 
 logger = logging.getLogger(__name__)
 
-
 async def check_metro_status(line: str) -> ToolResult[Dict[str, Any]]:
     """
-    示例工具：查询地铁线路状态。
 
-    你可以将内部逻辑替换为实际 API 调用。
     """
     try:
         # TODO: 替换为你的实际 API 调用
@@ -37,14 +34,7 @@ async def check_metro_status(line: str) -> ToolResult[Dict[str, Any]]:
 
         return ToolResult(
             success=True,
-            data=status,
-            metadata={"tool": "check_metro_status", "line": line},
-        )
 
     except Exception as e:
-        logger.error("check_metro_status failed: %s", e, exc_info=True)
         return ToolResult(
             success=False,
-            error=str(e),
-            metadata={"tool": "check_metro_status", "line": line},
-        )

@@ -9,13 +9,11 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 # ── Config Tests ──────────────────────────────────────────────
 
-
 class TestConfig:
     """Test configuration loading."""
 
     def test_deepseek_api_key_loaded(self):
         """Verify DEEPSEEK_API_KEY can be loaded from env."""
-        from fzq_ai.config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
         # These should at least be strings (may be empty if no .env)
         assert isinstance(DEEPSEEK_API_KEY, str)
         assert isinstance(DEEPSEEK_BASE_URL, str)
@@ -23,25 +21,14 @@ class TestConfig:
 
     def test_base_url_normalization(self):
         """DeepSeekClient should normalize base_url correctly."""
-        from fzq_ai.llm.providers.deepseek_client import DeepSeekClient
 
         with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "sk-test"}):
             # Test that /v1 is not doubled
-            client = DeepSeekClient(
-                api_key="sk-test",
-                base_url="https://api.deepseek.com/v1",
-            )
             assert client.base_url == "https://api.deepseek.com/v1"
 
-            client2 = DeepSeekClient(
-                api_key="sk-test",
-                base_url="https://api.deepseek.com",
-            )
             assert client2.base_url == "https://api.deepseek.com/v1"
 
-
 # ── Domain Model Tests ────────────────────────────────────────
-
 
 class TestDomainModels:
     """Test domain model integrity."""
@@ -62,7 +49,6 @@ class TestDomainModels:
 
     def test_article_defaults(self):
         from fzq_ai.domain.models import Article
-        a = Article(title_original="Test Title")
         assert a.title_original == "Test Title"
         assert a.credibility == 0.0
         assert a.propaganda_tags == []
@@ -70,13 +56,10 @@ class TestDomainModels:
 
     def test_intel_bundle_defaults(self):
         from fzq_ai.domain.models import IntelBundle, IntelMeta
-        bundle = IntelBundle()
         assert bundle.articles == []
         assert isinstance(bundle.meta, IntelMeta)
 
-
 # ── Formatter Tests ───────────────────────────────────────────
-
 
 class TestFormatters:
     """Test formatting utilities."""
@@ -110,33 +93,26 @@ class TestFormatters:
         assert "Narrative" in result
         assert "Risk" in result
 
-
 # ── Error Handling Tests ──────────────────────────────────────
-
 
 class TestErrors:
     """Test domain error classes."""
 
     def test_fzqai_error(self):
         from fzq_ai.domain.errors import FZQAIError
-        err = FZQAIError("test message", code="TEST")
         assert "TEST: test message" in str(err)
         assert err.code == "TEST"
 
     def test_llm_error(self):
         from fzq_ai.domain.errors import LLMError
-        err = LLMError("timeout")
         assert isinstance(err, Exception)
         assert "timeout" in str(err)
 
     def test_pipeline_error(self):
         from fzq_ai.domain.errors import PipelineError
-        err = PipelineError("step failed")
         assert isinstance(err, Exception)
 
-
 # ── Enums Tests ───────────────────────────────────────────────
-
 
 class TestEnums:
     """Test domain enumerations."""
@@ -151,9 +127,7 @@ class TestEnums:
         assert Sentiment.POSITIVE.value == "positive"
         assert Sentiment.NEGATIVE.value == "negative"
 
-
 # ── LLM Router Tests ──────────────────────────────────────────
-
 
 class TestLLMRouter:
     """Test LLM router with mocked providers."""
@@ -165,12 +139,9 @@ class TestLLMRouter:
             "DEEPSEEK_API_KEY": "sk-test",
             "OPENAI_API_KEY": "",
             "GEMINI_API_KEY": "",
-        }):
-            from fzq_ai.llm.llm_router import LLMRouter
             # Will fail if no key, but with test key it should init
             # Skip if key validation is strict
             try:
-                router = LLMRouter()
                 assert router.primary_provider in ("deepseek", "openai", "gemini")
             except (ValueError, RuntimeError) as e:
                 pytest.skip(f"Router init requires real API keys: {e}")
@@ -181,53 +152,32 @@ class TestLLMRouter:
             "DEEPSEEK_API_KEY": "sk-test",
             "OPENAI_API_KEY": "",
             "GEMINI_API_KEY": "",
-        }):
-            from fzq_ai.llm.llm_router import LLMRouter
             try:
-                router = LLMRouter()
-                metrics = router.metrics
                 assert "deepseek" in metrics
                 assert "healthy" in metrics["deepseek"]
             except (ValueError, RuntimeError):
                 pytest.skip("Router init requires real API keys")
 
-
 # ── Pipeline Tests ────────────────────────────────────────────
-
 
 class TestNewsPipeline:
     """Test news pipeline with mocked dependencies."""
 
     def test_pipeline_creation(self):
         from fzq_ai.pipelines.news_pipeline import NewsPipeline
-        pipeline = NewsPipeline()
         assert pipeline is not None
 
     def test_pipeline_run_no_topic(self):
         from fzq_ai.pipelines.news_pipeline import NewsPipeline
-        pipeline = NewsPipeline()
         result = pipeline.run("")
         assert isinstance(result, str) and len(result) > 0
-
 
 class TestRiskPipeline:
     """Test risk analysis pipeline."""
 
     def test_risk_pipeline_with_articles(self):
         from fzq_ai.pipelines.risk_pipeline import RiskPipeline
-        from fzq_ai.domain.models import Article
 
-        pipeline = RiskPipeline()
-        articles = [
-            Article(
-                title_original="Election crisis deepens amid protests",
-                region="western",
-            ),
-            Article(
-                title_original="Market rallies on inflation data",
-                region="western",
-            ),
-        ]
         result = pipeline.run(articles=articles)
         assert isinstance(result, str)
         assert len(result) > 0
@@ -235,40 +185,25 @@ class TestRiskPipeline:
     def test_risk_pipeline_empty_articles(self):
         from fzq_ai.pipelines.risk_pipeline import RiskPipeline
 
-        pipeline = RiskPipeline()
         result = pipeline.run(articles=[])
         assert isinstance(result, str)
-
 
 class TestNarrativePipeline:
     """Test narrative analysis pipeline."""
 
     def test_narrative_pipeline(self):
         from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
-        from fzq_ai.domain.models import Article
 
-        pipeline = NarrativePipeline()
-        articles = [
-            Article(title_original="US sanctions expand", region="western"),
-            Article(title_original="China GDP growth slows", region="east_asia"),
-        ]
         result = pipeline.run(articles=articles)
         assert isinstance(result, str)
         assert len(result) > 0
-
 
 class TestDailyReportPipeline:
     """Test daily report generation."""
 
     def test_daily_report(self):
         from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
-        from fzq_ai.domain.models import Article
 
-        pipeline = DailyReportPipeline()
-        articles = [
-            Article(title_original="Conflict escalates in region", region="middle_east"),
-            Article(title_original="Tech stocks surge", region="western"),
-        ]
         result = pipeline.run(articles=articles)
         assert isinstance(result, str)
         assert len(result) > 0

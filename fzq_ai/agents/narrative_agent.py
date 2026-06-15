@@ -1,6 +1,5 @@
 from typing import List
 
-
 class NarrativeAgent:
     def __init__(self, llm_router):
         self.llm_router = llm_router
@@ -14,11 +13,8 @@ class NarrativeAgent:
             "3）潜在影响（Implications）\n"
             "4）未来可能演化方向（Scenarios）\n\n"
             "【新闻原文汇总】\n"
-            f"{merged_news}\n\n"
             "【新闻列表】\n"
-            f"{lines}\n\n"
             "请用结构化方式输出分析结果。"
-        )
 
     def analyze(self, merged_news: str, items: List[str]) -> str:
         prompt = self._build_prompt(merged_news, items)

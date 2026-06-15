@@ -21,22 +21,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="FZQ-AI API",
     description="Unified API for News, Narrative, Risk, and Daily Report generation",
-    version="1.0.0",
 )
-
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
 
-
 @app.post("/run-report")
 async def run_report():
     """
-    触发 orchestrator，生成完整日报。
     """
     try:
-        orchestrator = TaskOrchestrator()
         result: ServiceResult = await orchestrator.orchestrate()
 
         return JSONResponse(
@@ -45,12 +40,8 @@ async def run_report():
         )
 
     except Exception as e:
-        logger.error("run_report failed: %s", e, exc_info=True)
         return JSONResponse(
             status_code=500,
-            content={
                 "success": False,
                 "error": str(e),
                 "metadata": {"endpoint": "run-report"},
-            },
-        )

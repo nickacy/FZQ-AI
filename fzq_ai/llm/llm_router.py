@@ -13,7 +13,6 @@ from fzq_ai.llm.providers.deepseek_client import DeepSeekClient
 from fzq_ai.llm.providers.openai_client import OpenAIClient
 from fzq_ai.llm.providers.gemini_client import GeminiClient
 
-
 class ProviderState:
     """Runtime health tracking for a provider."""
 
@@ -37,13 +36,10 @@ class ProviderState:
         if self.consecutive_failures >= 3:
             self.healthy = False
 
-
 class LLMRouter:
     """
     Multi-provider LLM router with automatic failover.
 
-    Priority chain: DeepSeek → OpenAI → Gemini
-    Unhealthy providers are skipped until they recover.
     """
 
     def __init__(self):
@@ -85,7 +81,6 @@ class LLMRouter:
             raise RuntimeError(
                 "No LLM provider configured. Set at least one of: "
                 "DEEPSEEK_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY"
-            )
 
         # In-memory response cache (for run_cached)
         self._cache: dict[str, str] = {}
@@ -94,35 +89,15 @@ class LLMRouter:
 
     async def run(
         self,
-        prompt: str,
-        model: str = "deepseek",
-        **kwargs: Any,
-    ) -> str:
         """
         Call LLM with automatic failover.
 
-        Args:
-            prompt: The user prompt
-            model: Preferred provider hint ("deepseek", "openai", "gemini")
-            **kwargs: temperature, max_tokens, system_prompt, retries
-
-        Returns:
-            LLM response text
-
-        Raises:
-            RuntimeError: If all providers fail
         """
         return await self._call_with_failover(prompt, preferred=model, **kwargs)
 
     async def run_json(
         self,
-        prompt: str,
-        model: str = "deepseek",
-        **kwargs: Any,
-    ) -> dict:
         """Call LLM and parse JSON response with repair."""
-        import json as _json
-        text: str = ""
         try:
             text = await self.run(prompt, model=model, **kwargs)
             text_stripped: str = text.strip()
@@ -132,7 +107,6 @@ class LLMRouter:
                     lines = lines[1:]
                 if lines and lines[-1].strip() == "```":
                     lines = lines[:-1]
-                text_stripped = "\n".join(lines)
             return _json.loads(text_stripped)
         except _json.JSONDecodeError as e:
             return {"_raw": text, "_error": f"JSON parse error: {e}"}
@@ -143,16 +117,7 @@ class LLMRouter:
 
     async def run_cached(
         self,
-        prompt: str,
-        model: str = "deepseek",
-        cache_key: Optional[str] = None,
-        **kwargs: Any,
-    ) -> str:
         """Call LLM with simple in-memory caching."""
-        import hashlib
-        key: str = cache_key or hashlib.sha256(
-            (prompt + model).encode()
-        ).hexdigest()
         if key in self._cache:
             return self._cache[key]
         result: str = await self.run(prompt, model=model, **kwargs)
@@ -163,7 +128,6 @@ class LLMRouter:
 
     def check_availability(self) -> dict[str, bool]:
         """Check all providers; never raises, logs failures."""
-        status: dict[str, bool] = {}
         for name, state in self._states.items():
             status[name] = state.healthy
         return status
@@ -172,28 +136,13 @@ class LLMRouter:
 
     async def _call_with_failover(
         self,
-        prompt: str,
-        *,
-        preferred: str = "deepseek",
-        temperature: float = 0.7,
-        max_tokens: int = 2048,
-        system_prompt: Optional[str] = None,
-        retries: int = 3,
-        **kwargs: Any,
-    ) -> str:
         """
-        Try preferred provider first, then fall through the chain.
-        Skips unhealthy providers.
         """
-        last_error: Optional[Exception] = None
 
         # Build ordered provider list: preferred first, then others
-        ordered = []
         for name, client in self._providers:
             if name == preferred:
-                ordered.insert(0, (name, client))
             else:
-                ordered.append((name, client))
 
         for name, client in ordered:
             state = self._states[name]
@@ -203,26 +152,18 @@ class LLMRouter:
                     state.last_health_check = time.time()
                     state.healthy = True  # Give it another chance
                 else:
-                    continue
 
             try:
                 result = await client.run(
                     prompt,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    system_prompt=system_prompt,
                     retries=min(retries, 2),  # Per-provider retries
                 )
-                state.record_success()
                 return result
 
             except Exception as e:
-                state.record_failure()
-                last_error = e
 
         raise RuntimeError(
             f"All LLM providers failed. Last error: {last_error}"
-        ) from last_error
 
     # ── Health & Metrics ───────────────────────────────────────
 
@@ -230,14 +171,12 @@ class LLMRouter:
     def metrics(self) -> dict:
         """Return per-provider health metrics for monitoring."""
         return {
-            name: {
                 "healthy": state.healthy,
                 "total_calls": state.total_calls,
                 "failures": state.total_failures,
                 "failure_rate": (
                     round(state.total_failures / max(state.total_calls, 1), 4)
                 ),
-            }
             for name, state in self._states.items()
         }
 

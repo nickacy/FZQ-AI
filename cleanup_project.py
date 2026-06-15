@@ -5,12 +5,10 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 EXCLUDE_DIRS = {"venv", "venv311", ".git", ".vscode", "__pycache__"}
 
-
 def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
         print(f"[创建目录] {path}")
-
 
 def move_file(src, dst_dir):
     if os.path.exists(src):
@@ -19,12 +17,10 @@ def move_file(src, dst_dir):
         shutil.move(src, dst)
         print(f"[移动] {src} → {dst}")
 
-
 def remove_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
         print(f"[删除目录] {path}")
-
 
 print("\n=== Nick‑Agent 项目自动清理开始 ===\n")
 
@@ -41,7 +37,6 @@ dirs = [
     "data/logs",
 ]
 for d in dirs:
-    ensure_dir(os.path.join(ROOT, d))
 
 # 2. 移动测试文件
 move_file(os.path.join(ROOT, "test_all.py"), os.path.join(ROOT, "tests"))
@@ -58,6 +53,5 @@ remove_dir(os.path.join(ROOT, "fzq_ai_agent.egg-info"))
 for root, dirs, files in os.walk(ROOT):
     dirs[:] = [d for d in dirs if d not in EXCLUDE_DIRS]
     if "__init__.py" not in files:
-        open(os.path.join(root, "__init__.py"), "a").close()
 
 print("\n=== 清理完成！项目结构已优化 ===\n")

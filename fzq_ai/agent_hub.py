@@ -13,12 +13,8 @@ from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
 from fzq_ai.pipelines.risk_pipeline import RiskPipeline
 from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
 
-
 class AgentHub:
     """
-    统一调度所有 Pipeline 的 Hub。
-    - config 保留参数，用于未来扩展
-    - Pipeline 全部通过 llm_router 注入
     """
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
@@ -40,20 +36,16 @@ class AgentHub:
 
     def run_narrative(self, items: List[str]) -> Dict[str, Any]:
         """叙事分析：将字符串列表转为文章列表后分析"""
-        from fzq_ai.domain.models import Article
 
-        articles = [
             Article(title_original=item, content_original=item) for item in items
         ]
         # NarrativePipeline.run 是 async，这里用同步包装
-        import asyncio
 
         result = asyncio.run(self.narrative_pipeline.run(articles=articles))
         return {"success": result.success, "data": result.data, "error": result.error}
 
     def run_risk(self, items: List[str]) -> Dict[str, Any]:
         """风险分析：将字符串列表转为文章列表后分析"""
-        from fzq_ai.domain.models import Article
 
         articles = [Article(title_original=item) for item in items]
         import asyncio
@@ -63,7 +55,6 @@ class AgentHub:
 
     def run_daily_report(self, items: List[str]) -> Dict[str, Any]:
         """每日报告：将字符串列表转为文章列表后生成报告"""
-        from fzq_ai.domain.models import Article
 
         articles = [Article(title_original=item) for item in items]
         import asyncio
@@ -82,5 +73,3 @@ class AgentHub:
                 "narrative_pipeline",
                 "risk_pipeline",
                 "daily_report_pipeline",
-            ],
-        }

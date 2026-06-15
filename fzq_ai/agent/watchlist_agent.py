@@ -10,12 +10,9 @@ from typing import Any, Dict, List
 
 DEFAULT_WATCHLIST = ["global conflict", "US election", "energy market"]
 
-
 class WatchlistAgent:
     """
-    v3.0 — Topic watchlist monitor.
 
-    Reads topics from watchlist.json, runs pipelines per topic,
     compares with historical data for trend alerts.
     """
 
@@ -55,5 +52,4 @@ class WatchlistAgent:
             results[topic] = {
                 "status": "scanned",
                 "topic": topic,
-            }
         return results

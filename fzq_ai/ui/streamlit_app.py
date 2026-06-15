@@ -6,7 +6,6 @@ import os, sys
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
 if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -28,9 +27,6 @@ load_dotenv()
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="FZQ-AI · Terminal",
-    page_icon="■",
-    layout="wide",
-    initial_sidebar_state="expanded",
 )
 inject_theme()
 
@@ -39,53 +35,24 @@ st.markdown(f"""
 <style>
 /* ── Sidebar badge glow ── */
 .fzq-key-dot {{
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-    box-shadow: 0 0 6px var(--dot-color);
 }}
 .fzq-key-row {{
-    display: flex;
-    align-items: center;
-    padding: 3px 0;
-    font-size: 12px;
-    color: rgba(255,255,255,0.75);
 }}
 .fzq-key-row .label {{ width: 70px; }}
 .fzq-key-row .status {{ font-weight: 500; }}
 
 /* ── Nav pills ── */
 .fzq-nav-pill {{
-    display: block;
-    padding: 10px 16px;
-    margin: 4px 0;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.8) !important;
-    text-decoration: none !important;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: 1px solid transparent;
 }}
 .fzq-nav-pill:hover {{
-    background: rgba(255,255,255,0.08) !important;
-    border-color: rgba(255,255,255,0.15);
 }}
 .fzq-nav-pill.active {{
-    background: rgba(255,255,255,0.12) !important;
-    border-color: {COLORS["accent"]} !important;
     color: #fff !important;
-    box-shadow: 0 0 8px rgba(232,93,44,0.2);
 }}
 .fzq-nav-pill .icon {{ font-size: 16px; margin-right: 8px; }}
 
 /* ── Compact divider ── */
 .fzq-sidebar-div {{
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 14px 0;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -114,65 +81,31 @@ with st.sidebar:
         '<text x="132" y="34" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#E85D2C" letter-spacing="3">AI</text>'
         '<text x="64" y="51" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" letter-spacing="3.5">INTELLIGENCE TERMINAL</text>'
         '</svg></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
 
     # ── Function Navigation ──
-    st.markdown(
         '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
         'text-transform:uppercase;margin-bottom:8px;">Function Navigation</div>',
-        unsafe_allow_html=True,
-    )
 
     # Session state for active nav
     if "active_nav" not in st.session_state:
-        st.session_state.active_nav = "full"
-
-    nav_items = [
-        ("full",    "🔍", "Full Intelligence"),
-        ("news",    "📰", "News Intel Analysis"),
-        ("narr",    "🧭", "Narrative Analysis"),
-        ("risk",    "⚠️", "Risk Scanner"),
-        ("report",  "📋", "Daily Report"),
-    ]
 
     for key, icon, label in nav_items:
         active_cls = "active" if st.session_state.active_nav == key else ""
         if st.button(
             f"{icon}  {label}",
-            key=f"nav_{key}",
-            use_container_width=True,
-        ):
-            st.session_state.active_nav = key
-
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
 
     # ── Query Input ──
-    st.markdown(
         '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
         'text-transform:uppercase;margin-bottom:6px;">Query</div>',
-        unsafe_allow_html=True,
-    )
-    query = st.text_input(
         "Topic",
-        placeholder="e.g. US election, Taiwan strait...",
-        label_visibility="collapsed",
-    )
-    run_btn = st.button("▶  Execute Analysis", use_container_width=True)
-
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
 
     # ── Footer ──
-    st.markdown(
         '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;'
         'line-height:1.6;">'
         '17 RSS · GDELT · NewsAPI<br>'
         'LLM: DeepSeek → OpenAI → Gemini<br>'
         'Global South ≥30% guaranteed'
         '</div>',
-        unsafe_allow_html=True,
-    )
 
 # ═══════════════════════════════════════════════════════════════
 # Main — Header
@@ -195,14 +128,6 @@ active_desc = {
 
 st.markdown(
     f'<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px;">'
-    f'<h1 style="color:{COLORS["primary"]};font-weight:700;margin:0;'
-    f'font-size:26px;">FZQ-AI Intelligence Dashboard</h1>'
-    f'<span style="font-size:13px;color:{COLORS["accent"]};font-weight:500;'
-    f'background:{COLORS["accent"]}15;padding:2px 10px;border-radius:10px;">'
-    f'{active_label}</span></div>'
-    f'<p style="color:{COLORS["text_secondary"]};font-size:14px;margin-top:4px;">'
-    f'{active_desc}</p>',
-    unsafe_allow_html=True,
 )
 
 orchestrator = TaskOrchestrator()
@@ -211,25 +136,8 @@ orchestrator = TaskOrchestrator()
 # Idle State
 # ═══════════════════════════════════════════════════════════════
 if not run_btn or not query:
-    features = [
-        ("📰", "Multi-Source", "17 RSS feeds · 8 regions · GDELT · NewsAPI"),
-        ("🧠", "AI Engines", "DeepSeek · OpenAI · Gemini · Auto-failover"),
-        ("🌍", "Global Balance", "30%+ Global South · Cross-region rebalancing"),
-        ("📊", "Visual Analytics", "Radar · Sentiment · Timeline · Narrative graph"),
-    ]
-    cols = st.columns(4)
     for col, (icon, title, desc) in zip(cols, features):
         with col:
-            st.markdown(
-                f'<div class="fzq-card" style="text-align:center;padding:20px 12px;">'
-                f'<div style="font-size:30px;margin-bottom:8px;">{icon}</div>'
-                f'<div style="font-weight:600;font-size:14px;color:{COLORS["text_primary"]};">'
-                f'{title}</div>'
-                f'<div style="font-size:11px;color:{COLORS["text_secondary"]};'
-                f'margin-top:4px;line-height:1.5;">{desc}</div></div>',
-                unsafe_allow_html=True,
-            )
-    st.stop()
 
 # ═══════════════════════════════════════════════════════════════
 # Execute: News Pipeline (always runs first)
@@ -249,7 +157,6 @@ if hasattr(bundle, "articles"):
 elif isinstance(bundle, dict) and "intel_bundle" in bundle:
     articles = bundle["intel_bundle"].articles
 else:
-    articles = getattr(bundle, "articles", [])
 
 regions = list(set(a.region for a in articles if a.region))
 metric_row({
@@ -268,7 +175,6 @@ if nav in ("full", "news"):
     cols = st.columns(2)
     for i, a in enumerate(articles[:20]):
         with cols[i % 2]:
-            render_news_card(a)
     if len(articles) > 20:
         st.caption(f"Showing 20 of {len(articles)} articles")
 
@@ -280,7 +186,6 @@ if nav in ("full", "narr"):
     section_header("🧭 Narrative Analysis", "")
     narr_result = orchestrator.run_agent(agent_name="narrative", task="narrative", articles=articles)
     if narr_result["success"]:
-        t1, t2 = st.tabs(["📊 Blocs View", "🕸️ Graph View"])
         with t1: render_narrative_block(narr_result["data"])
         with t2: render_narrative_graph(narr_result.get("data", {}))
     else:
@@ -294,7 +199,6 @@ if nav in ("full", "risk"):
     section_header("⚠️ Risk Analysis", "")
     risk_result = orchestrator.run_agent(agent_name="risk", task="risk", articles=articles)
     if risk_result["success"]:
-        c1, c2 = st.columns([1, 1])
         with c1: render_risk_block(risk_result["data"])
         with c2: render_radar_chart(risk_result["data"])
     else:

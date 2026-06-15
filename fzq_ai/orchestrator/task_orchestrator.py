@@ -102,27 +102,22 @@ PIPELINE_META: Dict[str, Dict[str, str]] = {
         "description": "多阵营叙事分析：按 region 分组 + 提取核心主题关键词",
         "inputs": "articles (List[Article])",
         "outputs": "Dict[region → {themes, articles}]",
-    },
     "risk": {
         "name": "Risk Pipeline",
         "description": "多维风险分析：政治/经济/军事/社会/科技关键词扫描 + 评分",
         "inputs": "articles (List[Article])",
         "outputs": "{overall_risk_score, category_intensity, items}",
-    },
     "daily-report": {
         "name": "Daily Report Pipeline",
         "description": "每日情报报告生成：结构化 Markdown + 关键事件 + 风险扫描",
         "inputs": "articles (List[Article]), summary (str, optional)",
         "outputs": "Markdown 文本",
-    },
     "sentiment": {
         "name": "Sentiment Pipeline",
         "description": "情感/态度分析：中英文关键词匹配 + 整体分布",
         "inputs": "articles (List[Article])",
         "outputs": "{items, distribution, overall_sentiment}",
-    },
 }
-
 
 # ── 自动 Pipeline 组合规则 (v2.6) ──────────────────────────────
 
@@ -140,7 +135,6 @@ PIPELINE_COMPOSITIONS: Dict[str, List[str]] = {
     "情感风险": ["news-intel", "sentiment", "risk"],
     "叙事风险": ["news-intel", "narrative", "risk"],
 }
-
 
 class TaskOrchestrator:
     """统一 Pipeline 调度器，支持 NL 任务路由。"""
@@ -163,40 +157,26 @@ class TaskOrchestrator:
 
     def run_nl(self, user_query: str, **kwargs: Any) -> Dict[str, Any]:
         """
-        根据自然语言查询自动选择 Pipeline（支持多 Pipeline 自动组合）。
 
-        Args:
-            user_query: 用户自然语言查询
-            **kwargs: items, topic, articles, region 等参数
-
-        Returns:
             {task, pipelines_used, results, diagnostics}
         """
-        query_lower: str = user_query.lower().strip()
 
         # —— 1. 检测组合关键词 ——
-        pipelines_to_run: List[str] = []
         for comp_key, comp_pipes in PIPELINE_COMPOSITIONS.items():
             if comp_key in query_lower:
-                pipelines_to_run = list(comp_pipes)
-                break
 
         # —— 2. 单 Pipeline 关键词匹配 ——
         if not pipelines_to_run:
             for keyword, key in KEYWORD_TASK_MAP.items():
                 if keyword.lower() in query_lower:
                     pipelines_to_run = [key]
-                    break
 
         # —— 3. diagnostics ——
-        diagnostics: Dict[str, Any] = {
             "topic_queried": user_query,
             "pipelines_selected": pipelines_to_run if pipelines_to_run else None,
             "timestamp": time.time(),
             "language_detected": "zh" if any(
                 "\u4e00" <= c <= "\u9fff" for c in user_query
-            ) else "en",
-        }
 
         # —— 4. 未知任务 ——
         if not pipelines_to_run:
@@ -210,34 +190,25 @@ class TaskOrchestrator:
                 "error": f"Cannot identify task: '{user_query}'. "
                          f"Available: {list(self.pipelines.keys())}",
                 "data": None,
-            }
 
         # —— 5. 执行 Pipeline(s) ——
         results: Dict[str, Any] = {}
         pipeline_results: Dict[str, Any] = {}
-        shared_articles: List[Article] = list(kwargs.get("articles", []))
 
         for pipe_key in pipelines_to_run:
             if pipe_key not in self.pipelines:
-                continue
 
             pipeline = self.pipelines[pipe_key]
             result: ServiceResult
 
             try:
                 if pipe_key == "news-intel":
-                    topic = kwargs.get("topic", user_query)
                     result = _to_service_result(pipeline.run(topic=topic))
                     if result.success and result.data:
                         if isinstance(result.data, dict):
                             bundle = result.data.get("intel_bundle", result.data)
                             shared_articles = list(getattr(bundle, "articles", []))
                         else:
-                            shared_articles = []
-                        diagnostics["articles_found"] = len(shared_articles)
-                        diagnostics["rss_sources_checked"] = len(
-                            getattr(self, "sources", [])
-                        ) or "unknown"
 
                 elif pipe_key == "sentiment":
                     result = _to_service_result(_run_async_safely(
@@ -262,7 +233,6 @@ class TaskOrchestrator:
                     "success": result.success,
                     "data": result.data,
                     "error": result.error,
-                }
 
             except Exception as e:
                 pipeline_results[pipe_key] = {
@@ -280,7 +250,6 @@ class TaskOrchestrator:
             if not v.get("success")
         ]
 
-        diagnostics["fallback_used"] = bool(errors)
         diagnostics["errors"] = errors if errors else None
 
         return {
@@ -297,16 +266,10 @@ class TaskOrchestrator:
 
     def run(
         self,
-        agent_name: str,
-        items: Optional[List[str]] = None,
-        **kwargs: Any,
-    ) -> Dict[str, Any]:
         """同步入口（向后兼容）。自动检测为 agent_name 或 NL 查询。"""
         if items is None:
-            items = []
 
         # 先尝试 agent 映射
-        agent_map: Dict[str, str] = {
             "daily_report": "daily-report",
             "daily-report": "daily-report",
             "narrative": "narrative",
@@ -314,17 +277,12 @@ class TaskOrchestrator:
             "news-intel": "news-intel",
             "news_intel": "news-intel",
             "sentiment": "sentiment",
-        }
-
-        pipeline_key: str = agent_map.get(agent_name) or agent_name
 
         # 如果不是已知 pipeline，尝试 NL 路由
         if pipeline_key not in self.pipelines:
             return self.run_nl(agent_name, **kwargs)
 
         pipeline = self.pipelines[pipeline_key]
-        articles: List[Article] = (
-            kwargs.get("articles")
             or [Article(title_original=str(i)) for i in items]
         )
 
@@ -346,57 +304,39 @@ class TaskOrchestrator:
                 "success": result.success,
                 "data": result.data,
                 "error": result.error,
-            }
 
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     def run_agent(
         self,
-        agent_name: str,
-        articles: Optional[List[Article]] = None,
-        **kwargs: Any,
-    ) -> Dict[str, Any]:
         """向后兼容包装。"""
         return self.run(agent_name, items=None, articles=articles, **kwargs)
 
     # ── v3.0: Scenario runner ─────────────────────────────────
 
-    SCENARIO_MAP: Dict[str, str] = {
         "daily_global_risk": "full analysis of global risk today",
         "taiwan_watch": "Taiwan strait situation latest news risk analysis",
         "energy_market": "global energy market oil sanctions news sentiment",
         "daily_global": "global news risk sentiment narrative full analysis",
-    }
 
     def run_scenario(self, scenario_name: str) -> Dict[str, Any]:
         """
-        v3.0 — Execute a named scenario (pre-configured pipeline combo).
 
-        Args:
-            scenario_name: Key from SCENARIO_MAP
-
-        Returns:
-            Same structure as run_nl()
         """
         query = self.SCENARIO_MAP.get(scenario_name, scenario_name)
         return self.run_nl(query)
 
     def list_pipelines(self) -> List[Dict[str, str]]:
         """
-        返回所有可用 Pipeline 的名称和简要说明。
 
-        Returns:
-            [{"name": "...", "description": "...", "inputs": "...", "outputs": "..."}, ...]
         """
         return [
-            {
                 "key": key,
                 "name": meta["name"],
                 "description": meta["description"],
                 "inputs": meta["inputs"],
                 "outputs": meta["outputs"],
-            }
             for key, meta in PIPELINE_META.items()
         ]
 
@@ -404,7 +344,6 @@ class TaskOrchestrator:
     def router_metrics(self) -> Dict[str, Any]:
         """暴露 LLM Router 指标。"""
         return self.router.metrics
-
 
 # ============================================================
 # 辅助函数
@@ -418,29 +357,21 @@ def _to_service_result(raw: Any) -> ServiceResult:
         return ServiceResult.ok(raw)
     return ServiceResult.ok(str(raw))
 
-
 def _run_async_safely(maybe_coro: Any) -> Any:
     """
-    安全执行异步协程，兼容同步返回值。
-    v2.6: 如果传入的是同步值（如 str），直接返回。
     """
-    import inspect
     if not inspect.iscoroutine(maybe_coro):
         return maybe_coro  # already a sync result
 
     try:
-        loop = asyncio.get_running_loop()
     except RuntimeError:
         return asyncio.run(maybe_coro)
-
-    import concurrent.futures
 
     def _run_in_thread() -> Any:
         new_loop = asyncio.new_event_loop()
         try:
             return new_loop.run_until_complete(maybe_coro)
         finally:
-            new_loop.close()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(_run_in_thread)

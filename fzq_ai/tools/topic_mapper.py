@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-
 class TopicMapper:
     """
-    将用户输入映射到预定义主题。
-    这是一个简单版本，后续我们会升级成 DeepSeek 语义分类。
     """
 
     def __init__(self):
@@ -31,13 +28,10 @@ class TopicMapper:
             "japan": "east_asia",
             "korea": "east_asia",
             "australia": "oceania",
-        }
 
     def map_topic(self, query: str | None) -> str | None:
         if not query:
             return None
-
-        q = query.lower()
 
         for key, topic in self.mapping.items():
             if key in q:

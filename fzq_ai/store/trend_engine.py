@@ -11,7 +11,6 @@ from typing import Any, Dict, List, Optional
 from fzq_ai.domain.models import Article
 from fzq_ai.store.intel_store import IntelStore
 
-
 class TrendEngine:
     """v2.7: Time-series trend analysis over IntelStore data."""
 
@@ -23,7 +22,6 @@ class TrendEngine:
         records = self._store.load_trend(topic)
         daily: Dict[str, int] = defaultdict(int)
         for r in records:
-            day = r.created_at.strftime("%Y-%m-%d")
             daily[day] += len(r.bundle.articles) if r.bundle.articles else 0
         return [{"date": d, "count": c} for d, c in sorted(daily.items())]
 
@@ -32,10 +30,7 @@ class TrendEngine:
         records = self._store.load_trend(topic)
         daily: Dict[str, List[float]] = defaultdict(list)
         for r in records:
-            day = r.created_at.strftime("%Y-%m-%d")
             for a in r.bundle.articles or []:
-                rl = getattr(a, "risk_level", 0) or 0
-                daily[day].append(float(rl))
         return [
             {"date": d, "avg_risk": round(sum(v)/len(v), 2) if v else 0}
             for d, v in sorted(daily.items())
@@ -48,13 +43,9 @@ class TrendEngine:
             lambda: defaultdict(int)
         )
         for r in records:
-            day = r.created_at.strftime("%Y-%m-%d")
             for a in r.bundle.articles or []:
-                region = a.region or "unknown"
-                region_daily[day][region] += 1
         result = []
         for day in sorted(region_daily):
             entry = {"date": day}
-            entry.update(dict(region_daily[day]))
             result.append(entry)
         return result

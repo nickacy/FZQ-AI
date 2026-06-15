@@ -1,12 +1,7 @@
 # pipelines/risk_scorer.py
 
-
 class RiskScorer:
     """
-    使用 DeepSeek 为新闻生成 3 个风险评分：
-    1) 地缘风险（1–5）
-    2) 市场影响（1–5）
-    3) 社会稳定（1–5）
     """
 
     def __init__(self, llm):

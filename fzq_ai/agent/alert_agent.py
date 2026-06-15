@@ -7,10 +7,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-
 class AlertAgent:
     """
-    v3.0 — Risk alert scanner.
 
     Scans recent data for high-risk events and generates alert records.
     """
@@ -24,22 +22,14 @@ class AlertAgent:
         """
         Scan data layer for articles with risk_level >= threshold.
 
-        Args:
-            hours: Look-back window in hours
-
-        Returns:
             List of alert dicts with title, risk_level, risk_type, url
         """
-        alerts: List[Dict[str, Any]] = []
-        since = datetime.now() - timedelta(hours=hours)
 
         if self._store:
             try:
                 articles = self._store.query_articles(since=since, limit=200)
                 for a in articles:
-                    risk = getattr(a, "risk_level", 0) or 0
                     if risk >= self._threshold:
-                        alerts.append({
                             "title": getattr(a, "title_original", ""),
                             "risk_level": risk,
                             "risk_type": getattr(a, "risk_type", ""),

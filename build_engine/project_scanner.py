@@ -2,7 +2,6 @@
 import os
 from typing import Dict
 
-
 def scan_project(root_dir: str, target_structure: Dict[str, str]) -> Dict[str, bool]:
     result = {}
     for rel_path in target_structure.keys():

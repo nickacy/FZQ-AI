@@ -4,7 +4,6 @@ from fzq_ai.agent.watchlist_agent import WatchlistAgent
 from fzq_ai.agent.report_agent import ReportAgent
 from fzq_ai.agent.alert_agent import AlertAgent
 
-
 class TestSchedulerAgent:
     def test_register_job(self):
         s = SchedulerAgent()
@@ -19,7 +18,6 @@ class TestSchedulerAgent:
     def test_scheduled_task(self):
         t = ScheduledTask("n", "0 8 * * *", "s")
         assert t.name == "n"
-
 
 class TestWatchlistAgent:
     def test_topics(self):
@@ -36,7 +34,6 @@ class TestWatchlistAgent:
         w = WatchlistAgent(watchlist_path="_test_wl.json")
         assert isinstance(w.run_once(), dict)
 
-
 class TestReportAgent:
     def test_empty_report(self):
         r = ReportAgent()
@@ -46,11 +43,9 @@ class TestReportAgent:
 
     def test_save_report(self):
         import os
-        r = ReportAgent()
         p = r.save_report("# test", filename="_tr.md")
         assert os.path.exists(p)
         os.remove(p)
-
 
 class TestAlertAgent:
     def test_scan_empty(self):
