@@ -83,7 +83,7 @@ class TestDailyReportPipeline:
         ]
         result = pipeline.run(articles=articles)
         assert isinstance(result, str) and len(result) > 0
-        assert "FZQ-AI" in result.data
+        assert "FZQ-AI" in result
 
     def test_daily_report_empty_articles(self):
         from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
