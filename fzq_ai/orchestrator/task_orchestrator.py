@@ -227,31 +227,34 @@ class TaskOrchestrator:
             try:
                 if pipe_key == "news-intel":
                     topic = kwargs.get("topic", user_query)
-                    result = pipeline.run(topic=topic)
+                    result = _to_service_result(pipeline.run(topic=topic))
                     if result.success and result.data:
-                        bundle = result.data.get("intel_bundle", result.data)
-                        shared_articles = list(getattr(bundle, "articles", []))
+                        if isinstance(result.data, dict):
+                            bundle = result.data.get("intel_bundle", result.data)
+                            shared_articles = list(getattr(bundle, "articles", []))
+                        else:
+                            shared_articles = []
                         diagnostics["articles_found"] = len(shared_articles)
                         diagnostics["rss_sources_checked"] = len(
                             getattr(self, "sources", [])
                         ) or "unknown"
 
                 elif pipe_key == "sentiment":
-                    result = _run_async_safely(
+                    result = _to_service_result(_run_async_safely(
                         pipeline.run(articles=shared_articles)
-                    )
+                    ))
                 elif pipe_key == "risk":
-                    result = _run_async_safely(
+                    result = _to_service_result(_run_async_safely(
                         pipeline.run(articles=shared_articles)
-                    )
+                    ))
                 elif pipe_key == "narrative":
-                    result = _run_async_safely(
+                    result = _to_service_result(_run_async_safely(
                         pipeline.run(articles=shared_articles)
-                    )
+                    ))
                 elif pipe_key == "daily-report":
-                    result = _run_async_safely(
+                    result = _to_service_result(_run_async_safely(
                         pipeline.run(articles=shared_articles)
-                    )
+                    ))
                 else:
                     result = ServiceResult.fail(f"Unknown pipeline: {pipe_key}")
 
@@ -329,7 +332,7 @@ class TaskOrchestrator:
             result: ServiceResult
             if pipeline_key == "news-intel":
                 topic = " ".join(items) if items else kwargs.get("topic", "")
-                result = pipeline.run(topic=topic)
+                result = _to_service_result(pipeline.run(topic=topic))
             elif pipeline_key == "sentiment":
                 result = _run_async_safely(
                     pipeline.run(articles=articles, **kwargs)
@@ -388,21 +391,35 @@ class TaskOrchestrator:
 # 辅助函数
 # ============================================================
 
-def _run_async_safely(coro: Any) -> Any:
+def _to_service_result(raw: Any) -> ServiceResult:
+    """Wrap sync str/ServiceResult returns uniformly."""
+    if isinstance(raw, ServiceResult):
+        return raw
+    if isinstance(raw, str):
+        return ServiceResult.ok(raw)
+    return ServiceResult.ok(str(raw))
+
+
+def _run_async_safely(maybe_coro: Any) -> Any:
     """
-    安全执行异步协程 — 兼容已有事件循环的情况。
+    安全执行异步协程，兼容同步返回值。
+    v2.6: 如果传入的是同步值（如 str），直接返回。
     """
+    import inspect
+    if not inspect.iscoroutine(maybe_coro):
+        return maybe_coro  # already a sync result
+
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        return asyncio.run(coro)
+        return asyncio.run(maybe_coro)
 
     import concurrent.futures
 
     def _run_in_thread() -> Any:
         new_loop = asyncio.new_event_loop()
         try:
-            return new_loop.run_until_complete(coro)
+            return new_loop.run_until_complete(maybe_coro)
         finally:
             new_loop.close()
 

@@ -1,9 +1,9 @@
-﻿# fzq_ai/pipelines/daily_report_pipeline.py
+# fzq_ai/pipelines/daily_report_pipeline.py
 
 from __future__ import annotations
 from typing import List, Any, Optional
 
-from fzq_ai.domain.models import Article, ServiceResult
+from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
 
@@ -24,7 +24,7 @@ class DailyReportPipeline:
         query: str = "",
         articles: Optional[List[Article]] = None,
         summary: str | None = None,
-    ) -> str:
+    ) -> ServiceResult:
         """
         生成每日情报报告。
         如果未传入 articles，则自动从 news_fetcher 抓取新闻。

@@ -1,11 +1,11 @@
-﻿# fzq_ai/pipelines/narrative_pipeline.py
+# fzq_ai/pipelines/narrative_pipeline.py
 
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
 from collections import Counter
 import re
 
-from fzq_ai.domain.models import Article, ServiceResult
+from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
 STOPWORDS = {
@@ -32,7 +32,7 @@ class NarrativePipeline:
         text: str = "",
         articles: Optional[List[Article]] = None,
         summary: str | None = None,
-    ) -> str:
+    ) -> ServiceResult:
         """
         多阵营叙事分析。
         - 如果传入 articles，直接分析

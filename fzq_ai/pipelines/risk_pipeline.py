@@ -1,9 +1,9 @@
-﻿# fzq_ai/pipelines/risk_pipeline.py
+# fzq_ai/pipelines/risk_pipeline.py
 
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
 
-from fzq_ai.domain.models import Article, ServiceResult
+from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
 
@@ -45,7 +45,7 @@ class RiskPipeline:
         topic: str = "",
         articles: Optional[List[Article]] = None,
         summary: str | None = None,
-    ) -> str:
+    ) -> ServiceResult:
         """
         风险扫描分析。
         - 如果传入 articles，直接分析
