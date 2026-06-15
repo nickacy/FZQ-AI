@@ -112,6 +112,7 @@ PIPELINE_META: Dict[str, Dict[str, str]] = {
         "description": "每日情报报告生成：结构化 Markdown + 关键事件 + 风险扫描",
         "inputs": "articles (List[Article]), summary (str, optional)",
         "outputs": "Markdown 文本",
+    },
     "sentiment": {
         "name": "Sentiment Pipeline",
         "description": "情感/态度分析：中英文关键词匹配 + 整体分布",
