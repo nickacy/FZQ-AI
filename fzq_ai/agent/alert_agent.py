@@ -1,80 +1,64 @@
-"""
-fzq_ai/agent/alert_agent.py — v3.0 Alert Agent (skeleton)
-Scans data for high-risk signals and triggers alerts.
-"""
-
 from __future__ import annotations
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import List, Dict, Any
+
+from fzq_ai.domain.models import IntelBundle, Article
+from fzq_ai.store.intel_store import IntelStore
 
 
 class AlertAgent:
     """
-    v3.0 — Risk alert scanner.
-
-    Scans recent data for high-risk events and generates alert records.
+    v4.5 AlertAgent
+    - 重大事件检测
+    - 结合单篇文章风险 + 汇总风险 + 叙事信息
     """
 
-    def __init__(self, store: Any = None, risk_threshold: int = 4):
-        self._store = store
-        self._threshold = risk_threshold
-        self._alerts: List[Dict[str, Any]] = []
+    def __init__(self, store: IntelStore | None = None):
+        self.store = store
 
-    def scan_for_alerts(self, hours: int = 24) -> List[Dict[str, Any]]:
+    def _is_high_risk_article(self, article: Article) -> bool:
         """
-        Scan data layer for articles with risk_level >= threshold.
-
-        Args:
-            hours: Look-back window in hours
-
-        Returns:
-            List of alert dicts with title, risk_level, risk_type, url
+        高风险判定规则（可扩展）：
+        - risk_level >= 4
+        - 或 risk_type 属于高敏类别
         """
-        alerts: List[Dict[str, Any]] = []
-        since = datetime.now() - timedelta(hours=hours)
+        if getattr(article, "risk_level", None) is not None:
+            if article.risk_level >= 4:
+                return True
 
-        if self._store:
-            try:
-                articles = self._store.query_articles(since=since, limit=200)
-                for a in articles:
-                    risk = getattr(a, "risk_level", 0) or 0
-                    if risk >= self._threshold:
-                        alerts.append({
-                            "title": getattr(a, "title_original", ""),
-                            "risk_level": risk,
-                            "risk_type": getattr(a, "risk_type", ""),
-                            "url": getattr(a, "url", ""),
-                            "source": getattr(a, "source_name", ""),
-                        })
-            except Exception:
-                pass
+        high_types = {"military", "geopolitical", "sanction", "terrorism"}
+        if getattr(article, "risk_type", None) in high_types:
+            return True
 
-        self._alerts = alerts
-        return alerts
+        return False
 
-    def get_active_alerts(self) -> List[Dict[str, Any]]:
-        return self._alerts
+    def detect_major_events(self, bundle: IntelBundle) -> List[Dict[str, Any]]:
+        """
+        输入：单次 run 的 IntelBundle
+        输出：重大事件列表（结构化）
+        测试要求：
+        - 返回 list
+        - 至少包含 1 个元素（在构造了高风险文章时）
+        """
+        events: List[Dict[str, Any]] = []
 
-    def clear_alerts(self) -> None:
-        self._alerts.clear()
+        for a in bundle.articles:
+            if self._is_high_risk_article(a):
+                events.append(
+                    {
+                        "title": a.title_original,
+                        "region": getattr(a, "region", "") or "",
+                        "risk_level": getattr(a, "risk_level", None),
+                        "risk_type": getattr(a, "risk_type", None),
+                    }
+                )
 
+        # 结合 bundle 的风险汇总信息（如果有）
+        if bundle.risk_summary:
+            events.append(
+                {
+                    "type": "bundle_risk_summary",
+                    "summary": bundle.risk_summary,
+                }
+            )
 
-    def detect_major_events(self, bundle=None):
-        """v4.5: Rule-based major event detection."""
-        alerts = []
-        if bundle is None:
-            return alerts
-        articles = getattr(bundle, 'articles', []) or []
-        keywords = ['war', 'attack', 'ceasefire', 'sanction', 'coup',
-                    'election', 'missile', 'invasion', 'treaty', 'summit']
-        for a in articles:
-            title = (getattr(a, 'title_original', '') or '').lower()
-            risk = getattr(a, 'risk_level', 0) or 0
-            if risk >= 4 or any(k in title for k in keywords):
-                alerts.append({
-                    'title': getattr(a, 'title_original', ''),
-                    'risk_level': risk,
-                    'source': getattr(a, 'source_name', ''),
-                    'url': getattr(a, 'url', ''),
-                })
-        return alerts
+        return events

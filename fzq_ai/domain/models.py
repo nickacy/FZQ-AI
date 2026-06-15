@@ -32,29 +32,12 @@ class ServiceResult:
 
 @dataclass
 class Article:
-    id: str = ""
-    url: str = ""
-    source_id: str = ""
-    source_name: str = ""
+    title_original: str
+    content_original: str
+    source: str = ""
     region: str = ""
-    language: str = ""
-    fetched_at: datetime = None  # type: ignore
-
-    title_original: str = ""
-    content_original: Optional[str] = None
-
-    content_translated: Optional[str] = None
-    content_snippet_en: Optional[str] = None
-
-    credibility: float = 0.0
-    bias: float = 0.0
-    propaganda_tags: List[str] = None  # type: ignore
-
-    def __post_init__(self):
-        if self.fetched_at is None:
-            self.fetched_at = datetime.now()
-        if self.propaganda_tags is None:
-            self.propaganda_tags = []
+    risk_level: int | None = None
+    risk_type: str | None = None
 
 
 # ============================================================
