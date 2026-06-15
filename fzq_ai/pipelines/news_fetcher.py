@@ -96,50 +96,37 @@ def fetch_from_rss(query: str = "") -> List[Article]:
     for cfg in RSS_SOURCES:
         all_articles.extend(_parse_rss_source(cfg))
 
-    # ── 智能多级过滤 (v2.6 fix) ──
+    # ── 智能多级匹配 + 相关性排序 (v2.6) ──
     if query:
         q_en = translate_to_english(query).lower()
         q_original = query.lower()
-
-        # 拆分为单词（用于单篇匹配）
         query_words = set(q_en.split()) | set(q_original.split())
-        # 过滤掉太短的停用词（a, an, the, in, on, of, to, is, ...）
         stopwords = {"a", "an", "the", "in", "on", "of", "to", "is", "at",
                      "for", "and", "or", "by", "it", "be", "as", "we", "us",
                      "its", "has", "had", "was", "are", "were", "will", "can"}
+        meaningful = {w for w in query_words if len(w) >= 2 and w not in stopwords}
 
-        # 第1级：整体短语匹配（精确）
-        matched = [
-            a for a in all_articles
-            if q_en in (a.title_original or "").lower()
-            or q_en in (a.content_original or "").lower()
-            or q_original in (a.title_original or "").lower()
-        ]
+        # 为每篇文章计算相关性分数
+        scored: List[tuple] = []
+        for a in all_articles:
+            text = ((a.title_original or "") + " " + (a.content_original or "")).lower()
+            score = 0
+            if q_en in text or q_original in text:
+                score += 3  # 短语精确匹配
+            for w in meaningful:
+                if w in text:
+                    score += 1  # 单词命中
+            score += (a.credibility or 0) * 2  # 来源可信度加权
+            if score > 0:
+                scored.append((score, a))
 
-        # 第2级：单词级匹配（任一关键词命中）
-        if not matched and len(query_words) > 0:
-            meaningful_words = {w for w in query_words
-                               if len(w) >= 2 and w not in stopwords}
-            if meaningful_words:
-                matched = [
-                    a for a in all_articles
-                    if any(
-                        w in (a.title_original or "").lower()
-                        or w in (a.content_original or "").lower()
-                        for w in meaningful_words
-                    )
-                ]
+        scored.sort(key=lambda x: x[0], reverse=True)
+        matched = [a for _, a in scored]
 
-        # 第3级：宽泛回退（前30条）
-        if not matched:
-            matched = all_articles[:30]
-
-        # 第4级：数量不足时补齐至50（v2.6）
+        # 数量不足时补齐至50
         if len(matched) < 50:
-            # 添加尚未匹配的文章（按顺序）
             remaining = [a for a in all_articles if a not in matched]
-            needed = 50 - len(matched)
-            matched.extend(remaining[:needed])
+            matched.extend(remaining[:50 - len(matched)])
 
         all_articles = matched
 
@@ -298,11 +285,11 @@ def fetch_all_news(query: str, min_results: int = 50) -> List[Article]:
     # v2.6: 区域平衡重排
     unique = rebalance_articles(unique, min_count=min_results)
 
-    # v2.6: 非中英内容翻译预览
+    # v2.6: 非英语内容 → 英文翻译预览
     for a in unique:
         if a.language not in ("zh", "en", "") and a.content_original:
-            a.content_snippet_en = translate_snippet_to_chinese(
-                a.content_original[:1000]
+            a.content_snippet_en = translate_snippet(
+                a.content_original[:1000], target_lang="en"
             )
 
     return unique
@@ -310,11 +297,18 @@ def fetch_all_news(query: str, min_results: int = 50) -> List[Article]:
 
 def rebalance_articles(articles: List[Article], min_count: int = 50) -> List[Article]:
     """
-    v2.6: 区域平衡重排 - 从每个地区轮流取一篇，
-    确保 Western / Global South / China / Russia / Africa 多样性。
+    v2.6: Region-balanced reorder + Global South >=30% guarantee.
+
+    Strategy:
+    1. Western capped at ~40%
+    2. Global South (china/russia/middle_east/africa/latin_america/east_asia) >=30%
+    3. Round-robin interleave, prefer Global South when under target
     """
     if len(articles) <= min_count:
         return articles
+
+    GS_REGIONS = {"china", "russia", "middle_east", "africa",
+                  "latin_america", "east_asia", "southeast_asia"}
 
     buckets: Dict[str, List[Article]] = {}
     for a in articles:
@@ -329,17 +323,38 @@ def rebalance_articles(articles: List[Article], min_count: int = 50) -> List[Art
     if len(region_order) == 1:
         return articles[:max(len(articles), min_count)]
 
+    # Round-robin interleave
     while len(result) < min_count and len(result) < len(articles):
         region = region_order[round_idx % len(region_order)]
         if idx[region] < len(buckets[region]):
             result.append(buckets[region][idx[region]])
             idx[region] += 1
         round_idx += 1
-        all_done = all(idx[r] >= len(buckets[r]) for r in region_order)
-        if all_done:
+        if all(idx[r] >= len(buckets[r]) for r in region_order):
             break
 
-    # 追加剩余
+    # Enforce Global South >=30%
+    gs_articles = [a for a in result if a.region in GS_REGIONS]
+    target_gs = max(int(len(result) * 0.3), 10)
+
+    if len(gs_articles) < target_gs:
+        extra_gs = []
+        for region in region_order:
+            if region in GS_REGIONS:
+                while idx[region] < len(buckets[region]):
+                    extra_gs.append(buckets[region][idx[region]])
+                    idx[region] += 1
+        insert_every = max(2, len(result) // (target_gs - len(gs_articles) + 1))
+        inserted = 0
+        for i, gs_a in enumerate(extra_gs):
+            if len(gs_articles) + inserted >= target_gs:
+                break
+            pos = (i + 1) * insert_every
+            if pos < len(result):
+                result.insert(pos, gs_a)
+                inserted += 1
+
+    # Append remaining
     for region in region_order:
         while idx[region] < len(buckets[region]) and len(result) < len(articles):
             result.append(buckets[region][idx[region]])
@@ -348,35 +363,40 @@ def rebalance_articles(articles: List[Article], min_count: int = 50) -> List[Art
     return result
 
 
-def translate_snippet_to_chinese(text: str) -> str:
+def translate_snippet(text: str, target_lang: str = "en") -> str:
     """
-    v2.6: 将非中英内容翻译为中文预览（前 1000 字符）。
-    使用 DeepSeek API，失败时返回原文前 200 字符。
+    v2.6: Translate non-English content to English (or Chinese).
+    target_lang="en": translate to English (default)
+    target_lang="zh": translate to Chinese
+    Falls back to first 200 chars of original text on failure.
     """
     if not text:
         return ""
-    has_cjk = any("\u4e00" <= c <= "\u9fff" for c in text[:50])
-    if has_cjk:
-        return text[:200]
     try:
         from fzq_ai.config import DEEPSEEK_API_KEY, DEEPSEEK_MODEL
         import requests as _r
         if not DEEPSEEK_API_KEY:
             return text[:200]
+        sys_msg = ("Translate to Chinese. Only return translation."
+                   if target_lang == "zh"
+                   else "Translate to English. Only return translation.")
         payload = {
             "model": DEEPSEEK_MODEL,
             "messages": [
-                {"role": "system", "content": "Translate to Chinese. Only return translation, no explanation."},
-                {"role": "user", "content": text[:800]},
+                {"role": "system", "content": sys_msg},
+                {"role": "user", "content": text[:1000]},
             ],
             "temperature": 0.2,
         }
-        headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}", "Content-Type": "application/json"}
-        resp = _r.post("https://api.deepseek.com/v1/chat/completions", json=payload, headers=headers, timeout=15)
+        headers = {"Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                   "Content-Type": "application/json"}
+        resp = _r.post("https://api.deepseek.com/v1/chat/completions",
+                       json=payload, headers=headers, timeout=15)
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"].strip()
     except Exception:
         return text[:200]
+
 
 
 def fetch_all_news_async(query: str) -> List[Article]:
