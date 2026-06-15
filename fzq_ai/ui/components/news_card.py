@@ -1,33 +1,17 @@
 """
-fzq_ai/ui/components/news_card.py
-v2.6 — Rich news card with title, summary, source, risk, keywords, and link.
+fzq_ai/ui/components/news_card.py — v2.6 Professional News Card
 """
 
 from __future__ import annotations
-
-from typing import Any, Dict, List, Optional
-
+from typing import Any, List
 import streamlit as st
 from fzq_ai.domain.models import Article
+from fzq_ai.ui.theme import COLORS, region_tag
 
 
 def render_news_card(article: Any) -> None:
-    """
-    Render a single news article as a rich card.
-
-    Args:
-        article: Article object or dict with title, source, summary, url, etc.
-    """
-    title: str = ""
-    source: str = ""
-    region: str = ""
-    url: str = ""
-    summary: str = ""
-    published: str = ""
-    risk_level: int = 0
-    risk_type: str = ""
-    credibility: float = 0.0
-    language: str = ""
+    title = source = region = url = summary = language = ""
+    credibility = 0.0
 
     if isinstance(article, Article):
         title = article.title_original or "Untitled"
@@ -37,8 +21,6 @@ def render_news_card(article: Any) -> None:
         summary = article.content_original or ""
         credibility = article.credibility or 0.0
         language = article.language or ""
-        published = str(article.fetched_at) if article.fetched_at else ""
-
     elif isinstance(article, dict):
         title = article.get("title_original") or article.get("title", "Untitled")
         source = article.get("source_name") or article.get("source", "")
@@ -47,49 +29,41 @@ def render_news_card(article: Any) -> None:
         summary = article.get("content_original") or article.get("summary", "")
         credibility = article.get("credibility", 0.0)
         language = article.get("language", "")
-        risk_level = article.get("risk_level", 0)
-        risk_type = article.get("risk_type", "")
-        published = article.get("published_at", "")
     else:
         st.write(str(article))
         return
 
-    # Card container
-    with st.container():
-        # Title
-        st.markdown(f"### 📰 {title[:100]}")
+    # ── Meta tags ──
+    tags_html = ""
+    if region:
+        tags_html += region_tag(region)
+    if language and language not in ("en", ""):
+        tags_html += f' <span class="fzq-tag" style="background:{COLORS["primary_light"]}">{language.upper()}</span>'
+    if credibility:
+        cred_color = COLORS["success"] if credibility >= 0.8 else COLORS["warning"]
+        tags_html += f' <span class="fzq-tag" style="background:{cred_color}">Cred {credibility:.1f}</span>'
 
-        # Meta row
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.caption(f"**Source:** {source}")
-        with col2:
-            st.caption(f"**Region:** {region}")
-        with col3:
-            st.caption(f"**Lang:** {language}")
-        with col4:
-            if published:
-                st.caption(f"**Published:** {published[:19]}")
+    # ── Title with link ──
+    title_display = f'<a href="{url}" target="_blank" style="text-decoration:none;color:{COLORS["text_primary"]};">{title[:120]}</a>' if url else title[:120]
 
-        # Summary
-        if summary:
-            st.markdown(summary[:300])
+    # ── Card ──
+    snippet_html = ""
+    if summary:
+        snippet_html = (
+            f'<div style="font-size:13px;color:{COLORS["text_secondary"]};'
+            f'margin:8px 0;line-height:1.5;">{summary[:250]}</div>'
+        )
 
-        # Keywords / Tags row
-        tags: List[str] = []
-        if risk_type:
-            tags.append(f"Risk: {risk_type}")
-        if credibility:
-            tags.append(f"Cred: {credibility:.1f}")
-        if risk_level:
-            level_emoji = {1: "🟢", 2: "🟡", 3: "🟠", 4: "🔴", 5: "🔴"}
-            tags.append(f"{level_emoji.get(risk_level, '⚪')} Risk Lv.{risk_level}")
-
-        if tags:
-            st.markdown(" · ".join(tags))
-
-        # Link
-        if url:
-            st.markdown(f"[🔗 Read Original]({url})")
-
-        st.markdown("---")
+    st.markdown(
+        f'<div class="fzq-card">'
+        f'<div style="font-weight:600;font-size:15px;margin-bottom:6px;">'
+        f'{title_display}</div>'
+        f'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+        f'<span style="font-size:12px;color:{COLORS["text_secondary"]};">'
+        f'📰 {source}</span>'
+        f'{tags_html}'
+        f'</div>'
+        f'{snippet_html}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )

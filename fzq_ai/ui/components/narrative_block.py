@@ -1,94 +1,93 @@
-# fzq_ai/ui/components/narrative_block.py
 """
-叙事分析展示组件 (v2.5)
-
-使用统一的防御性渲染模式：
-- 成功：展示结构化叙事卡片（按阵营分区）
-- 失败：展示友好错误提示
-- 空结果：显示提示信息
+fzq_ai/ui/components/narrative_block.py — v2.6 Professional Narrative View
 """
 
 from __future__ import annotations
-
 from typing import Any, Dict, List
-
 import streamlit as st
+from fzq_ai.ui.theme import COLORS, section_header
 
-BLOC_COLORS: Dict[str, str] = {
-    "western": "#4A90E2",
-    "east_asia": "#D0021B",
-    "middle_east": "#9013FE",
-    "other": "#7ED321",
-}
-
-BLOC_LABELS: Dict[str, str] = {
-    "western": "西方",
-    "east_asia": "东亚",
-    "middle_east": "中东",
-    "other": "其他",
+BLOC_DATA = {
+    "western":       {"label": "Western",       "color": COLORS["western"],       "icon": "🌍"},
+    "east_asia":     {"label": "East Asia",     "color": COLORS["east_asia"],     "icon": "🌏"},
+    "china":         {"label": "China",         "color": COLORS["china"],         "icon": "🇨🇳"},
+    "middle_east":   {"label": "Middle East",   "color": COLORS["middle_east"],   "icon": "🕌"},
+    "russia":        {"label": "Russia",        "color": COLORS["russia"],        "icon": "🇷🇺"},
+    "africa":        {"label": "Africa",        "color": COLORS["africa"],        "icon": "🌍"},
+    "latin_america": {"label": "Latin America", "color": COLORS["latin_america"], "icon": "🌎"},
+    "other":         {"label": "Other",         "color": COLORS["text_secondary"], "icon": "📡"},
 }
 
 
 def render_narrative_block(narrative_data: Any) -> None:
-    st.markdown("## 多阵营叙事分析")
-
-    if narrative_data is None:
-        st.info("暂无叙事数据")
-        return
+    section_header("Multi-Blocs Narrative", "🧭")
 
     data: Dict[str, Any] = {}
     if isinstance(narrative_data, dict):
         data = narrative_data
     elif hasattr(narrative_data, "data"):
         raw = getattr(narrative_data, "data", {})
-        if isinstance(raw, dict):
-            data = raw
-        else:
-            data = {}
-    else:
-        st.info("叙事数据格式暂不支持")
-        return
+        data = raw if isinstance(raw, dict) else {}
 
     if not data:
-        st.info("暂无叙事数据")
+        st.info("No narrative data available")
         return
 
-    has_any = False
-    for bloc in ["western", "east_asia", "middle_east", "other"]:
-        bloc_data: Dict[str, Any] = data.get(bloc, {})
-        if not bloc_data:
-            continue
+    # Find which blocs have content
+    active_blocs = []
+    for bloc in ["western", "east_asia", "china", "middle_east", "russia", "africa", "latin_america"]:
+        bd = data.get(bloc, {})
+        if isinstance(bd, dict) and (bd.get("themes") or bd.get("articles")):
+            active_blocs.append(bloc)
 
-        label = BLOC_LABELS.get(bloc, bloc)
-        themes: List[str] = bloc_data.get("themes", [])
-        articles: List[Dict[str, Any]] = bloc_data.get("articles", [])
+    if not active_blocs:
+        st.info("No significant narrative blocs detected")
+        return
 
-        if not themes and not articles:
-            continue
-        has_any = True
+    # ── Cards per bloc ──
+    cols = st.columns(min(len(active_blocs), 4))
+    for idx, bloc in enumerate(active_blocs):
+        bd = data[bloc]
+        meta = BLOC_DATA.get(bloc, BLOC_DATA["other"])
+        themes = bd.get("themes", [])
+        articles = bd.get("articles", [])
 
-        color = BLOC_COLORS.get(bloc, "#333")
-        st.markdown(
-            f"""<div style="background-color:{color};padding:6px 12px;
-            border-radius:4px;color:white;font-weight:bold;margin-bottom:8px;">
-            {label} 阵营</div>""",
-            unsafe_allow_html=True,
-        )
+        with cols[idx % len(cols)]:
+            st.markdown(
+                f'<div style="background:{meta["color"]}10;border:1px solid {meta["color"]}30;'
+                f'border-radius:10px;padding:14px;margin:4px 0;'
+                f'border-top:4px solid {meta["color"]};">'
+                f'<div style="font-size:18px;font-weight:700;color:{meta["color"]};'
+                f'margin-bottom:8px;">{meta["icon"]} {meta["label"]}</div>'
+                f'<div style="font-size:24px;font-weight:700;color:{COLORS["text_primary"]};">'
+                f'{len(articles)}</div>'
+                f'<div style="font-size:11px;color:{COLORS["text_secondary"]};">articles</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
 
-        if themes:
-            st.markdown(f"**核心主题:** {' | '.join(themes[:6])}")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        if articles:
-            for a in articles[:5]:
-                title = a.get("title", "无标题")
-                source = a.get("source", "")
-                url = a.get("url", "")
-                if url:
-                    st.markdown(f"- [{title[:80]}]({url}) ({source})")
-                else:
-                    st.markdown(f"- {title[:80]} ({source})")
+    # ── Theme details per bloc ──
+    for bloc in active_blocs:
+        bd = data[bloc]
+        meta = BLOC_DATA.get(bloc, BLOC_DATA["other"])
+        themes = bd.get("themes", [])
+        articles = bd.get("articles", [])
 
-        st.markdown("---")
+        with st.expander(f"{meta['icon']} {meta['label']} — {len(themes)} themes, {len(articles)} articles"):
+            if themes:
+                st.markdown("**Core Themes**")
+                theme_html = " ".join([
+                    f'<span style="display:inline-block;background:{meta["color"]}20;'
+                    f'color:{meta["color"]};padding:3px 10px;border-radius:12px;'
+                    f'margin:2px;font-size:12px;font-weight:500;">{t[:40]}</span>'
+                    for t in themes[:8]
+                ])
+                st.markdown(theme_html, unsafe_allow_html=True)
 
-    if not has_any:
-        st.info("各阵营暂无显著叙事数据")
+            if articles:
+                st.markdown("**Sample Articles**")
+                for a in articles[:5]:
+                    title = a.get("title", "Untitled") if isinstance(a, dict) else str(a)
+                    st.markdown(f"- {title[:120]}")

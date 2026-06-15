@@ -1,92 +1,102 @@
-# fzq_ai/ui/components/risk_block.py
 """
-风险分析展示组件 (v2.5)
-
-使用统一的防御性渲染模式：
-- 成功：展示结构化风险卡片
-- 失败：展示友好错误提示
-- 空结果：显示提示信息
+fzq_ai/ui/components/risk_block.py — v2.6 Professional Risk Dashboard
 """
 
 from __future__ import annotations
-
-from typing import Any, Dict, List, Optional
-
+from typing import Any, Dict, List
 import streamlit as st
+from fzq_ai.ui.theme import COLORS, RISK_COLORS, region_tag, section_header, status_strip
 
 
 def render_risk_block(risk_data: Any) -> None:
-    """
-    渲染风险分析结果。
+    section_header("Risk Analysis", "⚠️")
 
-    Args:
-        risk_data: dict 或任何格式的风险数据。
-                   预期结构: {overall_risk_score, category_intensity, items}
-    """
-    st.markdown("## ⚠️ 风险分析")
-
-    # ── 防御性解析 ────────────────────────────────────────────
     if risk_data is None:
-        st.info("暂无风险数据")
+        status_strip("No risk data available", "info")
         return
 
-    data: Optional[Dict[str, Any]] = None
+    data: Dict[str, Any] = {}
     if isinstance(risk_data, dict):
         data = risk_data
-    elif hasattr(risk_data, "data") and isinstance(getattr(risk_data, "data"), dict):
-        data = risk_data.data
-    elif hasattr(risk_data, "__dict__"):
-        data = getattr(risk_data, "__dict__", {})
-    else:
-        st.info(f"风险数据格式暂不支持（类型: {type(risk_data).__name__}）")
-        return
+    elif hasattr(risk_data, "data"):
+        raw = getattr(risk_data, "data", {})
+        data = raw if isinstance(raw, dict) else {}
 
     if not data:
-        st.info("暂无风险数据")
+        status_strip("No risk data available", "info")
         return
 
-    # ── 整体风险评分 ──────────────────────────────────────────
-    overall_score: float = float(data.get("overall_risk_score", 0))
-    if overall_score >= 70:
-        st.error(f"🔴 整体风险评分: **{overall_score} / 100** — 高风险")
-    elif overall_score >= 40:
-        st.warning(f"🟡 整体风险评分: **{overall_score} / 100** — 中等风险")
-    elif overall_score > 0:
-        st.success(f"🟢 整体风险评分: **{overall_score} / 100** — 低风险")
+    # ── Overall Score ──
+    overall = float(data.get("overall_risk_score", 0))
+    if overall >= 70:
+        level, emoji, color = "HIGH", "🔴", COLORS["danger"]
+    elif overall >= 40:
+        level, emoji, color = "MEDIUM", "🟡", COLORS["warning"]
     else:
-        st.info("整体风险评分: 暂无数据")
+        level, emoji, color = "LOW", "🟢", COLORS["success"]
 
-    # ── 各类别强度 ────────────────────────────────────────────
+    c1, c2, c3 = st.columns([1, 2, 1])
+    with c1:
+        st.metric("Overall Score", f"{overall:.0f}/100")
+    with c2:
+        st.markdown(
+            f'<div style="background:{color}15;border:1px solid {color}30;'
+            f'border-radius:10px;padding:14px 20px;text-align:center;">'
+            f'<span style="font-size:32px;">{emoji}</span><br>'
+            f'<span style="font-weight:700;color:{color};font-size:18px;">'
+            f'{level} Risk</span></div>',
+            unsafe_allow_html=True,
+        )
+    with c3:
+        cats = len(data.get("category_intensity", {}))
+        items = len(data.get("items", []))
+        st.metric("Categories", str(cats))
+        st.metric("Signals", str(items))
+
+    # ── Category Breakdown ──
     category_intensity: Dict[str, int] = data.get("category_intensity", {})
     if category_intensity:
-        st.markdown("### 风险类别分布")
+        st.markdown("#### Risk Category Distribution")
         cols = st.columns(len(category_intensity))
+        labels = {
+            "political": "🏛 Political", "economic": "💰 Economic",
+            "military": "⚔ Military", "social": "👥 Social",
+            "technology": "🔧 Tech",
+        }
         for idx, (cat, count) in enumerate(category_intensity.items()):
-            label: str = {
-                "political": "🏛️ 政治",
-                "economic": "💰 经济",
-                "military": "⚔️ 军事",
-                "social": "👥 社会",
-                "technology": "🔧 科技",
-            }.get(cat, cat)
             with cols[idx]:
-                st.metric(label=label, value=count)
+                color = RISK_COLORS.get(min(count, 5), COLORS["text_secondary"])
+                st.markdown(
+                    f'<div style="text-align:center;padding:10px 6px;'
+                    f'background:{color}10;border-radius:8px;'
+                    f'border-top:3px solid {color};">'
+                    f'<div style="font-size:22px;font-weight:700;color:{color};">'
+                    f'{count}</div>'
+                    f'<div style="font-size:11px;color:{COLORS["text_secondary"]};'
+                    f'margin-top:4px;">{labels.get(cat, cat)}</div></div>',
+                    unsafe_allow_html=True,
+                )
 
-    # ── 高风险条目列表 ────────────────────────────────────────
-    items: List[Dict[str, Any]] = data.get("items", [])
-    high_risk_items: List[Dict[str, Any]] = [
-        i for i in items if i.get("risk_score", 0) >= 50
-    ]
-
-    if high_risk_items:
-        st.markdown("### ⚡ 高风险条目")
-        for item in high_risk_items[:10]:
-            title: str = item.get("title", "无标题")
-            score: int = item.get("risk_score", 0)
-            cats: List[str] = item.get("risk_categories", [])
+    # ── High-risk items ──
+    items = data.get("items", [])
+    high_risk = [i for i in items if i.get("risk_score", 0) >= 40]
+    if high_risk:
+        st.markdown("#### ⚡ High-Risk Signals")
+        for item in high_risk[:8]:
+            title = item.get("title", "Untitled")
+            score = item.get("risk_score", 0)
+            cats = item.get("risk_categories", [])
+            region = item.get("region", "")
+            tag_html = " ".join([
+                f'<span class="fzq-tag" style="background:{COLORS["danger"]}">Risk {score}</span>'
+            ] + [f'<span class="fzq-tag" style="background:{COLORS["primary_light"]}">{c}</span>' for c in cats])
+            if region:
+                tag_html += region_tag(region)
             st.markdown(
-                f"- **{title[:80]}** "
-                f"(评分: {score}, 类别: {', '.join(cats) if cats else '无'})"
+                f'<div class="fzq-card" style="padding:10px 16px;margin:4px 0;">'
+                f'<span style="font-weight:500;">{title[:90]}</span>'
+                f'<div style="margin-top:6px;">{tag_html}</div></div>',
+                unsafe_allow_html=True,
             )
     elif items:
-        st.info(f"已分析 {len(items)} 条新闻，未发现高风险信号")
+        status_strip(f"Analyzed {len(items)} signals — no elevated risk detected", "success")
