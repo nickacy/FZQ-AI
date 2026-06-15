@@ -97,15 +97,46 @@ def fetch_from_rss(query: str = "") -> List[Article]:
     for cfg in RSS_SOURCES:
         all_articles.extend(_parse_rss_source(cfg))
 
-    # ⭐ 自动翻译中文 query → 英文，再过滤（方案二）
+    # ── 智能多级过滤 (v2.6 fix) ──
     if query:
         q_en = translate_to_english(query).lower()
-        all_articles = [
-            a
-            for a in all_articles
+        q_original = query.lower()
+
+        # 拆分为单词（用于单篇匹配）
+        query_words = set(q_en.split()) | set(q_original.split())
+        # 过滤掉太短的停用词（a, an, the, in, on, of, to, is, ...）
+        stopwords = {"a", "an", "the", "in", "on", "of", "to", "is", "at",
+                     "for", "and", "or", "by", "it", "be", "as", "we", "us",
+                     "its", "has", "had", "was", "are", "were", "will", "can"}
+
+        # 第1级：整体短语匹配（精确）
+        matched = [
+            a for a in all_articles
             if q_en in (a.title_original or "").lower()
             or q_en in (a.content_original or "").lower()
+            or q_original in (a.title_original or "").lower()
         ]
+
+        # 第2级：单词级匹配（任一关键词命中）
+        if not matched and len(query_words) > 0:
+            meaningful_words = {w for w in query_words
+                               if len(w) >= 2 and w not in stopwords}
+            if meaningful_words:
+                matched = [
+                    a for a in all_articles
+                    if any(
+                        w in (a.title_original or "").lower()
+                        or w in (a.content_original or "").lower()
+                        for w in meaningful_words
+                    )
+                ]
+
+        # 第3级：宽泛回退（前20条）
+        if not matched:
+            matched = all_articles[:20]
+
+        all_articles = matched
+
     return all_articles
 
 

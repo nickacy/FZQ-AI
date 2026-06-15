@@ -151,11 +151,18 @@ class NewsPipeline:
                 content: str = e.get("summary", "") or e.get("description", "")
                 link: str = e.get("link", "")
 
-                # 主题匹配
+                # 主题匹配（v2.6 fix: 单词级匹配）
                 if topic:
                     search_text: str = (title + " " + content).lower()
-                    if topic.lower() not in search_text:
-                        continue
+                    t_lower = topic.lower()
+                    # 精确短语匹配
+                    if t_lower in search_text:
+                        pass  # matched
+                    else:
+                        # 单词级匹配
+                        t_words = [w for w in t_lower.split() if len(w) >= 2]
+                        if not any(w in search_text for w in t_words):
+                            continue
 
                 try:
                     llm_summary: str = self._summarize(title, content)
