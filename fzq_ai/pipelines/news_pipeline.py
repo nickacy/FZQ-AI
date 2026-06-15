@@ -12,6 +12,8 @@ from fzq_ai.tools.translator import (
     translate_to_english,
     is_english_or_chinese,
 )
+from fzq_ai.store.intel_store import IntelStore
+import uuid
 
 # 每个文章翻译时取的最大字符数（约前 10 行）
 MAX_TRANSLATE_CHARS = 1000
@@ -47,6 +49,20 @@ class NewsPipeline:
         article_list = self._build_article_list(articles, max_items=30)
 
         # 3. 组合最终输出
+        # v2.7: persist to IntelStore
+        try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
+                articles=articles if "articles" in dir() else [],
+                events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "news_pipeline"})
+        except Exception:
+            pass  # never break main flow
+
         return self._compose(llm_summary, article_list, query)
 
     # ── 私有方法 ──────────────────────────────────────────

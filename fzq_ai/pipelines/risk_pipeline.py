@@ -6,6 +6,9 @@ from typing import List, Dict, Any, Optional
 from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
+from fzq_ai.store.intel_store import IntelStore
+import uuid
+
 
 class RiskPipeline:
     """
@@ -125,6 +128,20 @@ class RiskPipeline:
             lines.append("\n### ⚠️ 研判：当前存在一定风险信号，建议持续跟踪。")
         else:
             lines.append("\n### ✅ 研判：当前整体风险水平较低，仍需保持基础监测。")
+
+        # v2.7: persist to IntelStore
+        try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
+                articles=articles if "articles" in dir() else [],
+                events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "risk_pipeline"})
+        except Exception:
+            pass  # never break main flow
 
         return "\n".join(lines)
 

@@ -18,6 +18,9 @@ from typing import Any, Dict, List, Optional
 
 from fzq_ai.domain.models import Article, ServiceResult
 
+from fzq_ai.store.intel_store import IntelStore
+import uuid
+
 
 class SentimentPipeline:
     """
@@ -141,6 +144,20 @@ class SentimentPipeline:
             "overall_sentiment": overall,
             "total_articles": len(articles),
         }
+
+        # v2.7: persist to IntelStore
+        try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
+                articles=articles if "articles" in dir() else [],
+                events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "sentiment_pipeline"})
+        except Exception:
+            pass  # never break main flow
 
         return ServiceResult.ok(result)
 

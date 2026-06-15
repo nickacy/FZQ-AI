@@ -8,6 +8,9 @@ import re
 from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
+from fzq_ai.store.intel_store import IntelStore
+import uuid
+
 STOPWORDS = {
     "the", "and", "of", "to", "in", "for", "on", "at", "a", "an",
     "is", "are", "was", "were", "by", "with", "from", "as", "that",
@@ -97,6 +100,20 @@ class NarrativePipeline:
             for a in articles_in_bucket[:5]:
                 lines.append(f"- {a.title_original}  [{a.source_name}]")
             lines.append("")
+
+        # v2.7: persist to IntelStore
+        try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
+                articles=articles if "articles" in dir() else [],
+                events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "narrative_pipeline"})
+        except Exception:
+            pass  # never break main flow
 
         return "\n".join(lines)
 

@@ -6,6 +6,9 @@ from typing import List, Any, Optional
 from fzq_ai.domain.models import ServiceResult,  Article, ServiceResult
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
+from fzq_ai.store.intel_store import IntelStore
+import uuid
+
 
 class DailyReportPipeline:
     """
@@ -144,6 +147,20 @@ class DailyReportPipeline:
         md += "- 建议结合内部情报与领域专家判断进行进一步分析。\n\n"
 
         md += "---\n由 FZQ-AI 自动生成（语义新闻 + 基础叙事 + 风险扫描）\n"
+
+        # v2.7: persist to IntelStore
+        try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
+                articles=articles if "articles" in dir() else [],
+                events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "daily_report_pipeline"})
+        except Exception:
+            pass  # never break main flow
 
         return md
 
