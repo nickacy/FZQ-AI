@@ -96,39 +96,63 @@ def fetch_from_rss(query: str = "") -> List[Article]:
     for cfg in RSS_SOURCES:
         all_articles.extend(_parse_rss_source(cfg))
 
-    # ── 智能多级匹配 + 相关性排序 (v2.6) ──
+    # ── 智能多级匹配 + 同义扩展 + 全量排序 (v2.6 fix) ──
     if query:
         q_en = translate_to_english(query).lower()
         q_original = query.lower()
-        query_words = set(q_en.split()) | set(q_original.split())
+
+        # ── 同义词/近义词扩展 ──
+        synonym_map = {
+            "iran": ["iranian", "tehran", "persian", "iran's"],
+            "war": ["conflict", "military", "troops", "strike", "attack", "battle",
+                    "combat", "missile", "drone", "invasion", "ceasefire"],
+            "china": ["chinese", "beijing", "xi", "ccp"],
+            "russia": ["russian", "moscow", "kremlin", "putin"],
+            "us": ["america", "american", "washington", "white house", "u.s.", "usa",
+                   "united states", "biden", "trump"],
+            "election": ["vote", "voting", "ballot", "candidate", "campaign", "poll"],
+            "economy": ["economic", "market", "trade", "gdp", "inflation", "stock"],
+            "ai": ["artificial intelligence", "machine learning", "llm", "gpt"],
+            "climate": ["environment", "carbon", "emission", "warming", "green"],
+        }
+
+        # Expand query with synonyms
+        query_words = (set(q_en.split()) | set(q_original.split()))
+        expanded_words = set(query_words)
+        for w in query_words:
+            w_clean = w.strip(".,;:!?'\"")
+            if w_clean in synonym_map:
+                expanded_words.update(synonym_map[w_clean])
+            # Also add singular/plural variants
+            if w_clean.endswith("s"):
+                expanded_words.add(w_clean[:-1])
+            elif not w_clean.endswith("s"):
+                expanded_words.add(w_clean + "s")
+
         stopwords = {"a", "an", "the", "in", "on", "of", "to", "is", "at",
                      "for", "and", "or", "by", "it", "be", "as", "we", "us",
                      "its", "has", "had", "was", "are", "were", "will", "can"}
-        meaningful = {w for w in query_words if len(w) >= 2 and w not in stopwords}
+        meaningful = {w for w in expanded_words if len(w) >= 2 and w not in stopwords}
 
-        # 为每篇文章计算相关性分数
+        # 为每篇文章计算相关性分数（全量，不过滤）
         scored: List[tuple] = []
         for a in all_articles:
             text = ((a.title_original or "") + " " + (a.content_original or "")).lower()
-            score = 0
+            score = 0.0
+            # 整体短语匹配
             if q_en in text or q_original in text:
-                score += 3  # 短语精确匹配
+                score += 5.0
+            # 逐词匹配
             for w in meaningful:
                 if w in text:
-                    score += 1  # 单词命中
-            score += (a.credibility or 0) * 2  # 来源可信度加权
-            if score > 0:
-                scored.append((score, a))
+                    score += 1.0
+            # 可信度加权
+            score += (a.credibility or 0) * 1.0
+            scored.append((score, a))
 
+        # 按分数降序排列（score=0 的排在末尾）
         scored.sort(key=lambda x: x[0], reverse=True)
-        matched = [a for _, a in scored]
-
-        # 数量不足时补齐至50
-        if len(matched) < 50:
-            remaining = [a for a in all_articles if a not in matched]
-            matched.extend(remaining[:50 - len(matched)])
-
-        all_articles = matched
+        all_articles = [a for _, a in scored]
 
     return all_articles
 
