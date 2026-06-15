@@ -363,6 +363,29 @@ class TaskOrchestrator:
     # ── 信息查询 ──────────────────────────────────────────────
 
     @staticmethod
+
+    # ── v3.0: Scenario runner ─────────────────────────────────
+
+    SCENARIO_MAP: Dict[str, str] = {
+        "daily_global_risk": "full analysis of global risk today",
+        "taiwan_watch": "Taiwan strait situation latest news risk analysis",
+        "energy_market": "global energy market oil sanctions news sentiment",
+        "daily_global": "global news risk sentiment narrative full analysis",
+    }
+
+    def run_scenario(self, scenario_name: str) -> Dict[str, Any]:
+        """
+        v3.0 — Execute a named scenario (pre-configured pipeline combo).
+
+        Args:
+            scenario_name: Key from SCENARIO_MAP
+
+        Returns:
+            Same structure as run_nl()
+        """
+        query = self.SCENARIO_MAP.get(scenario_name, scenario_name)
+        return self.run_nl(query)
+
     def list_pipelines() -> List[Dict[str, str]]:
         """
         返回所有可用 Pipeline 的名称和简要说明。

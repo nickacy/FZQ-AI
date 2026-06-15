@@ -306,6 +306,16 @@ def fetch_all_news(query: str, min_results: int = 50) -> List[Article]:
         seen[key] = True
         unique.append(a)
 
+    # ── v2.7: Persist to IntelStore ──
+    try:
+        from fzq_ai.storage.intel_store import IntelStore
+        _store = IntelStore()
+        _store.init_schema()
+        _store.save_articles(unique, topic=query, pipeline_tag="news-intel")
+    except Exception:
+        import logging
+        logging.getLogger(__name__).warning("IntelStore write failed (non-fatal)")
+
     # v2.6: 区域平衡重排
     unique = rebalance_articles(unique, min_count=min_results)
 
