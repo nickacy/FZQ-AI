@@ -24,6 +24,10 @@ from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 from fzq_ai.ui.components.news_card import render_news_card
 from fzq_ai.ui.components.narrative_block import render_narrative_block
 from fzq_ai.ui.components.risk_block import render_risk_block
+from fzq_ai.ui.components.radar_chart import render_radar_chart
+from fzq_ai.ui.components.sentiment_trend import render_sentiment_trend
+from fzq_ai.ui.components.narrative_graph import render_narrative_graph
+from fzq_ai.ui.components.timeline import render_timeline
 
 # 加载 .env（确保 DEEPSEEK_API_KEY / NEWSAPI_KEY 生效）
 load_dotenv()
@@ -104,9 +108,10 @@ if run_btn and query:
     )
 
     if not risk_result["success"]:
-        st.error(f"RiskPipeline 错误：{risk_result['error']}")
+        st.error(f"RiskPipeline error: {risk_result['error']}")
     else:
         render_risk_block(risk_result["data"])
+        render_radar_chart(risk_result["data"])
 
     # -----------------------------
     # 4. 每日报告
@@ -120,7 +125,26 @@ if run_btn and query:
     )
 
     if not report_result["success"]:
-        st.error(f"DailyReportPipeline 错误：{report_result['error']}")
+        st.error(f"DailyReportPipeline error: {report_result['error']}")
     else:
-        # data is markdown text
         st.markdown(report_result["data"])
+
+    # -----------------------------
+    # 5. Sentiment & Timeline (v2.6)
+    # -----------------------------
+    st.subheader("Sentiment Analysis")
+    sentiment_result = orchestrator.run_agent(
+        agent_name="sentiment",
+        task="sentiment",
+        articles=articles,
+    )
+    if not sentiment_result["success"]:
+        st.warning(f"SentimentPipeline: {sentiment_result['error']}")
+    else:
+        render_sentiment_trend(sentiment_result["data"])
+
+    st.subheader("Event Timeline")
+    render_timeline(articles)
+
+    st.subheader("Narrative Graph")
+    render_narrative_graph(narrative_result.get("data", {}))

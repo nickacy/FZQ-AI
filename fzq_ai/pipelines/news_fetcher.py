@@ -275,5 +275,43 @@ def fetch_all_news_async(query: str) -> List[Article]:
     try:
         return asyncio.run(_run())
     except RuntimeError:
-        # 如果已经在事件循环中，回退到同步版
         return fetch_all_news(query)
+
+
+# ============================================================
+# v2.6: Balance Scoring
+# ============================================================
+
+def calculate_balance_score(articles: List[Article]) -> Dict[str, Any]:
+    """
+    Calculate source balance score for a set of articles.
+
+    Returns:
+        {source_region_distribution, source_type_distribution,
+         balance_score (0-100), assessment}
+    """
+    if not articles:
+        return {
+            "source_region_distribution": {},
+            "source_type_distribution": {},
+            "balance_score": 0,
+            "assessment": "no_data",
+        }
+    region_dist: Dict[str, int] = {}
+    for a in articles:
+        region = a.region or "unknown"
+        region_dist[region] = region_dist.get(region, 0) + 1
+    num_regions = len(region_dist)
+    balance_score = min(num_regions * 20, 100)
+    if balance_score >= 70:
+        assessment = "balanced"
+    elif balance_score >= 40:
+        assessment = "moderately balanced"
+    else:
+        assessment = "unbalanced"
+    return {
+        "source_region_distribution": region_dist,
+        "source_type_distribution": {},
+        "balance_score": balance_score,
+        "assessment": assessment,
+    }

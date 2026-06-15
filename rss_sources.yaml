@@ -1,63 +1,172 @@
+# FZQ-AI v2.6 RSS Sources Configuration
+# Multi-region, multi-language, multi-type (traditional + social media)
+
 sources:
+  # ── Western Media ──
   - id: reuters
     name: Reuters
     region: western
     language: en
+    type: traditional
     url: https://www.reuters.com/rssFeed/worldNews
-    topic_tags: ["geopolitics", "macro", "tech"]
+    topic_tags: [geopolitics, macro, tech]
 
   - id: bbc
     name: BBC World
     region: western
     language: en
+    type: traditional
     url: http://feeds.bbci.co.uk/news/world/rss.xml
-    topic_tags: ["geopolitics", "macro"]
+    topic_tags: [geopolitics, macro]
 
+  - id: ap
+    name: AP World
+    region: western
+    language: en
+    type: traditional
+    url: https://apnews.com/rss/apf-worldnews
+    topic_tags: [geopolitics]
+
+  # ── East Asia ──
   - id: nhk
     name: NHK Japan
     region: east_asia
     language: ja
+    type: traditional
     url: https://www3.nhk.or.jp/rss/news/cat0.xml
-    topic_tags: ["geopolitics", "tech"]
+    topic_tags: [geopolitics, tech]
 
   - id: yonhap
     name: Yonhap News
     region: east_asia
     language: ko
+    type: traditional
     url: https://en.yna.co.kr/RSS/news.xml
-    topic_tags: ["geopolitics"]
+    topic_tags: [geopolitics]
 
-  - id: rt
-    name: RT Russia
-    region: russia
-    language: ru
-    url: https://www.rt.com/rss/news/
-    topic_tags: ["geopolitics"]
+  - id: asahi
+    name: Asahi Shimbun
+    region: east_asia
+    language: ja
+    type: traditional
+    url: https://www.asahi.com/rss/asahi/newsheadlines.rdf
+    topic_tags: [geopolitics, macro]
 
-  - id: telesur
-    name: Telesur
-    region: latin_america
-    language: es
-    url: https://www.telesurenglish.net/rss/RssNews.xml
-    topic_tags: ["geopolitics"]
-
-  - id: news24
-    name: News24 Africa
-    region: africa
-    language: en
-    url: https://feeds.news24.com/articles/news24/World/rss
-    topic_tags: ["geopolitics"]
-
+  # ── China Media ──
   - id: xinhuanet
     name: Xinhua English
     region: china
     language: en
+    type: official
     url: http://www.xinhuanet.com/english/rss/worldrss.xml
-    topic_tags: ["geopolitics", "macro", "tech"]
+    topic_tags: [geopolitics, macro, tech]
 
   - id: globaltimes
     name: Global Times
     region: china
     language: en
+    type: official
     url: https://www.globaltimes.cn/rss/world.xml
-    topic_tags: ["geopolitics"]
+    topic_tags: [geopolitics]
+
+  - id: thepaper
+    name: The Paper (Pengpai)
+    region: china
+    language: zh
+    type: traditional
+    url: https://www.thepaper.cn/rss_news.xml
+    topic_tags: [geopolitics, macro, tech]
+
+  - id: guanchazhe
+    name: Guancha (Observer)
+    region: china
+    language: zh
+    type: independent
+    url: https://www.guancha.cn/rss/latest.xml
+    topic_tags: [geopolitics, macro]
+
+  # ── Middle East ──
+  - id: aljazeera
+    name: Al Jazeera
+    region: middle_east
+    language: en
+    type: traditional
+    url: https://www.aljazeera.com/xml/rss/all.xml
+    topic_tags: [geopolitics]
+
+  - id: arabnews
+    name: Arab News
+    region: middle_east
+    language: en
+    type: traditional
+    url: https://www.arabnews.com/rss.xml
+    topic_tags: [geopolitics, macro]
+
+  # ── Russia ──
+  - id: rt
+    name: RT Russia
+    region: russia
+    language: en
+    type: official
+    url: https://www.rt.com/rss/news/
+    topic_tags: [geopolitics]
+
+  - id: sputnik
+    name: Sputnik News
+    region: russia
+    language: en
+    type: official
+    url: https://sputnikglobe.com/export/rss2/archive/index.xml
+    topic_tags: [geopolitics]
+
+  # ── Latin America ──
+  - id: telesur
+    name: Telesur
+    region: latin_america
+    language: es
+    type: official
+    url: https://www.telesurenglish.net/rss/RssNews.xml
+    topic_tags: [geopolitics]
+
+  # ── Africa ──
+  - id: news24
+    name: News24 Africa
+    region: africa
+    language: en
+    type: traditional
+    url: https://feeds.news24.com/articles/news24/World/rss
+    topic_tags: [geopolitics]
+
+  # ── Southeast Asia ──
+  - id: straitstimes
+    name: Straits Times
+    region: southeast_asia
+    language: en
+    type: traditional
+    url: https://www.straitstimes.com/news/asia/rss.xml
+    topic_tags: [geopolitics, macro]
+
+  # ── Social Media / We-Media (v2.6) ──
+  - id: weibo_hot
+    name: Weibo Hot Search
+    region: china
+    language: zh
+    type: social_media
+    url: https://rsshub.app/weibo/search/hot
+    topic_tags: [trending, social]
+
+  - id: zhihu_hot
+    name: Zhihu Hot Topics
+    region: china
+    language: zh
+    type: social_media
+    url: https://rsshub.app/zhihu/hotlist
+    topic_tags: [trending, tech, social]
+
+  - id: twitter_trending
+    name: Twitter / X Trending
+    region: global
+    language: en
+    type: social_media
+    url: https://rsshub.app/twitter/trending/worldwide
+    topic_tags: [trending, social]

@@ -28,64 +28,64 @@ from fzq_ai.pipelines.sentiment_pipeline import SentimentPipeline
 # ============================================================
 
 KEYWORD_TASK_MAP: Dict[str, str] = {
-    # ── 新闻情报 ──
-    "新闻": "news-intel",
-    "news": "news-intel",
-    "新闻情报": "news-intel",
-    "情报": "news-intel",
-    "news intel": "news-intel",
-    "news-intel": "news-intel",
-    "news_intel": "news-intel",
-    "intelligence": "news-intel",
-    "rss": "news-intel",
-    "报道": "news-intel",
-    "headlines": "news-intel",
-    "latest": "news-intel",
+    # ── 新闻情报 (CN/EN/JP) ──
+    "新闻": "news-intel", "news": "news-intel", "新闻情报": "news-intel",
+    "情报": "news-intel", "news intel": "news-intel", "news-intel": "news-intel",
+    "news_intel": "news-intel", "intelligence": "news-intel",
+    "rss": "news-intel", "报道": "news-intel", "headlines": "news-intel",
+    "latest": "news-intel", "breaking": "news-intel",
     # ── 叙事分析 ──
-    "叙事": "narrative",
-    "narrative": "narrative",
-    "叙事分析": "narrative",
-    "多阵营": "narrative",
-    "话语": "narrative",
-    "discourse": "narrative",
-    "propaganda": "narrative",
-    "故事": "narrative",
-    "故事线": "narrative",
+    "叙事": "narrative", "narrative": "narrative", "叙事分析": "narrative",
+    "多阵营": "narrative", "话语": "narrative", "discourse": "narrative",
+    "propaganda": "narrative", "故事": "narrative", "故事线": "narrative",
+    "framing": "narrative", "media bias": "narrative", "coverage": "narrative",
     # ── 风险 ──
-    "风险": "risk",
-    "risk": "risk",
-    "风险分析": "risk",
-    "风险扫描": "risk",
-    "威胁": "risk",
-    "threat": "risk",
-    "危机": "risk",
-    "crisis": "risk",
-    "danger": "risk",
-    "安全": "risk",
-    "security": "risk",
+    "风险": "risk", "risk": "risk", "风险分析": "risk", "风险扫描": "risk",
+    "威胁": "risk", "threat": "risk", "危机": "risk", "crisis": "risk",
+    "danger": "risk", "安全": "risk", "security": "risk",
+    "conflict": "risk", "war": "risk", "tension": "risk",
+    "sanctions": "risk", "alert": "risk", "warning": "risk",
     # ── 日报 ──
-    "日报": "daily-report",
-    "daily": "daily-report",
-    "daily report": "daily-report",
-    "每日": "daily-report",
-    "报告": "daily-report",
-    "report": "daily-report",
-    "每日报告": "daily-report",
-    "daily-report": "daily-report",
-    "简报": "daily-report",
-    "briefing": "daily-report",
+    "日报": "daily-report", "daily": "daily-report",
+    "daily report": "daily-report", "每日": "daily-report",
+    "报告": "daily-report", "report": "daily-report",
+    "每日报告": "daily-report", "daily-report": "daily-report",
+    "简报": "daily-report", "briefing": "daily-report",
+    "summary": "daily-report", "digest": "daily-report",
     # ── 情感分析 ──
-    "情感": "sentiment",
-    "sentiment": "sentiment",
-    "情感分析": "sentiment",
-    "态度": "sentiment",
-    "情绪": "sentiment",
-    "mood": "sentiment",
-    "正面": "sentiment",
-    "负面": "sentiment",
-    "positive": "sentiment",
-    "negative": "sentiment",
-    "立场": "sentiment",
+    "情感": "sentiment", "sentiment": "sentiment",
+    "情感分析": "sentiment", "态度": "sentiment",
+    "情绪": "sentiment", "mood": "sentiment",
+    "正面": "sentiment", "负面": "sentiment",
+    "positive": "sentiment", "negative": "sentiment",
+    "立场": "sentiment", "opinion": "sentiment",
+    "bias": "sentiment", "tone": "sentiment",
+    # ── 自媒体/社交媒体 (v2.6) ──
+    "weibo": "news-intel", "微博": "news-intel",
+    "twitter": "news-intel", "x": "news-intel",
+    "tiktok": "news-intel", "抖音": "news-intel",
+    "youtube": "news-intel", "zhihu": "news-intel", "知乎": "news-intel",
+    "reddit": "news-intel", "trending": "news-intel",
+    "viral": "news-intel", "social media": "news-intel",
+    # ── 地缘政治 (v2.6) ──
+    "地缘": "news-intel", "geopolitics": "news-intel",
+    "diplomacy": "news-intel", "election": "news-intel",
+    "选举": "news-intel", "sanctions": "risk",
+    "nato": "news-intel", "eu": "news-intel",
+    "brics": "news-intel", "taiwan": "news-intel",
+    "ukraine": "news-intel", "gaza": "news-intel",
+    "middle east": "news-intel", "中东": "news-intel",
+    "africa": "news-intel", "非洲": "news-intel",
+    "latin america": "news-intel", "asean": "news-intel",
+    # ── 经济/科技 (v2.6) ──
+    "经济": "news-intel", "economy": "news-intel",
+    "market": "news-intel", "stock": "news-intel",
+    "crypto": "news-intel", "bitcoin": "news-intel",
+    "ai": "news-intel", "tech": "news-intel",
+    "能源": "news-intel", "energy": "news-intel",
+    "trade": "news-intel", "贸易": "news-intel",
+    "tariff": "risk", "inflation": "risk",
+    "recession": "risk", "gdp": "news-intel",
 }
 
 # ── Pipeline 元数据 ───────────────────────────────────────────
@@ -124,6 +124,24 @@ PIPELINE_META: Dict[str, Dict[str, str]] = {
 }
 
 
+# ── 自动 Pipeline 组合规则 (v2.6) ──────────────────────────────
+
+PIPELINE_COMPOSITIONS: Dict[str, List[str]] = {
+    "sentiment risk": ["news-intel", "sentiment", "risk"],
+    "risk sentiment": ["news-intel", "risk", "sentiment"],
+    "sentiment analysis": ["news-intel", "sentiment"],
+    "risk analysis": ["news-intel", "risk"],
+    "narrative risk": ["news-intel", "narrative", "risk"],
+    "full analysis": ["news-intel", "sentiment", "narrative", "risk"],
+    "comprehensive": ["news-intel", "sentiment", "narrative", "risk", "daily-report"],
+    "舆情风险": ["news-intel", "sentiment", "risk"],
+    "全面分析": ["news-intel", "sentiment", "narrative", "risk"],
+    "综合分析": ["news-intel", "sentiment", "narrative", "risk", "daily-report"],
+    "情感风险": ["news-intel", "sentiment", "risk"],
+    "叙事风险": ["news-intel", "narrative", "risk"],
+}
+
+
 class TaskOrchestrator:
     """统一 Pipeline 调度器，支持 NL 任务路由。"""
 
@@ -141,100 +159,136 @@ class TaskOrchestrator:
             "sentiment": SentimentPipeline(llm_router=self.router),
         }
 
-    # ── 自然语言路由 ──────────────────────────────────────────
+    # ── 自然语言路由 (v2.6: 自动组合) ──────────────────────────
 
     def run_nl(self, user_query: str, **kwargs: Any) -> Dict[str, Any]:
         """
-        根据自然语言查询自动选择 Pipeline 并执行。
-
-        支持中英文关键词匹配，见 KEYWORD_TASK_MAP。
+        根据自然语言查询自动选择 Pipeline（支持多 Pipeline 自动组合）。
 
         Args:
-            user_query: 用户自然语言查询（如 "分析今天的地缘政治新闻"）
-            **kwargs: 传递给 Pipeline 的额外参数
+            user_query: 用户自然语言查询
+            **kwargs: items, topic, articles, region 等参数
 
         Returns:
-            {
-                "success": bool,
-                "data": Any,
-                "error": Optional[str],
-                "diagnostics": {...}
-            }
+            {task, pipelines_used, results, diagnostics}
         """
         query_lower: str = user_query.lower().strip()
 
-        # 关键词匹配
-        pipeline_key: Optional[str] = None
-        for keyword, key in KEYWORD_TASK_MAP.items():
-            if keyword.lower() in query_lower:
-                pipeline_key = key
+        # —— 1. 检测组合关键词 ——
+        pipelines_to_run: List[str] = []
+        for comp_key, comp_pipes in PIPELINE_COMPOSITIONS.items():
+            if comp_key in query_lower:
+                pipelines_to_run = list(comp_pipes)
                 break
 
+        # —— 2. 单 Pipeline 关键词匹配 ——
+        if not pipelines_to_run:
+            for keyword, key in KEYWORD_TASK_MAP.items():
+                if keyword.lower() in query_lower:
+                    pipelines_to_run = [key]
+                    break
+
+        # —— 3. diagnostics ——
         diagnostics: Dict[str, Any] = {
             "topic_queried": user_query,
-            "pipeline_selected": pipeline_key,
+            "pipelines_selected": pipelines_to_run if pipelines_to_run else None,
             "timestamp": time.time(),
+            "language_detected": "zh" if any(
+                "\u4e00" <= c <= "\u9fff" for c in user_query
+            ) else "en",
         }
 
-        # 未知任务 → 返回结构化错误
-        if pipeline_key is None or pipeline_key not in self.pipelines:
+        # —— 4. 未知任务 ——
+        if not pipelines_to_run:
             diagnostics["available_pipelines"] = list(self.pipelines.keys())
-            diagnostics["suggestion"] = (
-                "请使用以下关键词之一：新闻、叙事、风险、日报、情感"
-            )
             return {
-                "success": False,
-                "error": f"无法识别任务类型: '{user_query}'。"
-                         f"可用 Pipeline: {list(self.pipelines.keys())}",
-                "data": None,
+                "task": user_query,
+                "pipelines_used": [],
+                "results": {},
                 "diagnostics": diagnostics,
+                "success": False,
+                "error": f"Cannot identify task: '{user_query}'. "
+                         f"Available: {list(self.pipelines.keys())}",
+                "data": None,
             }
 
-        # 执行 Pipeline
-        try:
-            pipeline = self.pipelines[pipeline_key]
+        # —— 5. 执行 Pipeline(s) ——
+        results: Dict[str, Any] = {}
+        pipeline_results: Dict[str, Any] = {}
+        shared_articles: List[Article] = list(kwargs.get("articles", []))
+
+        for pipe_key in pipelines_to_run:
+            if pipe_key not in self.pipelines:
+                continue
+
+            pipeline = self.pipelines[pipe_key]
             result: ServiceResult
 
-            if pipeline_key == "news-intel":
-                topic: str = kwargs.get("topic", user_query)
-                result = pipeline.run(topic=topic)
-            elif pipeline_key == "sentiment":
-                articles: List = kwargs.get("articles", [])
-                result = _run_async_safely(pipeline.run(articles=articles, **kwargs))
-            else:
-                articles = kwargs.get("articles", [])
-                result = _run_async_safely(
-                    pipeline.run(articles=articles, **kwargs)
-                )
+            try:
+                if pipe_key == "news-intel":
+                    topic = kwargs.get("topic", user_query)
+                    result = pipeline.run(topic=topic)
+                    if result.success and result.data:
+                        bundle = result.data.get("intel_bundle", result.data)
+                        shared_articles = list(getattr(bundle, "articles", []))
+                        diagnostics["articles_found"] = len(shared_articles)
+                        diagnostics["rss_sources_checked"] = len(
+                            getattr(self, "sources", [])
+                        ) or "unknown"
 
-            diagnostics["result_success"] = result.success
+                elif pipe_key == "sentiment":
+                    result = _run_async_safely(
+                        pipeline.run(articles=shared_articles)
+                    )
+                elif pipe_key == "risk":
+                    result = _run_async_safely(
+                        pipeline.run(articles=shared_articles)
+                    )
+                elif pipe_key == "narrative":
+                    result = _run_async_safely(
+                        pipeline.run(articles=shared_articles)
+                    )
+                elif pipe_key == "daily-report":
+                    result = _run_async_safely(
+                        pipeline.run(articles=shared_articles)
+                    )
+                else:
+                    result = ServiceResult.fail(f"Unknown pipeline: {pipe_key}")
 
-            # 检查空结果
-            if result.success and result.data is not None:
-                # 对 news-intel 检查 articles 数量
-                if pipeline_key == "news-intel":
-                    bundle = result.data.get("intel_bundle", result.data)
-                    articles_count = len(getattr(bundle, "articles", []))
-                    diagnostics["articles_found"] = articles_count
-                    if articles_count == 0:
-                        diagnostics["warning"] = (
-                            f"未找到与 '{user_query}' 匹配的新闻"
-                        )
+                pipeline_results[pipe_key] = {
+                    "success": result.success,
+                    "data": result.data,
+                    "error": result.error,
+                }
 
-            return {
-                "success": result.success,
-                "data": result.data,
-                "error": result.error,
-                "diagnostics": diagnostics,
-            }
+            except Exception as e:
+                pipeline_results[pipe_key] = {
+                    "success": False,
+                    "error": str(e),
+                }
 
-        except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "data": None,
-                "diagnostics": diagnostics,
-            }
+        # —— 6. 构建统一输出 ——
+        all_success = all(
+            r.get("success", False) for r in pipeline_results.values()
+        )
+        errors = [
+            f"{k}: {v['error']}"
+            for k, v in pipeline_results.items()
+            if not v.get("success")
+        ]
+
+        diagnostics["fallback_used"] = bool(errors)
+        diagnostics["errors"] = errors if errors else None
+
+        return {
+            "task": user_query,
+            "pipelines_used": list(pipeline_results.keys()),
+            "results": pipeline_results,
+            "diagnostics": diagnostics,
+            "success": all_success,
+            "data": pipeline_results,
+            "error": "; ".join(errors) if errors else None,
+        }
 
     # ── 原有调度入口 ──────────────────────────────────────────
 

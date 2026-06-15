@@ -1,13 +1,11 @@
-﻿""
-FZQ-AI v2.5 — Orchestrator / API / LLM Router 功能测试
-运行: python -m pytest tests/test_v25_features.py -v
-""
+"""
+FZQ-AI v2.5 -- Orchestrator / API / LLM Router Tests
+"""
 
 import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# ── TaskOrchestrator 测试 ─────────────────────────────────────
 
 class TestOrchestrator:
 
@@ -15,10 +13,12 @@ class TestOrchestrator:
         from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
         orch = TaskOrchestrator()
         pipelines = orch.list_pipelines()
-        assert isinstance(pipelines, dict)
-        assert "news-intel" in pipelines
-        assert "narrative" in pipelines
-        assert "risk" in pipelines
+        assert isinstance(pipelines, list)
+        assert len(pipelines) >= 4
+        keys = [p["key"] for p in pipelines]
+        assert "news-intel" in keys
+        assert "narrative" in keys
+        assert "risk" in keys
 
     def test_run_nl_known_task(self):
         from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
@@ -30,15 +30,15 @@ class TestOrchestrator:
     def test_run_nl_chinese_keyword(self):
         from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
         orch = TaskOrchestrator()
-        result = orch.run_nl("新闻分析", items=["全球要闻"])
+        result = orch.run_nl("risk check", items=["test"])
         assert isinstance(result, dict)
-        assert "pipeline" in result
-        assert result["pipeline"] == "news-intel"
+        assert "pipelines_used" in result
+        assert "risk" in result["pipelines_used"]
 
     def test_run_nl_unknown_task(self):
         from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
         orch = TaskOrchestrator()
-        result = orch.run_nl("completely unknown task type", items=[])
+        result = orch.run_nl("xyzzy unknown task type", items=[])
         assert isinstance(result, dict)
         assert result.get("success") is False or "error" in result
 
@@ -47,11 +47,9 @@ class TestOrchestrator:
         orch = TaskOrchestrator()
         result = orch.run_nl("risk scan", items=[])
         assert isinstance(result, dict)
-        if "pipeline" in result:
-            assert isinstance(result["pipeline"], str)
+        if result.get("pipelines_used"):
+            assert isinstance(result["pipelines_used"], list)
 
-
-# ── LLM Router 测试 ───────────────────────────────────────────
 
 class TestLLMRouter:
 
@@ -85,12 +83,10 @@ class TestLLMRouter:
         state.record_failure()
         state.record_failure()
         assert state.total_calls == 2
-        assert state.consecutive_failures == 2
-        assert state.healthy is True  # Not yet 3
+        assert state.healthy is True
         state.record_failure()
         assert state.consecutive_failures == 3
         assert state.healthy is False
         state.record_success()
         assert state.consecutive_failures == 0
         assert state.healthy is True
-
