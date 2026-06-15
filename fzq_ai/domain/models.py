@@ -3,6 +3,45 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Dict, Optional, Any
 
+# ============================
+# ServiceResult
+# ============================
+
+from dataclasses import dataclass
+from typing import Any, Optional, Dict
+
+
+@dataclass
+class ServiceResult:
+    """
+    通用 Pipeline 返回结构
+    - success: 是否成功
+    - data: 成功时的数据
+    - error: 失败时的错误信息
+    """
+
+    success: bool
+    data: Optional[Any] = None
+    error: Optional[str] = None
+
+    @staticmethod
+    def ok(data: Any) -> "ServiceResult":
+        return ServiceResult(success=True, data=data, error=None)
+
+    @staticmethod
+    def fail(error: str) -> "ServiceResult":
+        return ServiceResult(success=False, data=None, error=error)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "success": self.success,
+            "data": self.data,
+            "error": self.error,
+        }
+
+    def __bool__(self):
+        return self.success
+
 
 # ============================
 # Article
