@@ -30,13 +30,14 @@ class NewsPipeline:
     def __init__(self, llm=None, llm_router=None):
         self.llm = llm or llm_router or LLMRouter()
 
-    def run(self, query: str = "") -> ServiceResult:
+    def run(self, query: str = "", topic: str = "") -> ServiceResult:
         """
         执行新闻情报分析流程：
         1. 抓取相关新闻文章
         2. LLM 生成情报摘要（含文章上下文）
         3. 构建原文列表（含链接 + 翻译）
         """
+        query = query or topic
         articles = fetch_all_news(query)
 
         # 1. LLM 摘要（传入文章标题列表作为上下文）

@@ -1,4 +1,4 @@
-﻿# fzq_ai/tools/translator.py
+# fzq_ai/tools/translator.py
 """翻译工具：中英文互译 + 语言检测"""
 
 import requests

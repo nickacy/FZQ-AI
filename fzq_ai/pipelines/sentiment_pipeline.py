@@ -69,7 +69,7 @@ class SentimentPipeline:
 
     # ── 主入口 ────────────────────────────────────────────────
 
-    async def run(
+    def run(
         self,
         articles: List[Article],
         summary: Optional[str] = None,
