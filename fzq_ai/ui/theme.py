@@ -54,10 +54,11 @@ def inject_theme() -> None:
     st.markdown(f"""
     <style>
     /* ── Global ── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
 
     html, body, [class*="css"] {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        letter-spacing: -0.01em;
     }}
 
     /* ── Cards ── */
@@ -76,7 +77,7 @@ def inject_theme() -> None:
 
     /* ── Section headers ── */
     .fzq-section {{
-        border-left: 4px solid {COLORS["primary"]};
+        border-left: 2px solid {COLORS["primary"]};
         padding-left: 14px;
         margin: 24px 0 12px 0;
     }}

@@ -116,7 +116,7 @@ def check_api_keys():
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="FZQ-AI · Intelligence Dashboard",
-    page_icon="🔍",
+    page_icon="⬡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -178,10 +178,10 @@ with st.sidebar:
     )
 
     functions = [
-        ("📰", "News Intelligence", "Multi-source RSS news fetch + AI summary"),
-        ("🧭", "Narrative Analysis", "Cross-bloc narrative comparison"),
-        ("⚠️", "Risk Scanner", "Multi-dimension risk assessment"),
-        ("📊", "Daily Report", "Structured intelligence briefing"),
+        ("▤", "News Intelligence", "Multi-source RSS news fetch + AI summary"),
+        ("◎", "Narrative Analysis", "Cross-bloc narrative comparison"),
+        ("◬", "Risk Scanner", "Multi-dimension risk assessment"),
+        ("▥", "Daily Report", "Structured intelligence briefing"),
     ]
 
     if "active_function" not in st.session_state:
@@ -246,7 +246,7 @@ with st.sidebar:
 # ═══════════════════════════════════════════════════════════════
 nav_labels = ["News Intelligence", "Narrative Analysis",
               "Risk Scanner", "Daily Report"]
-nav_icons = ["📰", "🧭", "⚠️", "📊"]
+nav_icons = ["▤", "◎", "◬", "▥"]
 active_idx = st.session_state.get("active_function", 0)
 
 col_h, col_b = st.columns([3, 1])
@@ -283,10 +283,10 @@ if not run_btn or not query:
         unsafe_allow_html=True,
     )
     cards = [
-        ("📰", "News Intelligence", "17 RSS sources across 8 regions.\nLLM-powered summarization & risk scoring."),
-        ("🧭", "Narrative Analysis", "Cross-bloc narrative comparison.\nThemes, consensus facts, contested claims."),
-        ("⚠️", "Risk Scanner", "Political / economic / military / social / tech.\nMulti-dimension risk assessment."),
-        ("📊", "Daily Report", "Structured intelligence briefing.\nMarkdown format with key events & risk scan."),
+        ("▤", "News Intelligence", "17 RSS sources across 8 regions.\nLLM-powered summarization & risk scoring."),
+        ("◎", "Narrative Analysis", "Cross-bloc narrative comparison.\nThemes, consensus facts, contested claims."),
+        ("◬", "Risk Scanner", "Political / economic / military / social / tech.\nMulti-dimension risk assessment."),
+        ("▥", "Daily Report", "Structured intelligence briefing.\nMarkdown format with key events & risk scan."),
     ]
     cols = st.columns(4)
     for idx, (icon, name, desc) in enumerate(cards):
@@ -356,7 +356,7 @@ m4.metric("Credibility", f"{sum(getattr(a,'credibility',0) for a in articles)/ma
 m5.metric("Global South %", f"{sum(1 for a in articles if a.region in ('china','russia','middle_east','africa','latin_america','east_asia','southeast_asia'))/max(len(articles),1)*100:.0f}%")
 
 # ── News Grid ──
-section_header("News Feed", "📰")
+section_header("News Feed", "▤")
 cols = st.columns(2)
 for i, a in enumerate(articles[:20]):
     with cols[i % 2]:
@@ -368,7 +368,7 @@ for i, a in enumerate(articles[:20]):
 fn = st.session_state.get("active_function", 0)
 
 if fn in (1, 0):  # Narrative (or full)
-    section_header("Narrative Analysis", "🧭")
+    section_header("Narrative Analysis", "◎")
     nr = orchestrator.run_agent(agent_name="narrative", task="narrative", articles=articles)
     if nr["success"]:
         render_narrative_block(nr["data"])
@@ -376,7 +376,7 @@ if fn in (1, 0):  # Narrative (or full)
         status_strip(f"Narrative: {nr['error']}", "warning")
 
 if fn in (2, 0):  # Risk (or full)
-    section_header("Risk Scanner", "⚠️")
+    section_header("Risk Scanner", "◬")
     rr = orchestrator.run_agent(agent_name="risk", task="risk", articles=articles)
     if rr["success"]:
         c1, c2 = st.columns([3, 2])
@@ -388,7 +388,7 @@ if fn in (2, 0):  # Risk (or full)
         status_strip(f"Risk: {rr['error']}", "warning")
 
 # Sentiment + Timeline (always)
-section_header("Sentiment & Timeline", "📊")
+section_header("Sentiment & Timeline", "▥")
 sr = orchestrator.run_agent(agent_name="sentiment", task="sentiment", articles=articles)
 if sr["success"]:
     render_sentiment_trend(sr["data"])
@@ -396,7 +396,7 @@ render_timeline(articles)
 
 # Daily Report (if selected or full)
 if fn in (3, 0):
-    section_header("Daily Report", "📋")
+    section_header("Daily Report", "▦")
     dr = orchestrator.run_agent(agent_name="daily-report", task="daily-report", articles=articles)
     if dr["success"]:
         st.markdown(dr["data"])

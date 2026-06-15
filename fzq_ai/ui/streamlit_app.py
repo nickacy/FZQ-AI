@@ -28,7 +28,7 @@ load_dotenv()
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
     page_title="FZQ-AI · Intelligence Dashboard",
-    page_icon="◈",
+    page_icon="⬡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -121,7 +121,7 @@ with st.sidebar:
         '<rect x="63" y="32" width="2" height="16" rx="1" fill="#E85D2C" opacity="0.9"/>'
         '<text x="78" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#fff" letter-spacing="3">FZQ</text>'
         f'<text x="144" y="34" font-family="Inter,system-ui,sans-serif" font-size="26" font-weight="700" fill="#E85D2C">AI</text>'
-        '<text x="80" y="52" font-family="Inter,system-ui,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.3)" letter-spacing="3">INTELLIGENCE PLATFORM</text>'
+        '<text x="80" y="52" font-family="Inter,system-ui,sans-serif" font-size="9.5" fill="rgba(255,255,255,0.3)" letter-spacing="3">INTELLIGENCE TERMINAL</text>'
         '<line x1="6" y1="6" x2="14" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
         '<line x1="6" y1="6" x2="6" y2="14" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
         '<line x1="214" y1="6" x2="206" y2="6" stroke="#E85D2C" stroke-width="0.5" opacity="0.3"/>'
