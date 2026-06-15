@@ -5,8 +5,11 @@ from pipelines.news_pipeline import NewsPipeline
 from pipelines.narrative_pipeline import NarrativePipeline
 from tui.dashboard import dashboard_main
 
+
 class FZQAgent:
     """
+    FZQ‑AI Agent v1.5
+    主控制器：负责 orchestrate 全流程
     """
 
     def __init__(self):
@@ -22,5 +25,11 @@ class FZQAgent:
         narrative = self.narrative_pipeline.run(articles)
 
         # 3) 启动 TUI Dashboard
+        dashboard_main(
+            summary=narrative["global_summary"],
+            clusters=narrative["clusters"],
+            tension_matrix=narrative["tension_matrix"],
+            articles=articles,
+        )
 
         return narrative

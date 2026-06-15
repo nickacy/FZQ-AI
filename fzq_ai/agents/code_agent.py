@@ -3,8 +3,12 @@
 from typing import Optional
 from fzq_ai.llm.llm_router import LLMRouter
 
+
 class CodeAgent:
     """
+    代码分析 / 重构 / 调试 Agent
+    - 所有模型选择交给 LLMRouter
+    - 不再依赖 Claude
     """
 
     def __init__(self, router: LLMRouter):
@@ -22,6 +26,7 @@ class CodeAgent:
     # -----------------------------
     def refactor(self, code: str, goal: Optional[str] = None) -> str:
         goal_text = f"目标：{goal}\n\n" if goal else ""
+        prompt = f"{goal_text}请重构以下代码，使其更简洁、可维护：\n\n{code}"
         return self.router.ask(prompt, task="refactor_code")
 
     # -----------------------------

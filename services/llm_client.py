@@ -10,11 +10,17 @@ from typing import Optional
 
 from openai import OpenAI
 
+
 class LLMClient:
     """Standalone LLM client supporting DeepSeek, OpenAI, and Qwen."""
 
     def __init__(
         self,
+        provider: str = "deepseek",
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
+        base_url: Optional[str] = None,
+    ):
         self.provider = provider.lower()
 
         if self.provider == "deepseek":
@@ -48,6 +54,10 @@ class LLMClient:
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
             return response.choices[0].message.content or ""
 
         except Exception as e:

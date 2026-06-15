@@ -14,8 +14,12 @@ import json
 import time
 from typing import Any, Dict, Optional
 
+
 class NewsCache:
     """
+    简单的内存缓存：
+    key = md5(source + query)
+    value = {"timestamp": float, "data": Any}
     """
 
     def __init__(self, ttl_seconds: int = 1800) -> None:
@@ -45,6 +49,8 @@ class NewsCache:
         self._store[key] = {
             "timestamp": time.time(),
             "data": data,
+        }
+
 
 # 全局单例
 news_cache = NewsCache()

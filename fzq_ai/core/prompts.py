@@ -13,13 +13,17 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+
 class PromptTemplates:
     """
+    Prompt 模板统一管理类。
+    所有模板均为纯字符串，不依赖 Jinja2，避免额外依赖。
     """
 
     # ============================
     # 叙事分析模板 Narrative v1
     # ============================
+    NARRATIVE_V1 = """
 你是一名资深国际关系叙事分析专家。请基于以下新闻内容，提取叙事结构并输出结构化 JSON。
 
 【任务要求】
@@ -52,6 +56,7 @@ class PromptTemplates:
     # ============================
     # 风险分析模板 Risk v1
     # ============================
+    RISK_V1 = """
 你是一名全球风险分析专家。请基于叙事分析结果与新闻内容，生成结构化风险评估。
 
 【任务要求】
@@ -78,6 +83,7 @@ class PromptTemplates:
     # ============================
     # 日报模板 Daily Report v1
     # ============================
+    DAILY_REPORT_V1 = """
 你是一名专业的全球情报分析师，请基于以下输入生成《全球情报日报》。
 
 【输入：新闻摘要】
@@ -106,7 +112,12 @@ class PromptTemplates:
     @staticmethod
     def render(template: str, variables: Dict[str, Any]) -> str:
         """
+        简单模板渲染器：
+        将 {{var}} 替换为 variables[var]
+        不依赖 Jinja2，避免额外依赖导致部署复杂化。
         """
+        output = template
         for key, value in variables.items():
             placeholder = "{{" + key + "}}"
+            output = output.replace(placeholder, str(value))
         return output

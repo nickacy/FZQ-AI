@@ -5,6 +5,7 @@ import langdetect
 
 from fzq_ai.llm.llm_router import LLMRouter
 
+
 class TranslationManager:
     def __init__(self):
         self.router = LLMRouter()
@@ -20,11 +21,15 @@ class TranslationManager:
         if not text:
             return ""
 
+        cache_key = f"{text[:200]}::{target_lang}"
         if cache_key in self.cache:
             return self.cache[cache_key]
 
+        prompt = (
             f"请将以下内容翻译成{ '中文' if target_lang=='zh' else '英文' }：\n\n"
+            f"{text}\n\n"
             "要求：忠实、准确、保持原意，不要添加解释。"
+        )
 
         for provider in ["deepseek", "openai", "gemini"]:
             try:
@@ -32,6 +37,7 @@ class TranslationManager:
                 self.cache[cache_key] = result
                 return result
             except Exception:
+                continue
 
         return text
 
@@ -50,7 +56,9 @@ class TranslationManager:
         if detected != "zh":
             article.content_translated = await self.translate(original, "zh")
         else:
+            article.content_translated = original
 
         if detected not in ["zh", "en"]:
             article.content_snippet_en = await self.translate_snippet_en(original)
         else:
+            article.content_snippet_en = None

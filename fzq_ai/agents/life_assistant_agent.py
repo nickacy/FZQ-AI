@@ -7,18 +7,26 @@ Author: Nick + Copilot
 from typing import Dict, Any, List
 import json
 
+
 class LifeAssistantAgent:
     """
+    统一的生活助手 Agent：
+    - DeepSeek 做意图识别 + 工具规划
+    - 工具层执行（metro / route / walking / cost_of_living / attractions / weather）
+    - DeepSeek 做最终回答整合
     """
 
     def __init__(self, llm_router, tools: Dict[str, Any]):
         """
+        tools = {
             "metro": metro_tool,
             "route": route_tool,
             "walking": walking_tool,
             "attractions": attractions_tool,
             "cost": cost_tool,
             "weather": weather_tool,
+            ...
+        }
         """
         self.llm = llm_router
         self.tools = tools
@@ -28,7 +36,11 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     def answer(
         self, user_query: str, user_profile: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
         """
+        1. DeepSeek 做意图识别 + 工具规划
+        2. 调用对应工具
+        3. DeepSeek 做最终回答整合
         """
         plan = self.plan_tools(user_query, user_profile)
         tool_results = self.execute_tools(plan)
@@ -39,18 +51,22 @@ class LifeAssistantAgent:
             "plan": plan,
             "tool_results": tool_results,
             "final_answer": final_answer,
+        }
 
     # ---------------------------------------------------------
     # Step 1：DeepSeek 生成工具规划
     # ---------------------------------------------------------
     def plan_tools(
         self, user_query: str, user_profile: Dict[str, Any] | None = None
+    ) -> Dict[str, Any]:
         prompt = self.build_planning_prompt(user_query, user_profile)
         response = self.llm.run("life_planning", prompt)
         return self.parse_json_safe(response, default={"tools": [], "params": {}})
 
     def build_planning_prompt(
         self, user_query: str, user_profile: Dict[str, Any] | None
+    ) -> str:
+        profile_text = (
             json.dumps(user_profile, ensure_ascii=False) if user_profile else "{}"
         )
 
@@ -87,11 +103,14 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     def execute_tools(self, plan: Dict[str, Any]) -> Dict[str, Any]:
         results = {}
+        tools = plan.get("tools", [])
+        params = plan.get("params", {})
 
         for tool_name in tools:
             tool = self.tools.get(tool_name)
             if not tool:
                 results[tool_name] = {"error": "tool not found"}
+                continue
 
             try:
                 results[tool_name] = tool.run(params)
@@ -105,11 +124,13 @@ class LifeAssistantAgent:
     # ---------------------------------------------------------
     def compose_answer(
         self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]
+    ) -> str:
         prompt = self.build_answer_prompt(user_query, plan, tool_results)
         return self.llm.run("life_answer", prompt)
 
     def build_answer_prompt(
         self, user_query: str, plan: Dict[str, Any], tool_results: Dict[str, Any]
+    ) -> str:
         return f"""
 你是一个生活助手 Agent，请根据工具执行结果给用户一个自然语言回答。
 
@@ -136,6 +157,8 @@ class LifeAssistantAgent:
             return json.loads(text)
         except:
             try:
+                start = text.index("{")
+                end = text.rindex("}") + 1
                 return json.loads(text[start:end])
             except:
                 return default

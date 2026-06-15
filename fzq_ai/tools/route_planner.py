@@ -18,9 +18,12 @@ from fzq_ai.domain.errors import ToolExecutionError
 
 logger = logging.getLogger(__name__)
 
+
 async def plan_route(start: str, end: str) -> ToolResult[Dict[str, Any]]:
     """
+    示例工具：规划从 start 到 end 的路线。
 
+    你可以将内部逻辑替换为实际路线规划算法或 API。
     """
     try:
         # TODO: 替换为你的实际路线规划逻辑
@@ -30,13 +33,23 @@ async def plan_route(start: str, end: str) -> ToolResult[Dict[str, Any]]:
             "start": start,
             "end": end,
             "steps": [
+                f"Walk from {start} station to platform 2",
                 "Take Line T1 towards Central",
+                f"Arrive at {end} station",
+            ],
             "estimated_minutes": 32,
         }  # 占位
 
         return ToolResult(
             success=True,
+            data=route,
+            metadata={"tool": "plan_route", "start": start, "end": end},
+        )
 
     except Exception as e:
+        logger.error("plan_route failed: %s", e, exc_info=True)
         return ToolResult(
             success=False,
+            error=str(e),
+            metadata={"tool": "plan_route", "start": start, "end": end},
+        )

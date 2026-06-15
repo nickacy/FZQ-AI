@@ -16,11 +16,13 @@ SUPPORTED_COMMANDS = [
     "/quit",
 ]
 
+
 def load_config():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(base_dir, "fzq_ai", "config", "config.yaml")
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
+
 
 class NickTUI:
     def __init__(self):
@@ -123,9 +125,14 @@ class NickTUI:
         while True:
             self.render()
             try:
+                cmd = input("> ")
             except KeyboardInterrupt:
+                break
 
             if not self.handle_command(cmd):
                 break
 
+
 if __name__ == "__main__":
+    app = NickTUI()
+    app.run()

@@ -1,7 +1,9 @@
 # tui/news_view.py
 
+
 class NewsListView:
     """
+    新闻列表视图（支持分页、翻页、查看详情）
     """
 
     def __init__(self, articles, page_size=20):
@@ -46,6 +48,8 @@ class NewsListView:
 
         for idx, item in enumerate(items):
             global_index = self.page * self.page_size + idx
+            title = item.get("title", "")[:70]
+            source = item.get("source", "")
             print("{:<4} {:<70} {:<10}".format(global_index, title, source))
 
         print("-" * 80)
@@ -58,6 +62,7 @@ class NewsListView:
     # ------------------------------------------------------------
     def interact(self, on_select_callback):
         """
+        on_select_callback(index) → 用于显示新闻详情
         """
         while True:
             self.render()
@@ -76,3 +81,4 @@ class NewsListView:
                 if 0 <= index < len(self.articles):
                     on_select_callback(index)
             elif cmd == "q":
+                break
