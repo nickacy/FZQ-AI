@@ -1,49 +1,18 @@
-# fzq_ai/pipelines/narrative_pipeline.py
+﻿# fzq_ai/pipelines/narrative_pipeline.py
 
 from __future__ import annotations
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from collections import Counter
 import re
 
 from fzq_ai.domain.models import Article, ServiceResult
+from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
 STOPWORDS = {
-    "the",
-    "and",
-    "of",
-    "to",
-    "in",
-    "for",
-    "on",
-    "at",
-    "a",
-    "an",
-    "is",
-    "are",
-    "was",
-    "were",
-    "by",
-    "with",
-    "from",
-    "as",
-    "that",
-    "this",
-    "it",
-    "its",
-    "be",
-    "has",
-    "have",
-    "had",
-    "will",
-    "would",
-    "about",
-    "over",
-    "after",
-    "before",
-    "into",
-    "out",
-    "up",
-    "down",
+    "the", "and", "of", "to", "in", "for", "on", "at", "a", "an",
+    "is", "are", "was", "were", "by", "with", "from", "as", "that",
+    "this", "it", "its", "be", "has", "have", "had", "will", "would",
+    "about", "over", "after", "before", "into", "out", "up", "down",
 }
 
 
@@ -58,14 +27,23 @@ class NarrativePipeline:
     def __init__(self, llm_router: Any = None):
         self.llm_router = llm_router
 
-    async def run(
+    def run(
         self,
-        articles: List[Article],
+        text: str = "",
+        articles: Optional[List[Article]] = None,
         summary: str | None = None,
-    ) -> ServiceResult:
+    ) -> str:
+        """
+        多阵营叙事分析。
+        - 如果传入 articles，直接分析
+        - 如果只传入 text，则根据 text 抓取新闻后分析
+        - 返回可读的文本结果
+        """
+        if articles is None:
+            articles = fetch_all_news(text)
 
         if not articles:
-            return ServiceResult.fail("NarrativePipeline 需要 articles 参数")
+            return "暂无数据，无法进行叙事分析。请提供文章数据或有效的搜索关键词。"
 
         # 1. 按阵营分组
         buckets: Dict[str, List[Article]] = {
@@ -86,51 +64,46 @@ class NarrativePipeline:
             else:
                 buckets["other"].append(a)
 
-        # 2. 为每个阵营提取“叙事主题关键词”
+        # 2. 为每个阵营提取"叙事主题关键词"
         def extract_themes(items: List[Article]) -> List[str]:
-            text = " ".join(a.title_original for a in items)
-            text = text.lower()
-            tokens = re.findall(r"[a-zA-Z]{3,}", text)
+            text_blob = " ".join(a.title_original for a in items)
+            text_blob = text_blob.lower()
+            tokens = re.findall(r"[a-zA-Z]{3,}", text_blob)
             tokens = [t for t in tokens if t not in STOPWORDS]
             counter = Counter(tokens)
             return [w for w, _ in counter.most_common(8)]
 
-        def to_brief_list(items: List[Article]) -> List[Dict[str, Any]]:
-            return [
-                {
-                    "title": a.title_original,
-                    "source": a.source_name,
-                    "region": a.region,
-                    "url": a.url,
-                }
-                for a in items[:10]
-            ]
+        # 3. 构建可读输出
+        lines = ["# 🌥 多阵营叙事分析报告\n"]
 
-        result = {
-            "western": {
-                "themes": (
-                    extract_themes(buckets["western"]) if buckets["western"] else []
-                ),
-                "articles": to_brief_list(buckets["western"]),
-            },
-            "east_asia": {
-                "themes": (
-                    extract_themes(buckets["east_asia"]) if buckets["east_asia"] else []
-                ),
-                "articles": to_brief_list(buckets["east_asia"]),
-            },
-            "middle_east": {
-                "themes": (
-                    extract_themes(buckets["middle_east"])
-                    if buckets["middle_east"]
-                    else []
-                ),
-                "articles": to_brief_list(buckets["middle_east"]),
-            },
-            "other": {
-                "themes": extract_themes(buckets["other"]) if buckets["other"] else [],
-                "articles": to_brief_list(buckets["other"]),
-            },
+        labels = {
+            "western": "西方阵营",
+            "east_asia": "东亚阵营",
+            "middle_east": "中东阵营",
+            "other": "其他阵营",
         }
 
-        return ServiceResult.ok(result)
+        for key, label in labels.items():
+            lines.append(f"## {label}")
+            articles_in_bucket = buckets[key]
+            if not articles_in_bucket:
+                lines.append("- 暂无该阵营文章\n")
+                continue
+
+            themes = extract_themes(articles_in_bucket)
+            lines.append(f"**核心叙事主题**: {', '.join(themes) if themes else '（无显著主题）'}")
+            lines.append(f"**文章数**: {len(articles_in_bucket)}")
+            lines.append("")
+            for a in articles_in_bucket[:5]:
+                lines.append(f"- {a.title_original}  [{a.source_name}]")
+            lines.append("")
+
+        return "\n".join(lines)
+
+
+if __name__ == "__main__":
+    print("Running NarrativePipeline test...")
+    pipeline = NarrativePipeline()
+    result = pipeline.run(text="global economy")
+    print("Result:")
+    print(result)

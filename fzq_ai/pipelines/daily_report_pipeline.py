@@ -1,9 +1,10 @@
-# fzq_ai/pipelines/daily_report_pipeline.py
+﻿# fzq_ai/pipelines/daily_report_pipeline.py
 
 from __future__ import annotations
-from typing import List, Any
+from typing import List, Any, Optional
 
 from fzq_ai.domain.models import Article, ServiceResult
+from fzq_ai.pipelines.news_fetcher import fetch_all_news
 
 
 class DailyReportPipeline:
@@ -18,14 +19,22 @@ class DailyReportPipeline:
     def __init__(self, llm_router: Any = None):
         self.llm_router = llm_router
 
-    async def run(
+    def run(
         self,
-        articles: List[Article],
+        query: str = "",
+        articles: Optional[List[Article]] = None,
         summary: str | None = None,
-    ) -> ServiceResult:
+    ) -> str:
+        """
+        生成每日情报报告。
+        如果未传入 articles，则自动从 news_fetcher 抓取新闻。
+        返回 Markdown 字符串，可直接供 UI 显示。
+        """
+        if articles is None:
+            articles = fetch_all_news(query)
 
         if not articles:
-            return ServiceResult.fail("DailyReportPipeline 需要 articles 参数")
+            return "# 📫 FZQ-AI 每日情报报告\n\n暂无数据，请检查新闻源配置或稍后重试。\n"
 
         # 1. 关键事件（前 10 条）
         top_titles = [a.title_original for a in articles[:10]]
@@ -67,20 +76,20 @@ class DailyReportPipeline:
         risk_score = min(len(risk_hits) * 10, 100)
 
         # 4. 生成 Markdown 报告
-        md = "# 📄 FZQ-AI 每日情报报告\n\n"
+        md = "# 📫 FZQ-AI 每日情报报告\n\n"
 
-        md += "## 🧭 今日主题概览\n"
+        md += "## 🌋 今日主题概览\n"
         if summary:
             md += summary + "\n\n"
         else:
             md += "（暂无摘要）\n\n"
 
-        md += "## 🔍 关键事件（Top 10）\n"
+        md += "## 🔳 关键事件（Top 10）\n"
         for t in top_titles:
             md += f"- {t}\n"
         md += "\n"
 
-        md += "## 🧠 多阵营叙事概览\n"
+        md += "## 🌥 多阵营叙事概况\n"
 
         md += "### 西方叙事\n"
         if western:
@@ -136,4 +145,12 @@ class DailyReportPipeline:
 
         md += "---\n由 FZQ-AI 自动生成（语义新闻 + 基础叙事 + 风险扫描）\n"
 
-        return ServiceResult.ok(md)
+        return md
+
+
+if __name__ == "__main__":
+    print("Running DailyReportPipeline test...")
+    pipeline = DailyReportPipeline()
+    result = pipeline.run()
+    print("Result:")
+    print(result)
