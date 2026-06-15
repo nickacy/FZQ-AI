@@ -1,166 +1,110 @@
-# pipelines/news_pipeline.py
+import feedparser
+from fzq_ai.domain.models import Article, IntelBundle, IntelMeta
+from fzq_ai.tools.service_result import ServiceResult
+from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.utils.logger import get_logger
+from fzq_ai.config import get_config
+from datetime import datetime
 
-import requests
-from bs4 import BeautifulSoup
-
-from pipelines.reuters_fetcher import ReutersFetcher
-from pipelines.summarizer import NewsSummarizer
-from pipelines.risk_scorer import RiskScorer
-from core.cache_manager import CacheManager
+logger = get_logger(__name__)
 
 
 class NewsPipeline:
     """
-    FZQ‑AI Agent — News Pipeline v1.5
-    多源新闻抓取 + Reuters 四层终极抓取器
-    + 自动摘要 + 自动风险评分 + 缓存系统
+    FZQ‑AI v2.5 — News Intelligence Pipeline
+    RSS 多源新闻抓取 + 自动摘要 + 风险评分
     """
 
-    def __init__(self, config, llm=None):
-        self.config = config
-        self.sources = config.news_sources
-        self.llm = llm
+    def __init__(self, llm: LLMRouter = None):
+        self.config = get_config()
+        self.sources = self.config.get("rss_sources", [])
+        self.llm = llm or LLMRouter()
 
-        # 终极抓取器
-        self.reuters_fetcher = ReutersFetcher()
-
-        # 摘要生成器
-        self.summarizer = NewsSummarizer(llm)
-
-        # 风险评分器
-        self.risk_scorer = RiskScorer(llm)
-
-        # 缓存系统
-        self.news_cache = CacheManager("data/cache/news_cache.json", expire_hours=6)
-        self.summary_cache = CacheManager(
-            "data/cache/summary_cache.json", expire_hours=24
-        )
-        self.risk_cache = CacheManager("data/cache/risk_cache.json", expire_hours=24)
-
-        # 通用浏览器 UA
-        self.headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/123.0.0.0 Safari/537.36"
-            ),
-            "Accept-Language": "en-US,en;q=0.9",
-        }
-
-    # ------------------------------------------------------------
-    # 通用 HTML 抓取
-    # ------------------------------------------------------------
-    def fetch_html(self, url):
+    def _fetch_rss(self, url: str):
         try:
-            print(f"[HTML] 抓取: {url}")
-            resp = requests.get(url, headers=self.headers, timeout=10)
-            resp.raise_for_status()
-            return resp.text
+            feed = feedparser.parse(url)
+            return feed.entries
         except Exception as e:
-            print(f"[ERROR] 抓取失败: {url} — {e}")
-            return ""
+            logger.error(f"[RSS] 抓取失败: {url} — {e}")
+            return []
 
-    # ------------------------------------------------------------
-    # 通用 HTML 解析（简单标题提取）
-    # ------------------------------------------------------------
-    def parse_news(self, html, source_name):
-        soup = BeautifulSoup(html, "html.parser")
-        items = []
+    def _summarize(self, title: str, content: str):
+        prompt = f"""
+你是一名新闻分析助手，请总结以下新闻内容：
 
-        for a in soup.find_all("a"):
-            title = a.get_text(strip=True)
-            href = a.get("href", "")
+标题：{title}
+内容：{content}
 
-            if not title or len(title) < 10:
-                continue
+请输出简短摘要。
+"""
+        return self.llm.run(prompt)
 
-            if href.startswith("/"):
-                href = f"https://{source_name}{href}"
+    def _risk_score(self, title: str, summary: str):
+        prompt = f"""
+请对以下新闻进行风险评分（1-5），并给出风险类型：
 
-            items.append(
-                {"title": title, "url": href, "summary": "", "source": source_name}
-            )
+标题：{title}
+摘要：{summary}
 
-        return items
+输出 JSON：
+{{
+  "risk_level": 1-5,
+  "risk_type": "政治/经济/社会/科技/其他"
+}}
+"""
+        return self.llm.run_json(prompt)
 
-    # ------------------------------------------------------------
-    # 主流程（含缓存 + Reuters 终极抓取器）
-    # ------------------------------------------------------------
-    def run(self):
-        print("[NewsPipeline] 开始抓取新闻...")
+    def run(self, topic: str):
+        logger.info(f"[NewsPipeline] 开始分析主题: {topic}")
 
-        all_news = []
+        articles = []
 
+        # --------------------------------------------------------
+        # 1. 遍历所有 RSS 源
+        # --------------------------------------------------------
         for src in self.sources:
-            name = src["name"]
-            url = src["url"]
+            url = src.get("url")
+            name = src.get("name")
 
-            # ----------------------------------------------------
-            # 1) 缓存检查
-            # ----------------------------------------------------
-            cached = self.news_cache.get(url)
-            if cached:
-                print(f"[Cache] 命中缓存: {url}")
-                all_news.extend(cached)
-                continue
+            entries = self._fetch_rss(url)
+            for e in entries:
+                title = e.get("title", "")
+                summary = e.get("summary", "")
+                link = e.get("link", "")
 
-            # ----------------------------------------------------
-            # 2) Reuters 使用终极抓取器（永不 401）
-            # ----------------------------------------------------
-            if "reuters.com" in url:
-                print(f"[Reuters] 使用终极抓取器: {url}")
-                articles = self.reuters_fetcher.fetch(url, self.llm)
-                all_news.extend(articles)
-                self.news_cache.set(url, articles)
-                continue
+                if topic not in title and topic not in summary:
+                    continue
 
-            # ----------------------------------------------------
-            # 3) 其他网站使用普通 HTML 抓取
-            # ----------------------------------------------------
-            html = self.fetch_html(url)
-            if not html:
-                continue
+                # LLM 摘要
+                llm_summary = self._summarize(title, summary)
 
-            items = self.parse_news(html, name)
-            all_news.extend(items)
-            self.news_cache.set(url, items)
+                # 风险评分
+                risk = self._risk_score(title, llm_summary)
 
-        print(f"[NewsPipeline] 抓取完成，共 {len(all_news)} 条新闻")
-        print("[NewsPipeline] 开始生成摘要与风险评分...")
+                articles.append(
+                    Article(
+                        title=title,
+                        url=link,
+                        summary=llm_summary,
+                        source=name,
+                        published_at=e.get("published", ""),
+                        risk_level=risk.get("risk_level", 1),
+                        risk_type=risk.get("risk_type", "其他"),
+                    )
+                )
 
         # --------------------------------------------------------
-        # 4) 为每条新闻生成摘要 + 风险评分（含缓存）
+        # 2. 构建 intel_bundle
         # --------------------------------------------------------
-        for item in all_news:
-            title = item["title"]
-
-            # -------------------------
-            # 摘要缓存
-            # -------------------------
-            cached_summary = self.summary_cache.get(title)
-            if cached_summary:
-                item["summary"] = cached_summary
-            else:
-                summary = self.summarizer.summarize(
-                    title=item["title"], url=item["url"]
-                )
-                item["summary"] = summary
-                self.summary_cache.set(title, summary)
-
-            # -------------------------
-            # 风险评分缓存
-            # -------------------------
-            cached_risk = self.risk_cache.get(title)
-            if cached_risk:
-                item.update(cached_risk)
-            else:
-                scores = self.risk_scorer.score(
-                    title=item["title"], summary=item["summary"]
-                )
-                item.update(scores)
-                self.risk_cache.set(title, scores)
-
-        print(
-            f"[NewsPipeline] 全部处理完成，共 {len(all_news)} 条新闻（含摘要 + 风险评分）"
+        bundle = IntelBundle(
+            meta=IntelMeta(
+                topics=[topic],
+                regions=[],
+                depth="normal",
+                timestamp=datetime.utcnow().isoformat(),
+            ),
+            articles=articles,
+            events=[],
         )
-        return all_news
+
+        return ServiceResult.success(bundle)
