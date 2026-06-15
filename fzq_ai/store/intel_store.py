@@ -10,8 +10,15 @@ from fzq_ai.domain.models import Article, IntelBundle, IntelMeta
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class IntelRecord:
+    run_id: str
+    topic: str
+    created_at: datetime
+    provider_snapshot: Dict[str, Any]
+    bundle: IntelBundle
+
 
 class IntelStore:
     """v2.7: Persist IntelBundle, query by topic/time, trend analysis."""
@@ -34,24 +41,48 @@ class IntelStore:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS intel_runs (
                     run_id TEXT PRIMARY KEY,
+                    topic TEXT,
+                    created_at TEXT,
+                    provider_snapshot TEXT,
+                    bundle_json TEXT
+                )""")
+            conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_runs_topic_time "
                 "ON intel_runs(topic, created_at)")
 
     def save_bundle(
         self, run_id: str, topic: str, bundle: IntelBundle,
+        provider_snapshot: Dict[str, Any],
+        created_at: Optional[datetime] = None,
+    ) -> None:
+        created_at = created_at or datetime.utcnow()
         try:
+            bj = json.dumps(asdict(bundle), ensure_ascii=False, default=str)
+            ps = json.dumps(provider_snapshot, ensure_ascii=False)
             with self._get_conn() as conn:
                 conn.execute(
                     """INSERT OR REPLACE INTO intel_runs
+                       (run_id, topic, created_at, provider_snapshot, bundle_json)
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (run_id, topic, created_at.isoformat(),
+                     ps, bj))
         except Exception as e:
+            logger.warning(f"IntelStore.save_bundle failed: {e}")
 
     def load_latest(self, topic: str, limit: int = 1) -> List[IntelRecord]:
         return self._query(
             "WHERE topic = ? ORDER BY created_at DESC LIMIT ?",
+            (topic, limit))
 
     def load_trend(
         self, topic: str, since: Optional[datetime] = None
+    ) -> List[IntelRecord]:
+        sql = "WHERE topic = ?"
+        params: list = [topic]
         if since:
+            sql += " AND created_at >= ?"
+            params.append(since.isoformat())
+        sql += " ORDER BY created_at ASC"
         return self._query(sql, tuple(params))
 
     def _query(self, where_clause: str, params: tuple) -> List[IntelRecord]:
@@ -61,10 +92,25 @@ class IntelStore:
             rows = conn.execute(sql, params).fetchall()
         records: List[IntelRecord] = []
         for row in rows:
+            bd = json.loads(row["bundle_json"])
+            bundle = _dict_to_bundle(bd)
+            records.append(IntelRecord(
+                run_id=row["run_id"], topic=row["topic"],
+                created_at=datetime.fromisoformat(row["created_at"]),
+                provider_snapshot=json.loads(row["provider_snapshot"]),
+                bundle=bundle))
         return records
+
 
 def _dict_to_bundle(d: dict) -> IntelBundle:
     """Reconstruct IntelBundle from dict."""
+    meta_d = d.get("meta", {})
+    meta = IntelMeta(
+        topics=meta_d.get("topics", []),
+        regions=meta_d.get("regions", []),
+        depth=meta_d.get("depth", "normal"),
+    )
+    articles = []
     for ad in d.get("articles", []):
         a = Article(
             title_original=ad.get("title_original", ""),
@@ -78,6 +124,9 @@ def _dict_to_bundle(d: dict) -> IntelBundle:
         # Preserve fetched_at if present
         if ad.get("fetched_at"):
             try:
+                a.fetched_at = datetime.fromisoformat(ad["fetched_at"])
             except (ValueError, TypeError):
                 pass
+        articles.append(a)
+    events = d.get("events", [])
     return IntelBundle(meta=meta, articles=articles, events=events)

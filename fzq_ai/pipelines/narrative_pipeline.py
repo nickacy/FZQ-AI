@@ -18,8 +18,13 @@ STOPWORDS = {
     "about", "over", "after", "before", "into", "out", "up", "down",
 }
 
+
 class NarrativePipeline:
     """
+    多阵营叙事分析（专业版）
+    - 按 region 分阵营
+    - 提取每个阵营的核心叙事主题（关键词）
+    - 输出结构化结果，便于 UI 和日报使用
     """
 
     def __init__(self, llm_router: Any = None):
@@ -27,24 +32,40 @@ class NarrativePipeline:
 
     def run(
         self,
+        text: str = "",
+        articles: Optional[List[Article]] = None,
+        summary: str | None = None,
+    ) -> ServiceResult:
         """
+        多阵营叙事分析。
+        - 如果传入 articles，直接分析
+        - 如果只传入 text，则根据 text 抓取新闻后分析
+        - 返回可读的文本结果
         """
         if articles is None:
+            articles = fetch_all_news(text)
 
         if not articles:
             return "暂无数据，无法进行叙事分析。请提供文章数据或有效的搜索关键词。"
 
         # 1. 按阵营分组
+        buckets: Dict[str, List[Article]] = {
             "western": [],
             "east_asia": [],
             "middle_east": [],
             "other": [],
+        }
 
         for a in articles:
+            region = (a.region or "").lower()
             if region in ["western", "us", "europe"]:
+                buckets["western"].append(a)
             elif region in ["east_asia", "japan", "korea", "china"]:
+                buckets["east_asia"].append(a)
             elif region in ["middle_east"]:
+                buckets["middle_east"].append(a)
             else:
+                buckets["other"].append(a)
 
         # 2. 为每个阵营提取"叙事主题关键词"
         def extract_themes(items: List[Article]) -> List[str]:
@@ -52,34 +73,50 @@ class NarrativePipeline:
             text_blob = text_blob.lower()
             tokens = re.findall(r"[a-zA-Z]{3,}", text_blob)
             tokens = [t for t in tokens if t not in STOPWORDS]
+            counter = Counter(tokens)
             return [w for w, _ in counter.most_common(8)]
 
         # 3. 构建可读输出
         lines = ["# 🌥 多阵营叙事分析报告\n"]
 
+        labels = {
             "western": "西方阵营",
             "east_asia": "东亚阵营",
             "middle_east": "中东阵营",
             "other": "其他阵营",
+        }
 
         for key, label in labels.items():
             lines.append(f"## {label}")
             articles_in_bucket = buckets[key]
             if not articles_in_bucket:
+                lines.append("- 暂无该阵营文章\n")
+                continue
 
+            themes = extract_themes(articles_in_bucket)
             lines.append(f"**核心叙事主题**: {', '.join(themes) if themes else '（无显著主题）'}")
             lines.append(f"**文章数**: {len(articles_in_bucket)}")
             lines.append("")
             for a in articles_in_bucket[:5]:
+                lines.append(f"- {a.title_original}  [{a.source_name}]")
+            lines.append("")
 
         # v2.7: persist to IntelStore
         try:
+            store = IntelStore()
+            run_id = str(uuid.uuid4())
+            from fzq_ai.domain.models import IntelBundle, IntelMeta
+            bundle = IntelBundle(
+                meta=IntelMeta(topics=[query or topic or ""], regions=[], depth="normal"),
                 articles=articles if "articles" in dir() else [],
                 events=[],
+            )
+            store.save_bundle(run_id, query or topic or "", bundle, {"pipeline": "narrative_pipeline"})
         except Exception:
             pass  # never break main flow
 
         return "\n".join(lines)
+
 
 if __name__ == "__main__":
     print("Running NarrativePipeline test...")
