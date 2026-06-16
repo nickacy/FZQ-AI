@@ -51,6 +51,9 @@ class Article:
     language: str = ""  # intel_store 反序列化需要
     credibility: float = 0.0  # tests 要求默认 0.0
 
+    # ---- propaganda tags（tests 要求） ----
+    propaganda_tags: List[str] = field(default_factory=list)
+
     # ---- 时间字段 ----
     fetched_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -60,6 +63,7 @@ class Article:
 
     # ---- 其他字段 ----
     id: str = ""
+
 
 
 # ============================
