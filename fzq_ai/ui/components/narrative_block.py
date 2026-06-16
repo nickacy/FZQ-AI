@@ -1,59 +1,38 @@
-"""
-fzq_ai/ui/components/narrative_block.py — v2.6 Professional Narrative View
-"""
-
-from __future__ import annotations
-from typing import Any, Dict, List
 import streamlit as st
-from fzq_ai.ui.theme import COLORS, section_header
 
-BLOC_DATA = {
-    "western":       {"label": "Western",       "color": COLORS["western"],       "icon": "🌍"},
-    "east_asia":     {"label": "East Asia",     "color": COLORS["east_asia"],     "icon": "🌏"},
-    "china":         {"label": "China",         "color": COLORS["china"],         "icon": "🇨🇳"},
-    "middle_east":   {"label": "Middle East",   "color": COLORS["middle_east"],   "icon": "🕌"},
-    "russia":        {"label": "Russia",        "color": COLORS["russia"],        "icon": "🇷🇺"},
-    "africa":        {"label": "Africa",        "color": COLORS["africa"],        "icon": "🌍"},
-    "latin_america": {"label": "Latin America", "color": COLORS["latin_america"], "icon": "🌎"},
-    "other":         {"label": "Other",         "color": COLORS["text_secondary"], "icon": "📡"},
-}
 
-def render_narrative_block(narrative_data: Any) -> None:
-    section_header("Multi-Blocs Narrative", "🧭")
+def render_narrative_block(narrative_data):
+    """
+    Render narrative analysis block in the UI.
+    """
 
-    if isinstance(narrative_data, dict):
-        data = narrative_data
-    elif hasattr(narrative_data, "data"):
-        raw = getattr(narrative_data, "data", {})
-        data = raw if isinstance(raw, dict) else {}
-
-    if not data:
+    if not narrative_data:
+        st.info("No narrative data available.")
         return
 
-    # Find which blocs have content
-    for bloc in ["western", "east_asia", "china", "middle_east", "russia", "africa", "latin_america"]:
-        if isinstance(bd, dict) and (bd.get("themes") or bd.get("articles")):
-            active_blocs.append(bloc)
+    title = narrative_data.get("title", "Narrative Summary")
+    zh = narrative_data.get("zh", "")
+    en = narrative_data.get("en", "")
 
-    if not active_blocs:
-        return
+    st.markdown(
+        f"""
+        <div style="
+            border:1px solid #ddd;
+            border-radius:8px;
+            padding:12px;
+            margin-bottom:12px;
+            background-color:#fdfdfd;
+        ">
+            <h3 style="margin-bottom:10px;">{title}</h3>
 
-    # ── Cards per bloc ──
-    for idx, bloc in enumerate(active_blocs):
-        bd = data[bloc]
+            <h4>中文叙事</h4>
+            <p>{zh}</p>
 
-        with cols[idx % len(cols)]:
-            st.markdown(
-                f'<div style="background:{meta["color"]}10;border:1px solid {meta["color"]}30;'
+            <hr style="margin:12px 0;">
 
-    # ── Theme details per bloc ──
-    for bloc in active_blocs:
-
-        with st.expander(f"{meta['icon']} {meta['label']} — {len(themes)} themes, {len(articles)} articles"):
-            if themes:
-                    for t in themes[:8]
-
-            if articles:
-                for a in articles[:5]:
-                    title = a.get("title", "Untitled") if isinstance(a, dict) else str(a)
-                    st.markdown(f"- {title[:120]}")
+            <h4>English Narrative</h4>
+            <p>{en}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
