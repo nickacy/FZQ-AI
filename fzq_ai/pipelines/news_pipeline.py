@@ -92,7 +92,7 @@ class NewsPipeline:
             f"3. 使用专业、客观的情报分析语言\n"
             f"4. 不需要逐条罗列，而是提炼整合"
         )
-        raw = asyncio.run(self.llm.run(prompt))
+        raw = asyncio.run(self.llm.route("news_intel", prompt))
         return raw.strip()
 
     def _build_article_list(
