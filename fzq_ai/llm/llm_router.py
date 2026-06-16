@@ -224,6 +224,82 @@ class LLMRouter:
             f"All LLM providers failed. Last error: {last_error}"
         ) from last_error
 
+    # ── v6.0: 智能路由 (任务类型 → 模型) ─────────────────────
+
+    TASK_MODEL_MAP = {
+        "event_extraction":      ["openai", "gemini"],
+        "multilingual_summary":  ["gemini", "openai"],
+        "deep_reasoning":        ["deepseek", "openai"],
+        "structured_extraction": ["openai", "gemini"],
+        "news_intel":            ["openai", "deepseek", "gemini"],
+    }
+
+    FALLBACK_CHAIN = ["openai", "deepseek", "gemini"]
+
+    async def route(self, task_type: str, prompt: str, **kwargs) -> str:
+        """
+        v6.0: Task-based intelligent model routing.
+
+        Args:
+            task_type: event_extraction | multilingual_summary |
+                       deep_reasoning | structured_extraction | news_intel
+            prompt: The prompt to send
+            **kwargs: temperature, max_tokens, system_prompt, retries
+
+        Returns:
+            LLM response text
+
+        Raises:
+            RuntimeError: If all providers in the routing chain fail
+        """
+        preferred_models = self.TASK_MODEL_MAP.get(
+            task_type, self.FALLBACK_CHAIN
+        )
+        # Try preferred models first, then fallback chain
+        ordered = list(preferred_models) + [
+            m for m in self.FALLBACK_CHAIN if m not in preferred_models
+        ]
+        return await self._call_ordered(prompt, ordered, **kwargs)
+
+    async def _call_ordered(
+        self, prompt: str, model_order: list, **kwargs
+    ) -> str:
+        """Call providers in specified order with failover."""
+        last_error = None
+        for model_name in model_order:
+            try:
+                return await self._call_provider(prompt, model_name, **kwargs)
+            except Exception as e:
+                last_error = e
+                continue
+        raise RuntimeError(
+            f"All providers failed in order {model_order}. "
+            f"Last error: {last_error}"
+        ) from last_error
+
+    async def _call_provider(
+        self, prompt: str, model_name: str, **kwargs
+    ) -> str:
+        """Call a specific provider by name."""
+        provider = self._providers_map.get(model_name)
+        if not provider:
+            raise ValueError(f"Unknown provider: {model_name}")
+        return await provider.run(
+            prompt,
+            temperature=kwargs.get("temperature", 0.3),
+            max_tokens=kwargs.get("max_tokens", 2000),
+            system_prompt=kwargs.get("system_prompt", ""),
+            retries=kwargs.get("retries", 1),
+        )
+
+    @property
+    def _providers_map(self) -> dict:
+        return {
+            "deepseek": self.deepseek,
+            "openai": self.openai,
+            "gemini": self.gemini,
+        }
+
     # ── Health & Metrics ───────────────────────────────────────
 
     @property
