@@ -23,8 +23,14 @@ class SentimentPipeline:
         return "neutral"
 
     def run(self, articles: List[Article]):
+        """
+        tests 要求：
+        - 返回 str
+        - 空列表返回 str
+        """
+
         if not articles:
-            return "[]"
+            return json.dumps({"items": [], "total_articles": 0}, ensure_ascii=False)
 
         items: List[Dict[str, Any]] = []
         pos = neg = neu = 0
