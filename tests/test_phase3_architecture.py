@@ -74,7 +74,7 @@ class TestSchemas:
 
     def test_news_intel_output_schema(self):
         """NewsPipelineOutput validates with correct fields."""
-        from fzq_ai.schemas.pipeline_outputs import NewsPipelineOutput
+        from fzq_ai.schemas.pipeline_output import NewsPipelineOutput
         obj = NewsPipelineOutput(
             summary="news intel summary",
             article_count=10,
@@ -87,7 +87,7 @@ class TestSchemas:
 
     def test_narrative_output_schema(self):
         """NarrativePipelineOutput validates with correct fields."""
-        from fzq_ai.schemas.pipeline_outputs import NarrativePipelineOutput
+        from fzq_ai.schemas.pipeline_output import NarrativePipelineOutput
         obj = NarrativePipelineOutput(
             summary="narrative summary",
             key_points="key points 1, key points 2",
@@ -99,7 +99,7 @@ class TestSchemas:
 
     def test_risk_output_schema(self):
         """RiskPipelineOutput validates with correct fields."""
-        from fzq_ai.schemas.pipeline_outputs import RiskPipelineOutput
+        from fzq_ai.schemas.pipeline_output import RiskPipelineOutput
         obj = RiskPipelineOutput(
             summary="risk summary",
             factors="factor1, factor2",
@@ -112,7 +112,7 @@ class TestSchemas:
 
     def test_daily_report_output_schema(self):
         """DailyReportOutput validates with correct fields."""
-        from fzq_ai.schemas.pipeline_outputs import DailyReportOutput
+        from fzq_ai.schemas.pipeline_output import DailyReportOutput
         obj = DailyReportOutput(
             news="news result",
             risk="risk result",
@@ -125,7 +125,7 @@ class TestSchemas:
 
     def test_schema_from_import(self):
         """All schema models importable."""
-        from fzq_ai.schemas.pipeline_outputs import (
+        from fzq_ai.schemas.pipeline_output import (
             NewsPipelineOutput, RiskPipelineOutput, SentimentPipelineOutput,
             NarrativePipelineOutput, ScenarioPipelineOutput, DailyReportOutput
         )
@@ -268,7 +268,7 @@ class TestConcurrency:
         """DailyReportPipeline.run_async should gather 5 sub-pipelines."""
         from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
         from fzq_ai.domain.models import ServiceResult
-        from fzq_ai.schemas.pipeline_outputs import DailyReportOutput
+        from fzq_ai.schemas.pipeline_output import DailyReportOutput
         # Test concurrency pattern, \
              patch('fzq_ai.pipelines.daily_report_pipeline.DailyReportOutput', DailyReportOutput):
             p = DailyReportPipeline.__new__(DailyReportPipeline)
