@@ -1,6 +1,5 @@
 # fzq_ai/llm/providers/provider_registry.py
 
-from typing import Dict, Any
 from fzq_ai.llm.providers.openai_provider import OpenAIProvider
 from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
 from fzq_ai.llm.providers.gemini_provider import GeminiProvider
@@ -10,7 +9,7 @@ class ProviderRegistry:
     """Registry for all LLM providers."""
 
     def __init__(self) -> None:
-        self.providers: Dict[str, Any] = {
+        self.providers = {
             "openai": OpenAIProvider(),
             "deepseek": DeepSeekProvider(),
             "gemini": GeminiProvider(),
