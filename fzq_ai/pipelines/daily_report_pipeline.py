@@ -1,7 +1,7 @@
 # fzq_ai/pipelines/daily_report_pipeline.py
 
-from typing import List
 import asyncio
+from typing import List
 
 from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.pipelines.news_pipeline import NewsPipeline
@@ -19,17 +19,12 @@ from fzq_ai.schemas.pipeline_output import (
     DailyReportPipelineOutput,
 )
 
+from fzq_ai.prompts.template_loader import load_prompt_template
+from fzq_ai.llm.router import LLMRouter
+from fzq_ai.schemas.llm import LLMRequestSchema
+
 
 class DailyReportPipeline(BasePipeline[DailyReportPipelineOutput]):
-    """
-    Phase 4‑2：全链路并发 DailyReportPipeline
-
-    特点：
-    - 继承 BasePipeline（统一 run / run_async）
-    - 返回强类型 DailyReportPipelineOutput
-    - 内部使用 asyncio.gather 并发执行 Risk / Sentiment / Scenario
-    - News → Narrative 是顺序依赖（必须先跑 News）
-    """
 
     def __init__(self) -> None:
         super().__init__()
@@ -38,26 +33,21 @@ class DailyReportPipeline(BasePipeline[DailyReportPipelineOutput]):
         self.risk_pipeline = RiskPipeline()
         self.sentiment_pipeline = SentimentPipeline()
         self.scenario_pipeline = ScenarioPipeline()
+        self.router = LLMRouter()
 
     async def run_async(
         self,
         topic: str,
         news_raw_texts: List[str],
     ) -> DailyReportPipelineOutput:
-        """
-        顶层异步入口：
-        - 输入：topic（主题）、news_raw_texts（新闻原文列表）
-        - 输出：DailyReportPipelineOutput（完整日报）
-        """
 
         # ------------------------------------------------------------
-        # 1. 先跑 NewsPipeline（必须先执行）
+        # 1. 先跑 NewsPipeline（顺序依赖）
         # ------------------------------------------------------------
         news_result: NewsPipelineOutput = await self.news_pipeline.run_async(
             news_raw_texts=news_raw_texts
         )
 
-        # NarrativePipeline 依赖新闻摘要
         combined_summary = "\n".join(news_result.summaries)
 
         # ------------------------------------------------------------
@@ -76,74 +66,31 @@ class DailyReportPipeline(BasePipeline[DailyReportPipelineOutput]):
         )
 
         # ------------------------------------------------------------
-        # 3. 组装最终日报文本
+        # 3. 用 LLM 生成最终日报（替换手写 compose）
         # ------------------------------------------------------------
-        report_content = self._compose_report(
+        template = load_prompt_template("daily_report_generate.j2")
+
+        filled_prompt = template.render(
             topic=topic,
-            news=news_result,
-            narrative=narrative_result,
-            risk=risk_result,
-            sentiment=sentiment_result,
-            scenario=scenario_result,
+            news="\n".join(news_result.summaries),
+            narrative=narrative_result.narrative_text,
+            risk=risk_result.summary,
+            sentiment=sentiment_result.summary,
+            scenario=scenario_result.scenarios,
         )
+
+        llm_resp = await self.router.route_llm_call(
+            task_type="daily_report_generate",
+            req=LLMRequestSchema(prompt=filled_prompt),
+        )
+
+        final_report = llm_resp.content
 
         # ------------------------------------------------------------
         # 4. 返回强类型 Schema
         # ------------------------------------------------------------
         return DailyReportPipelineOutput(
-            report_content=report_content,
+            report_content=final_report,
             news_count=news_result.raw_input_count,
             task_status="completed",
         )
-
-    # ------------------------------------------------------------
-    # 报告组装逻辑（Phase 4‑4 会升级为 LLM 生成）
-    # ------------------------------------------------------------
-    def _compose_report(
-        self,
-        topic: str,
-        news: NewsPipelineOutput,
-        narrative: NarrativePipelineOutput,
-        risk: RiskPipelineOutput,
-        sentiment: SentimentPipelineOutput,
-        scenario: ScenarioPipelineOutput,
-    ) -> str:
-        lines: List[str] = []
-
-        lines.append(f"# 每日情报报告：{topic}")
-        lines.append("")
-
-        # --- 新闻摘要 ---
-        lines.append("## 📰 新闻摘要")
-        for idx, s in enumerate(news.summaries, start=1):
-            lines.append(f"{idx}. {s}")
-        lines.append("")
-
-        # --- 叙事分析 ---
-        lines.append("## 🧠 叙事分析")
-        lines.append(narrative.narrative_text)
-        lines.append("")
-
-        # --- 风险分析 ---
-        lines.append("## ⚠️ 风险分析")
-        lines.append(risk.summary)
-        lines.append("")
-        lines.append("### 主要风险因素")
-        lines.append(risk.factors)
-        lines.append("")
-        lines.append("### 风险趋势预测")
-        lines.append(risk.forecast)
-        lines.append("")
-
-        # --- 情绪分析 ---
-        lines.append("## 😊 情绪倾向")
-        lines.append(f"情绪评分：{sentiment.score}")
-        lines.append(sentiment.summary)
-        lines.append("")
-
-        # --- 情景推演 ---
-        lines.append("## 🔮 情景推演")
-        lines.append(scenario.scenarios)
-        lines.append("")
-
-        return "\n".join(lines)
