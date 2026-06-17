@@ -1,52 +1,77 @@
-# fzq_ai/schemas/pipeline_outputs.py
-"""Unified Pydantic schemas for all pipeline outputs."""
+# fzq_ai/schemas/pipeline_output.py
+# Phase 4‑5 最终版：完整结构化情报输出 Schema
 
-from __future__ import annotations
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Any
-
-
-class NewsPipelineOutput(BaseModel):
-    """Output schema for NewsPipeline."""
-    summary: str = Field(..., description="LLM-generated intelligence summary")
-    article_count: int = Field(default=0, description="Number of articles fetched")
-    articles: List[Dict[str, Any]] = Field(default_factory=list, description="Article metadata list")
-    regions_covered: List[str] = Field(default_factory=list)
-    languages_detected: List[str] = Field(default_factory=list)
+from typing import List
+from pydantic import Field
+from .base import PipelineOutputSchema
 
 
-class RiskPipelineOutput(BaseModel):
-    """Output schema for RiskPipeline."""
-    summary: str = Field(..., description="Risk assessment summary")
-    factors: str = Field(default="", description="Key risk factors")
-    forecast: str = Field(default="", description="30-day risk trend forecast")
-    risk_score: Optional[float] = Field(default=None, description="Computed risk score 0-100")
+# ------------------------------------------------------------
+# News Pipeline Output
+# ------------------------------------------------------------
+class NewsPipelineOutput(PipelineOutputSchema):
+    raw_input_count: int
+    summaries: List[str]
+    task_status: str = "completed"
 
 
-class SentimentPipelineOutput(BaseModel):
-    """Output schema for SentimentPipeline."""
-    score: str = Field(default="neutral", description="Sentiment score (-1 to +1)")
-    summary: str = Field(default="", description="Sentiment tendency summary")
-    distribution: Dict[str, int] = Field(default_factory=dict, description="positive/neutral/negative counts")
+# ------------------------------------------------------------
+# Narrative Pipeline Output
+# ------------------------------------------------------------
+class NarrativePipelineOutput(PipelineOutputSchema):
+    narrative_text: str
+    task_status: str = "completed"
 
 
-class NarrativePipelineOutput(BaseModel):
-    """Output schema for NarrativePipeline."""
-    summary: str = Field(..., description="Narrative summary")
-    key_points: str = Field(default="", description="5 key narrative points")
-    storyline: str = Field(default="", description="Clear storyline")
-    implications: str = Field(default="", description="30-day implications")
+# ------------------------------------------------------------
+# Risk Pipeline Output
+# ------------------------------------------------------------
+class RiskPipelineOutput(PipelineOutputSchema):
+    summary: str
+    factors: str
+    forecast: str
+    task_status: str = "completed"
 
 
-class ScenarioPipelineOutput(BaseModel):
-    """Output schema for ScenarioPipeline."""
-    scenarios: str = Field(..., description="3 scenario descriptions with risk levels")
+# ------------------------------------------------------------
+# Sentiment Pipeline Output
+# ------------------------------------------------------------
+class SentimentPipelineOutput(PipelineOutputSchema):
+    score: float
+    summary: str
+    task_status: str = "completed"
 
 
-class DailyReportOutput(BaseModel):
-    """Output schema for DailyReportPipeline."""
-    news: Any = Field(default="", description="News section")
-    risk: Any = Field(default="", description="Risk section")
-    sentiment: Any = Field(default="", description="Sentiment section")
-    narrative: Any = Field(default="", description="Narrative section")
-    scenario: Any = Field(default="", description="Scenario section")
+# ------------------------------------------------------------
+# Scenario Pipeline Output
+# ------------------------------------------------------------
+class ScenarioPipelineOutput(PipelineOutputSchema):
+    scenarios: str
+    task_status: str = "completed"
+
+
+# ------------------------------------------------------------
+# Daily Report Pipeline Output（最终结构化情报对象）
+# ------------------------------------------------------------
+class DailyReportPipelineOutput(PipelineOutputSchema):
+    """
+    Phase 4‑5：最终结构化日报 Schema
+    包含：
+    - 最终日报文本（LLM 生成）
+    - 所有子模块的结构化结果
+    """
+
+    # 最终日报文本（LLM 生成）
+    report_content: str
+
+    # 子模块结构化结果
+    news: NewsPipelineOutput
+    narrative: NarrativePipelineOutput
+    risk: RiskPipelineOutput
+    sentiment: SentimentPipelineOutput
+    scenario: ScenarioPipelineOutput
+
+    # 统计字段
+    news_count: int
+
+    task_status: str = "completed"
