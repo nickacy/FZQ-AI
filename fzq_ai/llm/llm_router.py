@@ -3,8 +3,9 @@
 import asyncio
 import time
 
-from fzq_ai.llm.providers.openai_client import OpenAIClient
-from fzq_ai.llm.providers.deepseek_client import DeepSeekClient
+from fzq_ai.llm.providers.openai_provider import OpenAIProvider
+from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
+from fzq_ai.llm.providers.gemini_provider import GeminiProvider
 from fzq_ai.llm.providers.minimax_client import MiniMaxClient
 
 from fzq_ai.llm.task_registry import TaskRegistry
