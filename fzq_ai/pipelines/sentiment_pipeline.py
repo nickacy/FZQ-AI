@@ -3,59 +3,36 @@
 import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
+from fzq_ai.pipelines.base_pipeline import BasePipeline
+from fzq_ai.domain.models import ServiceResult
 
 
-SENTIMENT_SCORE_TEMPLATE = PromptTemplate(
-    """
-请根据以下主题给出情绪倾向评分（-1 到 +1）：
+SENTIMENT_SCORE_TEMPLATE = PromptTemplate("""
+Give a sentiment score (-1 to +1) for the following topic:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
-SENTIMENT_SUMMARY_TEMPLATE = PromptTemplate(
-    """
-请根据以下主题生成情绪倾向总结（正面/中性/负面）并说明原因：
+SENTIMENT_SUMMARY_TEMPLATE = PromptTemplate("""
+Generate a sentiment tendency summary (positive/neutral/negative) and explain why:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
 
-class SentimentPipeline:
-    """
-    SentimentPipeline（增强版）
-    - 保留旧行为（同步 run）
-    - 新增 async run_async（并发执行 sentiment 子任务）
-    """
+class SentimentPipeline(BasePipeline):
+    """Sentiment analysis with concurrent sub-tasks."""
 
     def __init__(self):
         self.llm = LLMRouter()
 
-    # ---------------------------------------------------------
-    # 同步入口（保持旧行为）
-    # ---------------------------------------------------------
-    def run(self, query: str):
-        score = asyncio.run(self.llm.route("sentiment_score", SENTIMENT_SCORE_TEMPLATE.render(query=query)))
-        summary = asyncio.run(self.llm.route("sentiment_summary", SENTIMENT_SUMMARY_TEMPLATE.render(query=query)))
-
-        return {
-            "score": score,
-            "summary": summary,
-        }
-
-    # ---------------------------------------------------------
-    # 异步入口（并发执行 sentiment 子任务）
-    # ---------------------------------------------------------
-    async def run_async(self, query: str):
+    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
             self.llm.route("sentiment_score", SENTIMENT_SCORE_TEMPLATE.render(query=query)),
             self.llm.route("sentiment_summary", SENTIMENT_SUMMARY_TEMPLATE.render(query=query)),
         ]
-
         score, summary = await asyncio.gather(*tasks)
-
-        return {
+        return ServiceResult.ok({
             "score": score,
             "summary": summary,
-        }
+        })

@@ -1,45 +1,31 @@
 # fzq_ai/pipelines/scenario_pipeline.py
 
-import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
+from fzq_ai.pipelines.base_pipeline import BasePipeline
+from fzq_ai.domain.models import ServiceResult
 
 
-SCENARIO_TEMPLATE = PromptTemplate(
-    """
-你是一名地缘政治情景分析专家，请根据以下主题生成 3 个未来 30 天的可能情景：
+SCENARIO_TEMPLATE = PromptTemplate("""
+You are a geopolitical scenario analysis expert. Generate 3 possible scenarios for the next 30 days:
 
-主题：$query
+Topic: $query
 
-请输出：
-1. 情景名称
-2. 触发因素
-3. 可能发展路径
-4. 风险等级（低/中/高）
-"""
-)
+Output:
+1. Scenario name
+2. Trigger factors
+3. Possible development path
+4. Risk level (low/medium/high)
+""")
 
 
-class ScenarioPipeline:
-    """
-    ScenarioPipeline（新增）
-    - 保留旧行为（同步 run）
-    - 支持 async run_async（并发执行）
-    """
+class ScenarioPipeline(BasePipeline):
+    """Scenario planning pipeline."""
 
     def __init__(self):
         self.llm = LLMRouter()
 
-    # ---------------------------------------------------------
-    # 同步入口（保持旧行为）
-    # ---------------------------------------------------------
-    def run(self, query: str):
+    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         prompt = SCENARIO_TEMPLATE.render(query=query)
-        return asyncio.run(self.llm.route("scenario", prompt))
-
-    # ---------------------------------------------------------
-    # 异步入口（支持并发）
-    # ---------------------------------------------------------
-    async def run_async(self, query: str):
-        prompt = SCENARIO_TEMPLATE.render(query=query)
-        return await self.llm.route("scenario", prompt)
+        result = await self.llm.route("scenario", prompt)
+        return ServiceResult.ok(result)

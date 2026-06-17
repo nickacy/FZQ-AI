@@ -3,83 +3,52 @@
 import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
+from fzq_ai.pipelines.base_pipeline import BasePipeline
+from fzq_ai.domain.models import ServiceResult
 
 
-SUMMARY_TEMPLATE = PromptTemplate(
-    """
-你是一名新闻叙事分析专家，请根据以下主题生成简短摘要：
+SUMMARY_TEMPLATE = PromptTemplate("""
+You are a news narrative analysis expert. Generate a concise summary for the following topic:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
-KEYPOINTS_TEMPLATE = PromptTemplate(
-    """
-请根据以下主题生成 5 条关键要点：
+KEYPOINTS_TEMPLATE = PromptTemplate("""
+Generate 5 key points for the following topic:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
-STORYLINE_TEMPLATE = PromptTemplate(
-    """
-请根据以下主题生成一条清晰的叙事线（storyline）：
+STORYLINE_TEMPLATE = PromptTemplate("""
+Generate a clear storyline for the following topic:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
-IMPLICATIONS_TEMPLATE = PromptTemplate(
-    """
-请根据以下主题分析未来 30 天的潜在影响：
+IMPLICATIONS_TEMPLATE = PromptTemplate("""
+Analyze the potential implications for the next 30 days for the following topic:
 
-主题：$query
-"""
-)
+Topic: $query
+""")
 
 
-class NarrativePipeline:
-    """
-    NarrativePipeline（增强版）
-    - 保留旧行为（同步 run）
-    - 新增 async run_async（并发执行 narrative 子任务）
-    """
+class NarrativePipeline(BasePipeline):
+    """Narrative analysis with concurrent sub-tasks."""
 
     def __init__(self):
         self.llm = LLMRouter()
 
-    # ---------------------------------------------------------
-    # 同步入口（保持旧行为）
-    # ---------------------------------------------------------
-    def run(self, query: str):
-        summary = asyncio.run(self.llm.route("narrative_summary", SUMMARY_TEMPLATE.render(query=query)))
-        key_points = asyncio.run(self.llm.route("narrative_keypoints", KEYPOINTS_TEMPLATE.render(query=query)))
-        storyline = asyncio.run(self.llm.route("narrative_storyline", STORYLINE_TEMPLATE.render(query=query)))
-        implications = asyncio.run(self.llm.route("narrative_implications", IMPLICATIONS_TEMPLATE.render(query=query)))
-
-        return {
-            "summary": summary,
-            "key_points": key_points,
-            "storyline": storyline,
-            "implications": implications,
-        }
-
-    # ---------------------------------------------------------
-    # 异步入口（并发执行 narrative 子任务）
-    # ---------------------------------------------------------
-    async def run_async(self, query: str):
+    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
             self.llm.route("narrative_summary", SUMMARY_TEMPLATE.render(query=query)),
             self.llm.route("narrative_keypoints", KEYPOINTS_TEMPLATE.render(query=query)),
             self.llm.route("narrative_storyline", STORYLINE_TEMPLATE.render(query=query)),
             self.llm.route("narrative_implications", IMPLICATIONS_TEMPLATE.render(query=query)),
         ]
-
         summary, key_points, storyline, implications = await asyncio.gather(*tasks)
-
-        return {
+        return ServiceResult.ok({
             "summary": summary,
             "key_points": key_points,
             "storyline": storyline,
             "implications": implications,
-        }
+        })

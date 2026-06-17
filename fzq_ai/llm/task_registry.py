@@ -1,7 +1,8 @@
 # fzq_ai/llm/task_registry.py
+# v6.0 - Unified task registry (all pipeline task types registered)
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List
 
 
 @dataclass
@@ -15,53 +16,71 @@ class TaskConfig:
 
 
 class TaskRegistry:
-    """
-    任务注册表（统一管理所有 LLM 任务）
-    """
+    """Unified task registration - drives LLMRouter provider selection."""
 
     def __init__(self):
         self.tasks = {}
+        self._register_all()
 
-        # 注册所有任务
-        self.register(
-            TaskConfig(
-                name="news_intel",
-                default_provider="openai",
-                fallback_chain=["openai", "deepseek", "minimax"],
-                json_mode=True,
-            )
-        )
+    def _register_all(self):
+        # Intelligence (JSON structured output)
+        _intel = lambda n: TaskConfig(
+            name=n, default_provider="openai",
+            fallback_chain=["openai", "deepseek", "minimax"], json_mode=True)
+        self.register(_intel("news_intel"))
+        self.register(_intel("event_extraction"))
+        self.register(_intel("structured_extraction"))
 
-        self.register(
-            TaskConfig(
-                name="event_extraction",
-                default_provider="openai",
-                fallback_chain=["openai", "deepseek", "minimax"],
-                json_mode=True,
-            )
-        )
+        # Risk (reasoning-heavy)
+        _risk = lambda n: TaskConfig(
+            name=n, default_provider="deepseek",
+            fallback_chain=["deepseek", "openai", "minimax"],
+            json_mode=False, require_reasoning=True)
+        self.register(_risk("risk_intel"))
+        self.register(_risk("risk_summary"))
+        self.register(_risk("risk_factors"))
+        self.register(_risk("risk_forecast"))
 
-        self.register(
-            TaskConfig(
-                name="risk_intel",
-                default_provider="deepseek",
-                fallback_chain=["deepseek", "openai", "minimax"],
-                json_mode=False,
-                require_reasoning=True,
-            )
-        )
+        # Sentiment
+        _sent = lambda n: TaskConfig(
+            name=n, default_provider="openai",
+            fallback_chain=["openai", "deepseek", "minimax"], json_mode=False)
+        self.register(_sent("sentiment"))
+        self.register(_sent("sentiment_score"))
+        self.register(_sent("sentiment_summary"))
 
-        self.register(
-            TaskConfig(
-                name="sentiment",
-                default_provider="openai",
-                fallback_chain=["openai", "deepseek", "minimax"],
-                json_mode=False,
-            )
-        )
+        # Narrative (deep reasoning)
+        _narr = lambda n: TaskConfig(
+            name=n, default_provider="deepseek",
+            fallback_chain=["deepseek", "openai", "minimax"],
+            json_mode=False, require_reasoning=True)
+        self.register(_narr("narrative_summary"))
+        self.register(_narr("narrative_keypoints"))
+        self.register(_narr("narrative_storyline"))
+        self.register(_narr("narrative_implications"))
 
-    def register(self, config: TaskConfig):
+        # Scenario (long context + deep reasoning)
+        self.register(TaskConfig(
+            name="scenario", default_provider="deepseek",
+            fallback_chain=["deepseek", "openai", "minimax"],
+            json_mode=False, require_reasoning=True, require_long_context=True))
+
+        # Multilingual
+        self.register(TaskConfig(
+            name="multilingual_summary", default_provider="gemini",
+            fallback_chain=["gemini", "openai", "deepseek"], json_mode=False))
+
+        # Deep reasoning
+        self.register(TaskConfig(
+            name="deep_reasoning", default_provider="deepseek",
+            fallback_chain=["deepseek", "openai", "minimax"],
+            json_mode=False, require_reasoning=True, require_long_context=True))
+
+    def register(self, config: TaskConfig) -> None:
         self.tasks[config.name] = config
 
     def get(self, task: str) -> TaskConfig:
         return self.tasks.get(task, self.tasks["sentiment"])
+
+    def list_tasks(self) -> list:
+        return sorted(self.tasks.keys())
