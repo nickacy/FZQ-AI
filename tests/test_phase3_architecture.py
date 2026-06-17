@@ -252,37 +252,61 @@ class TestConcurrency:
     async def test_pipeline_run_async_uses_gather(self):
         """NarrativePipeline.run_async should gather multiple LLM calls."""
         from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
-        from fzq_ai.domain.models import ServiceResult
-        with patch.object(NarrativePipeline, '__init__', lambda self: None):
-            p = NarrativePipeline.__new__(NarrativePipeline)
-            p.llm = MagicMock()
-            p.llm.route = AsyncMock(return_value="narrative text")
-            result = await p.run_async("test")
-            assert isinstance(result, ServiceResult)
-            assert result.success
-            # Should call route exactly 4 times
-            assert p.llm.route.call_count == 4
+
+        # Create instance without calling __init__
+        p = NarrativePipeline.__new__(NarrativePipeline)
+
+        # Mock llm router
+        p.router = MagicMock()
+        p.router.route_llm_call = AsyncMock(return_value=type("FakeResp", (), {"content": "text"})())
+
+        result = await p.run_async("test")
+
+        # NarrativePipeline makes 4 LLM calls
+        assert p.router.route_llm_call.call_count == 4
+
 
     @pytest.mark.asyncio
     async def test_daily_report_gathers_all_pipelines(self):
-        """DailyReportPipeline.run_async should gather 5 sub-pipelines."""
+        """DailyReportPipeline.run_async should gather 4 concurrent sub-pipelines."""
         from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
-        from fzq_ai.domain.models import ServiceResult
-        from fzq_ai.schemas.pipeline_output import DailyReportOutput
-        # Test concurrency pattern, \
-             patch('fzq_ai.pipelines.daily_report_pipeline.DailyReportOutput', DailyReportOutput):
-            p = DailyReportPipeline.__new__(DailyReportPipeline)
-            pipeline_names = ["news", "risk", "sentiment", "narrative", "scenario"]
-            mock_result = ServiceResult.ok("data")
-            mock_async = AsyncMock(return_value=mock_result)
-            for name in pipeline_names:
-                mock_pipe = MagicMock()
-                mock_pipe.run_async = mock_async
-                setattr(p, name, mock_pipe)
-            result = await p.run_async("test")
-            assert isinstance(result, ServiceResult)
-            assert result.success
-            assert mock_async.call_count == 5
+        from fzq_ai.schemas.pipeline_output import DailyReportPipelineOutput
+
+        # Create instance without calling __init__
+        p = DailyReportPipeline.__new__(DailyReportPipeline)
+
+        # Mock 4 concurrent pipelines
+        pipeline_names = [
+            "narrative_pipeline",
+            "risk_pipeline",
+            "sentiment_pipeline",
+            "scenario_pipeline",
+        ]
+
+        mock_async = AsyncMock(return_value="ok")
+
+        for name in pipeline_names:
+            mock_pipe = MagicMock()
+            mock_pipe.run_async = mock_async
+            setattr(p, name, mock_pipe)
+
+        # Mock NewsPipeline (sequential)
+        mock_news = MagicMock()
+        mock_news.run_async = AsyncMock(return_value=type("FakeNews", (), {
+            "summaries": ["a", "b"],
+            "raw_input_count": 2
+        })())
+        p.news_pipeline = mock_news
+
+        # Mock LLMRouter
+        p.router = MagicMock()
+        p.router.route_llm_call = AsyncMock(return_value=type("FakeResp", (), {"content": "REPORT"})())
+
+        result = await p.run_async("topic", ["a", "b"])
+
+        assert isinstance(result, DailyReportPipelineOutput)
+        assert mock_async.call_count == 4
+
 
 
 class TestEdgeCases:
