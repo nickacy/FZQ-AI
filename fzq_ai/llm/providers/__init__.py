@@ -1,5 +1,11 @@
-# fzq_ai/llm/providers/__init__.py
+from fzq_ai.llm.providers.provider_registry import ProviderRegistry
+from fzq_ai.llm.providers.openai_provider import OpenAIProvider
+from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
+from fzq_ai.llm.providers.gemini_provider import GeminiProvider
 
-from .deepseek_client import DeepSeekClient
-from .openai_client import OpenAIClient
-from .gemini_client import GeminiClient
+__all__ = [
+    "ProviderRegistry",
+    "OpenAIProvider",
+    "DeepSeekProvider",
+    "GeminiProvider",
+]
