@@ -3,12 +3,12 @@
 import asyncio
 from typing import List
 
-from fzq_ai.pipelines.base import BasePipeline
-from fzq_ai.pipelines.news_pipeline import NewsPipeline
-from fzq_ai.pipelines.narrative_pipeline import NarrativePipeline
-from fzq_ai.pipelines.risk_pipeline import RiskPipeline
-from fzq_ai.pipelines.sentiment_pipeline import SentimentPipeline
-from fzq_ai.pipelines.scenario_pipeline import ScenarioPipeline
+from .base_pipeline import BasePipeline
+from .news_pipeline import NewsPipeline
+from .narrative_pipeline import NarrativePipeline
+from .risk_pipeline import RiskPipeline
+from .sentiment_pipeline import SentimentPipeline
+from .scenario_pipeline import ScenarioPipeline
 
 from fzq_ai.schemas.pipeline_output import (
     NewsPipelineOutput,
@@ -87,10 +87,15 @@ class DailyReportPipeline(BasePipeline[DailyReportPipelineOutput]):
         final_report = llm_resp.content
 
         # ------------------------------------------------------------
-        # 4. 返回强类型 Schema
+        # 4. 返回完整结构化情报对象（Phase 4‑5 Schema）
         # ------------------------------------------------------------
         return DailyReportPipelineOutput(
             report_content=final_report,
+            news=news_result,
+            narrative=narrative_result,
+            risk=risk_result,
+            sentiment=sentiment_result,
+            scenario=scenario_result,
             news_count=news_result.raw_input_count,
             task_status="completed",
         )
