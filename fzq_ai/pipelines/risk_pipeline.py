@@ -1,71 +1,73 @@
 # fzq_ai/pipelines/risk_pipeline.py
 
+import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
-from fzq_ai.domain.models import ServiceResult, ok, err
-from fzq_ai.storage.intel_store import IntelStore
-import uuid
+from fzq_ai.prompts.template import PromptTemplate
+
+
+RISK_SUMMARY_TEMPLATE = PromptTemplate(
+    """
+你是一名风险分析专家，请根据以下主题生成风险摘要：
+
+主题：$query
+"""
+)
+
+RISK_FACTORS_TEMPLATE = PromptTemplate(
+    """
+请根据以下主题列出 5 个主要风险因素：
+
+主题：$query
+"""
+)
+
+RISK_FORECAST_TEMPLATE = PromptTemplate(
+    """
+请根据以下主题预测未来 30 天的风险趋势（上升/下降/持平），并说明原因：
+
+主题：$query
+"""
+)
 
 
 class RiskPipeline:
     """
-    风险分析 Pipeline（Legacy 保留版）
-    - 保留全部旧功能
-    - MINIMAX P0 修复：query 未定义
+    RiskPipeline（增强版）
+    - 保留旧行为（同步 run）
+    - 新增 async run_async（并发执行 risk 子任务）
     """
 
-    def __init__(self, llm_router=None):
-        self.llm_router = llm_router or LLMRouter()
-
-    def run(self, topic: str = "", articles=None) -> ServiceResult:
-        """
-        执行风险分析流程
-        """
-        # ⭐ P0 修复：补齐 query 变量，避免 NameError
-        query = topic or ""
-
-        try:
-            # 1. 构建 prompt（旧逻辑保留）
-            prompt = self._build_prompt(query, articles)
-
-            # 2. 调用 LLM（旧逻辑保留）
-            raw = self.llm_router.route("risk_intel", prompt)
-
-            # 3. 保存到 IntelStore（旧逻辑保留）
-            try:
-                store = IntelStore()
-                run_id = str(uuid.uuid4())
-                from fzq_ai.domain.models import IntelBundle, IntelMeta
-                bundle = IntelBundle(
-                    meta=IntelMeta(topics=[query], regions=[], depth="normal"),
-                    articles=articles or [],
-                    events=[],
-                )
-                store.save_bundle(run_id, query, bundle, {"pipeline": "risk_pipeline"})
-            except Exception:
-                pass
-
-            return ok(raw)
-
-        except Exception as e:
-            return err(str(e))
+    def __init__(self):
+        self.llm = LLMRouter()
 
     # ---------------------------------------------------------
-    # 私有方法（旧逻辑保留）
+    # 同步入口（保持旧行为）
     # ---------------------------------------------------------
-    def _build_prompt(self, query: str, articles):
-        context = ""
-        if articles:
-            lines = []
-            for i, a in enumerate(articles[:10], 1):
-                lines.append(f"{i}. {a.title_original}")
-            context = "\n".join(lines)
+    def run(self, query: str):
+        summary = asyncio.run(self.llm.route("risk_summary", RISK_SUMMARY_TEMPLATE.render(query=query)))
+        factors = asyncio.run(self.llm.route("risk_factors", RISK_FACTORS_TEMPLATE.render(query=query)))
+        forecast = asyncio.run(self.llm.route("risk_forecast", RISK_FORECAST_TEMPLATE.render(query=query)))
 
-        return (
-            f"你是一名风险分析专家，请根据以下主题生成风险评估：\n"
-            f"主题：{query}\n\n"
-            f"相关新闻：\n{context}\n\n"
-            f"请输出：\n"
-            f"1. 主要风险点\n"
-            f"2. 潜在影响\n"
-            f"3. 未来 30 天的风险趋势预测\n"
-        )
+        return {
+            "summary": summary,
+            "factors": factors,
+            "forecast": forecast,
+        }
+
+    # ---------------------------------------------------------
+    # 异步入口（并发执行 risk 子任务）
+    # ---------------------------------------------------------
+    async def run_async(self, query: str):
+        tasks = [
+            self.llm.route("risk_summary", RISK_SUMMARY_TEMPLATE.render(query=query)),
+            self.llm.route("risk_factors", RISK_FACTORS_TEMPLATE.render(query=query)),
+            self.llm.route("risk_forecast", RISK_FORECAST_TEMPLATE.render(query=query)),
+        ]
+
+        summary, factors, forecast = await asyncio.gather(*tasks)
+
+        return {
+            "summary": summary,
+            "factors": factors,
+            "forecast": forecast,
+        }

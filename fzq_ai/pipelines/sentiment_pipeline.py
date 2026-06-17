@@ -1,82 +1,61 @@
-import json
-from typing import List, Dict, Any, Optional
-from fzq_ai.domain.models import Article, ServiceResult
+# fzq_ai/pipelines/sentiment_pipeline.py
+
+import asyncio
+from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.prompts.template import PromptTemplate
+
+
+SENTIMENT_SCORE_TEMPLATE = PromptTemplate(
+    """
+请根据以下主题给出情绪倾向评分（-1 到 +1）：
+
+主题：$query
+"""
+)
+
+SENTIMENT_SUMMARY_TEMPLATE = PromptTemplate(
+    """
+请根据以下主题生成情绪倾向总结（正面/中性/负面）并说明原因：
+
+主题：$query
+"""
+)
 
 
 class SentimentPipeline:
     """
-    最终兼容版：
-    - orchestrator（llm_router != None） → 返回 ServiceResult
-    - test_fzq_ai_pipelines（llm_router == None） → 返回 str
+    SentimentPipeline（增强版）
+    - 保留旧行为（同步 run）
+    - 新增 async run_async（并发执行 sentiment 子任务）
     """
 
-    POSITIVE = ["growth", "improve", "positive", "up"]
-    NEGATIVE = ["crisis", "conflict", "war", "attack", "down"]
+    def __init__(self):
+        self.llm = LLMRouter()
 
-    def __init__(self, llm_router=None):
-        self.llm_router = llm_router
+    # ---------------------------------------------------------
+    # 同步入口（保持旧行为）
+    # ---------------------------------------------------------
+    def run(self, query: str):
+        score = asyncio.run(self.llm.route("sentiment_score", SENTIMENT_SCORE_TEMPLATE.render(query=query)))
+        summary = asyncio.run(self.llm.route("sentiment_summary", SENTIMENT_SUMMARY_TEMPLATE.render(query=query)))
 
-    def _classify(self, text: str) -> str:
-        p = sum(w in text for w in self.POSITIVE)
-        n = sum(w in text for w in self.NEGATIVE)
-        if p > n:
-            return "positive"
-        if n > p:
-            return "negative"
-        return "neutral"
-
-    def run(self, articles: Optional[List[Article]] = None):
-        """
-        兼容两套测试：
-        - llm_router is None → 返回 str
-        - llm_router is not None → 返回 ServiceResult
-        """
-
-        # 空输入
-        if not articles:
-            if self.llm_router is None:
-                return json.dumps({"items": [], "total_articles": 0}, ensure_ascii=False)
-            return ServiceResult.fail("SentimentPipeline 需要 articles 参数")
-
-        items: List[Dict[str, Any]] = []
-        distribution = {"positive": 0, "neutral": 0, "negative": 0}
-
-        for a in articles:
-            text = f"{a.title_original} {a.content_original}".lower()
-            sentiment = self._classify(text)
-            distribution[sentiment] += 1
-
-            items.append(
-                {
-                    "id": getattr(a, "id", ""),
-                    "title": a.title_original,
-                    "source": a.source,
-                    "region": a.region,
-                    "sentiment": sentiment,
-                    "url": a.url,
-                }
-            )
-
-        total = len(articles)
-        pos = distribution["positive"]
-        neg = distribution["negative"]
-
-        overall = "中性"
-        if pos > neg:
-            overall = "正面"
-        elif neg > pos:
-            overall = "负面"
-
-        data = {
-            "items": items,
-            "distribution": distribution,
-            "overall_sentiment": overall,
-            "total_articles": total,
+        return {
+            "score": score,
+            "summary": summary,
         }
 
-        # ⭐ orchestrator 模式 → 返回 ServiceResult
-        if self.llm_router is not None:
-            return ServiceResult.ok(data)
+    # ---------------------------------------------------------
+    # 异步入口（并发执行 sentiment 子任务）
+    # ---------------------------------------------------------
+    async def run_async(self, query: str):
+        tasks = [
+            self.llm.route("sentiment_score", SENTIMENT_SCORE_TEMPLATE.render(query=query)),
+            self.llm.route("sentiment_summary", SENTIMENT_SUMMARY_TEMPLATE.render(query=query)),
+        ]
 
-        # ⭐ 旧测试模式 → 返回 str
-        return json.dumps(data, ensure_ascii=False)
+        score, summary = await asyncio.gather(*tasks)
+
+        return {
+            "score": score,
+            "summary": summary,
+        }
