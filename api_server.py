@@ -40,10 +40,15 @@ BUILD_TIME: str = "2026-06-15T00:00:00Z"
 #  FastAPI 初始化
 # ============================================================
 app = FastAPI(
-    title="FZQ-AI Intelligence API",
-    version=APP_VERSION,
-    description="多模型情报分析系统 · 新闻 · 叙事 · 风险 · 日报",
+    title="FZQ-AI Intelligence API v2.6",
+    version="2.6.0",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    # 如果你之前有初始化逻辑，放这里
+    pass
+
 
 app.add_middleware(
     CORSMiddleware,
