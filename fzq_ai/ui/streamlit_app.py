@@ -1,323 +1,172 @@
-# fzq_ai/ui/streamlit_app.py — v2.6 Professional UI
-from dotenv import load_dotenv
-load_dotenv()
-
-import os, sys
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
 import streamlit as st
-from dotenv import load_dotenv
+import requests
+import plotly.graph_objects as go
+import pandas as pd
 
-from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
-from fzq_ai.ui.theme import inject_theme, section_header, metric_row, status_strip, COLORS
-from fzq_ai.ui.components.news_card import render_news_card
-from fzq_ai.ui.components.narrative_block import render_narrative_block
-from fzq_ai.ui.components.risk_block import render_risk_block
-from fzq_ai.ui.components.radar_chart import render_radar_chart
-from fzq_ai.ui.components.sentiment_trend import render_sentiment_trend
-from fzq_ai.ui.components.narrative_graph import render_narrative_graph
-from fzq_ai.ui.components.timeline import render_timeline
+API_URL = "http://localhost:8000/api/daily_report"
 
-load_dotenv()
-
-# ═══════════════════════════════════════════════════════════════
-# Page Config & Theme
-# ═══════════════════════════════════════════════════════════════
+# -----------------------------
+# 页面配置
+# -----------------------------
 st.set_page_config(
-    page_title="FZQ-AI · Terminal",
-    page_icon="■",
+    page_title="FZQ‑AI Intelligence Dashboard",
     layout="wide",
-    initial_sidebar_state="expanded",
 )
-inject_theme()
 
-# ── Inject extra sidebar & nav styling ──
-st.markdown(f"""
-<style>
-/* ── Sidebar badge glow ── */
-.fzq-key-dot {{
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-    box-shadow: 0 0 6px var(--dot-color);
-}}
-.fzq-key-row {{
-    display: flex;
-    align-items: center;
-    padding: 3px 0;
-    font-size: 12px;
-    color: rgba(255,255,255,0.75);
-}}
-.fzq-key-row .label {{ width: 70px; }}
-.fzq-key-row .status {{ font-weight: 500; }}
+st.title("🧠 FZQ‑AI 情报分析系统 v11 Dashboard")
 
-/* ── Nav pills ── */
-.fzq-nav-pill {{
-    display: block;
-    padding: 10px 16px;
-    margin: 4px 0;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.8) !important;
-    text-decoration: none !important;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: 1px solid transparent;
-}}
-.fzq-nav-pill:hover {{
-    background: rgba(255,255,255,0.08) !important;
-    border-color: rgba(255,255,255,0.15);
-}}
-.fzq-nav-pill.active {{
-    background: rgba(255,255,255,0.12) !important;
-    border-color: {COLORS["accent"]} !important;
-    color: #fff !important;
-    box-shadow: 0 0 8px rgba(232,93,44,0.2);
-}}
-.fzq-nav-pill .icon {{ font-size: 16px; margin-right: 8px; }}
 
-/* ── Compact divider ── */
-.fzq-sidebar-div {{
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 14px 0;
-}}
-</style>
-""", unsafe_allow_html=True)
-
-# ═══════════════════════════════════════════════════════════════
-# Sidebar — Key Status + Function Navigation
-# ═══════════════════════════════════════════════════════════════
+# -----------------------------
+# 输入区域（左侧）
+# -----------------------------
 with st.sidebar:
-    # ── Brand Logo (Bloomberg-style) ──
-    st.markdown(
-        '<div style="text-align:center;padding:18px 4px 10px 4px;">'
-        '<svg width="220" height="68" viewBox="0 0 220 68" xmlns="http://www.w3.org/2000/svg">'
-        '<defs>'
-        '<linearGradient id="blGrad" x1="0%" y1="0%" x2="100%" y2="0%">'
-        '<stop offset="0%" stop-color="#fff"/>'
-        '<stop offset="100%" stop-color="#E85D2C"/>'
-        '</linearGradient>'
-        '</defs>'
-        '<rect x="14" y="16" width="38" height="38" rx="3" fill="none" stroke="url(#blGrad)" stroke-width="1.8" opacity="0.9"/>'
-        '<rect x="19" y="21" width="28" height="28" rx="1.5" fill="none" stroke="#fff" stroke-width="0.8" opacity="0.15"/>'
-        '<line x1="22" y1="38" x2="44" y2="38" stroke="#E85D2C" stroke-width="2" opacity="0.9"/>'
-        '<line x1="22" y1="44" x2="40" y2="44" stroke="#E85D2C" stroke-width="1.2" opacity="0.5"/>'
-        '<line x1="22" y1="48" x2="36" y2="48" stroke="#E85D2C" stroke-width="1.2" opacity="0.25"/>'
-        '<circle cx="33" cy="33" r="2" fill="#E85D2C" opacity="0.8"/>'
-        '<text x="62" y="34" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#fff" letter-spacing="4">FZQ</text>'
-        '<text x="132" y="34" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="700" fill="#E85D2C" letter-spacing="3">AI</text>'
-        '<text x="64" y="51" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" letter-spacing="3.5">INTELLIGENCE TERMINAL</text>'
-        '</svg></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+    st.header("📌 输入参数")
 
-    # ── Function Navigation ──
-    st.markdown(
-        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
-        'text-transform:uppercase;margin-bottom:8px;">Function Navigation</div>',
-        unsafe_allow_html=True,
+    topic = st.text_input("分析主题（topic）", "")
+
+    news_raw = st.text_area(
+        "新闻文本（每条一行）",
+        height=300,
+        placeholder="在这里粘贴新闻，每条一行…"
     )
 
-    # Session state for active nav
-    if "active_nav" not in st.session_state:
-        st.session_state.active_nav = "full"
+    run_btn = st.button("🚀 生成情报日报")
 
-    nav_items = [
-        ("full",    "🔍", "Full Intelligence"),
-        ("news",    "📰", "News Intel Analysis"),
-        ("narr",    "🧭", "Narrative Analysis"),
-        ("risk",    "⚠️", "Risk Scanner"),
-        ("report",  "📋", "Daily Report"),
-    ]
 
-    for key, icon, label in nav_items:
-        active_cls = "active" if st.session_state.active_nav == key else ""
-        if st.button(
-            f"{icon}  {label}",
-            key=f"nav_{key}",
-            use_container_width=True,
-        ):
-            st.session_state.active_nav = key
+# -----------------------------
+# 调用 FastAPI 后端
+# -----------------------------
+if run_btn:
+    if not topic or not news_raw.strip():
+        st.error("请输入 topic 和至少一条新闻")
+        st.stop()
 
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+    news_list = [line.strip() for line in news_raw.split("\n") if line.strip()]
 
-    # ── Query Input ──
-    st.markdown(
-        '<div style="font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.35);'
-        'text-transform:uppercase;margin-bottom:6px;">Query</div>',
-        unsafe_allow_html=True,
-    )
-    query = st.text_input(
-        "Topic",
-        placeholder="e.g. US election, Taiwan strait...",
-        label_visibility="collapsed",
-    )
-    run_btn = st.button("▶  Execute Analysis", use_container_width=True)
+    with st.spinner("正在生成情报日报…"):
+        response = requests.post(
+            API_URL,
+            json={
+                "topic": topic,
+                "news_raw_texts": news_list
+            }
+        )
 
-    st.markdown('<div class="fzq-sidebar-div"></div>', unsafe_allow_html=True)
+    if response.status_code != 200:
+        st.error(f"后端错误：{response.text}")
+        st.stop()
 
-    # ── Footer ──
-    st.markdown(
-        '<div style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;'
-        'line-height:1.6;">'
-        '17 RSS · GDELT · NewsAPI<br>'
-        'LLM: DeepSeek → OpenAI → Gemini<br>'
-        'Global South ≥30% guaranteed'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    data = response.json()
 
-# ═══════════════════════════════════════════════════════════════
-# Main — Header
-# ═══════════════════════════════════════════════════════════════
-active_label = {
-    "full": "Full Intelligence Suite",
-    "news": "News Intel Analysis",
-    "narr": "Narrative Deep-Dive",
-    "risk": "Risk Scanner",
-    "report": "Daily Report Generator",
-}.get(st.session_state.active_nav, "Dashboard")
+    # -----------------------------
+    # 展示日报（Markdown）
+    # -----------------------------
+    st.subheader("📄 情报日报（Markdown）")
+    st.markdown(data["final_markdown_report"])
 
-active_desc = {
-    "full": "All pipelines · news → narrative → risk → sentiment → report",
-    "news": "Multi-source RSS + GDELT news aggregation with relevance ranking",
-    "narr": "Cross-blocs narrative comparison with theme extraction",
-    "risk": "Multi-dimensional risk scoring with category breakdown",
-    "report": "Structured Markdown intelligence brief with key events",
-}.get(st.session_state.active_nav, "")
 
-st.markdown(
-    f'<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:2px;">'
-    f'<h1 style="color:{COLORS["primary"]};font-weight:700;margin:0;'
-    f'font-size:26px;">FZQ-AI Intelligence Dashboard</h1>'
-    f'<span style="font-size:13px;color:{COLORS["accent"]};font-weight:500;'
-    f'background:{COLORS["accent"]}15;padding:2px 10px;border-radius:10px;">'
-    f'{active_label}</span></div>'
-    f'<p style="color:{COLORS["text_secondary"]};font-size:14px;margin-top:4px;">'
-    f'{active_desc}</p>',
-    unsafe_allow_html=True,
-)
+    # -----------------------------
+    # v11 Dashboard 图表区
+    # -----------------------------
+    st.subheader("📊 情报指标 Dashboard")
 
-orchestrator = TaskOrchestrator()
+    col1, col2 = st.columns(2)
+    col3, col4 = st.columns(2)
 
-# ═══════════════════════════════════════════════════════════════
-# Idle State
-# ═══════════════════════════════════════════════════════════════
-if not run_btn or not query:
-    features = [
-        ("📰", "Multi-Source", "17 RSS feeds · 8 regions · GDELT · NewsAPI"),
-        ("🧠", "AI Engines", "DeepSeek · OpenAI · Gemini · Auto-failover"),
-        ("🌍", "Global Balance", "30%+ Global South · Cross-region rebalancing"),
-        ("📊", "Visual Analytics", "Radar · Sentiment · Timeline · Narrative graph"),
-    ]
-    cols = st.columns(4)
-    for col, (icon, title, desc) in zip(cols, features):
-        with col:
-            st.markdown(
-                f'<div class="fzq-card" style="text-align:center;padding:20px 12px;">'
-                f'<div style="font-size:30px;margin-bottom:8px;">{icon}</div>'
-                f'<div style="font-weight:600;font-size:14px;color:{COLORS["text_primary"]};">'
-                f'{title}</div>'
-                f'<div style="font-size:11px;color:{COLORS["text_secondary"]};'
-                f'margin-top:4px;line-height:1.5;">{desc}</div></div>',
-                unsafe_allow_html=True,
+    # -----------------------------
+    # 1. 风险雷达图
+    # -----------------------------
+    with col1:
+        st.markdown("### ⚠️ 风险雷达图")
+
+        risk_scores = data["risk_scores"]  # dict: {"政治风险": 0.7, ...}
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatterpolar(
+            r=list(risk_scores.values()),
+            theta=list(risk_scores.keys()),
+            fill="toself",
+            name="风险评分"
+        ))
+        fig.update_layout(
+            polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+            showlegend=False
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # -----------------------------
+    # 2. 情绪极化图
+    # -----------------------------
+    with col2:
+        st.markdown("### 😠 情绪极化图")
+
+        sentiment = data["sentiment_scores"]  # {"positive":0.3,"neutral":0.4,"negative":0.3}
+
+        fig = go.Figure(data=[
+            go.Bar(
+                x=list(sentiment.keys()),
+                y=list(sentiment.values()),
+                marker_color=["green", "gray", "red"]
             )
-    st.stop()
+        ])
+        fig.update_layout(yaxis=dict(range=[0, 1]))
+        st.plotly_chart(fig, use_container_width=True)
 
-# ═══════════════════════════════════════════════════════════════
-# Execute: News Pipeline (always runs first)
-# ═══════════════════════════════════════════════════════════════
-nav = st.session_state.active_nav
-section_header("📰 News Intelligence", "")
-news_result = orchestrator.run_agent(agent_name="news-intel", task="news", topic=query)
 
-if not news_result["success"]:
-    status_strip(f"NewsPipeline error: {news_result['error']}", "danger")
-    st.stop()
+    # -----------------------------
+    # 3. 区域覆盖度图
+    # -----------------------------
+    with col3:
+        st.markdown("### 🌍 区域覆盖度图")
 
-bundle = news_result["data"]
-articles = []
-if hasattr(bundle, "articles"):
-    articles = bundle.articles
-elif isinstance(bundle, dict) and "intel_bundle" in bundle:
-    articles = bundle["intel_bundle"].articles
-else:
-    articles = getattr(bundle, "articles", [])
+        region = data["region_coverage"]  # {"中国":3,"美国":1,"欧洲":2}
 
-regions = list(set(a.region for a in articles if a.region))
-metric_row({
-    "Articles": len(articles),
-    "Regions": len(regions),
-    "Sources": len(set(a.source_name for a in articles)),
-    "Credibility": f"{sum(a.credibility for a in articles)/max(len(articles),1):.1f}",
-})
+        fig = go.Figure(data=[
+            go.Pie(
+                labels=list(region.keys()),
+                values=list(region.values()),
+                hole=0.4
+            )
+        ])
+        st.plotly_chart(fig, use_container_width=True)
 
-if len(articles) == 0:
-    status_strip(f"No articles matched '{query}'. Broaden your search.", "warning")
-    st.stop()
 
-# ── News cards ──
-if nav in ("full", "news"):
-    cols = st.columns(2)
-    for i, a in enumerate(articles[:20]):
-        with cols[i % 2]:
-            render_news_card(a)
-    if len(articles) > 20:
-        st.caption(f"Showing 20 of {len(articles)} articles")
+    # -----------------------------
+    # 4. Provider Fallback 监控
+    # -----------------------------
+    with col4:
+        st.markdown("### 🔄 Provider Fallback 监控")
 
-# ═══════════════════════════════════════════════════════════════
-# Narrative (nav: full, narr)
-# ═══════════════════════════════════════════════════════════════
-if nav in ("full", "narr"):
-    st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-    section_header("🧭 Narrative Analysis", "")
-    narr_result = orchestrator.run_agent(agent_name="narrative", task="narrative", articles=articles)
-    if narr_result["success"]:
-        t1, t2 = st.tabs(["📊 Blocs View", "🕸️ Graph View"])
-        with t1: render_narrative_block(narr_result["data"])
-        with t2: render_narrative_graph(narr_result.get("data", {}))
-    else:
-        status_strip(f"Narrative: {narr_result['error']}", "warning")
+        fallback = data["provider_fallback"]  # {"deepseek":5,"kimi":2,"qwen":1}
 
-# ═══════════════════════════════════════════════════════════════
-# Risk (nav: full, risk)
-# ═══════════════════════════════════════════════════════════════
-if nav in ("full", "risk"):
-    st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-    section_header("⚠️ Risk Analysis", "")
-    risk_result = orchestrator.run_agent(agent_name="risk", task="risk", articles=articles)
-    if risk_result["success"]:
-        c1, c2 = st.columns([1, 1])
-        with c1: render_risk_block(risk_result["data"])
-        with c2: render_radar_chart(risk_result["data"])
-    else:
-        status_strip(f"Risk: {risk_result['error']}", "warning")
+        fig = go.Figure(data=[
+            go.Bar(
+                x=list(fallback.keys()),
+                y=list(fallback.values()),
+                marker_color="orange"
+            )
+        ])
+        st.plotly_chart(fig, use_container_width=True)
 
-# ═══════════════════════════════════════════════════════════════
-# Sentiment + Timeline (always shown)
-# ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-section_header("📊 Sentiment & Timeline", "")
-sent_result = orchestrator.run_agent(agent_name="sentiment", task="sentiment", articles=articles)
-if sent_result["success"]:
-    render_sentiment_trend(sent_result["data"])
-st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-section_header("📅 Event Timeline", "")
-render_timeline(articles)
 
-# ═══════════════════════════════════════════════════════════════
-# Daily Report (nav: full, report)
-# ═══════════════════════════════════════════════════════════════
-if nav in ("full", "report"):
-    st.markdown('<div class="fzq-divider"></div>', unsafe_allow_html=True)
-    section_header("📋 Daily Intelligence Report", "")
-    rep_result = orchestrator.run_agent(agent_name="daily-report", task="daily-report", articles=articles)
-    if rep_result["success"]:
-        st.markdown(rep_result["data"])
+    # -----------------------------
+    # 5. 翻译失败率监控
+    # -----------------------------
+    st.markdown("### ❗ 翻译失败率监控")
+
+    trans = data["translation_failures"]  # {"total":10,"failed":2}
+
+    df = pd.DataFrame({
+        "类型": ["成功", "失败"],
+        "数量": [trans["total"] - trans["failed"], trans["failed"]]
+    })
+
+    fig = go.Figure(data=[
+        go.Bar(
+            x=df["类型"],
+            y=df["数量"],
+            marker_color=["green", "red"]
+        )
+    ])
+    st.plotly_chart(fig, use_container_width=True)
