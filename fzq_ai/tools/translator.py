@@ -1,16 +1,55 @@
 
 """
-FZQ-AI Tools — 多语言翻译器 v8
-支持自动语言检测、多语言翻译、翻译质量评分
+FZQ-AI Tools — 多语言翻译器 v10
+支持自动语言检测、多语言翻译、翻译质量评分、翻译缓存
 """
 import re
 import asyncio
+import hashlib
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from fzq_ai.schemas.real import (
     LanguageCode, ModelProvider, LLMRequest,
 )
 from fzq_ai.core.prompts import PromptTemplates
+
+
+# ---------------------------------------------------------
+# v10: 翻译缓存 — SHA-256 索引，24h TTL
+# ---------------------------------------------------------
+
+class TranslationCache:
+    """v10: 基于 SHA-256 的翻译缓存，带 TTL。"""
+
+    def __init__(self, ttl_seconds: int = 86400):
+        self._cache: Dict[str, Dict[str, Any]] = {}
+        self._ttl = ttl_seconds
+
+    def _key(self, text: str, target: LanguageCode) -> str:
+        """生成 SHA-256 缓存键。"""
+        payload = f"{text}::{target.value}"
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    def get(self, text: str, target: LanguageCode) -> Optional[Dict[str, Any]]:
+        key = self._key(text, target)
+        entry = self._cache.get(key)
+        if entry is None:
+            return None
+        if time.time() - entry.get("ts", 0) > self._ttl:
+            del self._cache[key]
+            return None
+        return entry.get("data")
+
+    def set(self, text: str, target: LanguageCode, data: Dict[str, Any]) -> None:
+        key = self._key(text, target)
+        self._cache[key] = {"ts": time.time(), "data": data}
+
+    def clear(self) -> None:
+        self._cache.clear()
+
+    def size(self) -> int:
+        return len(self._cache)
 
 
 # ---------------------------------------------------------
@@ -135,19 +174,164 @@ def is_english_or_chinese(text: str) -> bool:
 # ---------------------------------------------------------
 
 class Translator:
-    """v8 多语言翻译器：自动检测 + 多语言翻译 + 质量评分。
+    """v10 多语言翻译器：自动检测 + 多语言翻译 + 质量评分 + 缓存。
 
     支持：
     - 中英互译（核心）
     - 阿语/法语/西语/俄语/日语/韩语 fallback
     - LLM 翻译质量评分
+    - v10: SHA-256 翻译缓存（24h TTL）
     """
 
-    def __init__(self, llm_router: Optional[Any] = None):
+    def __init__(self, llm_router: Optional[Any] = None, cache: Optional[TranslationCache] = None):
         self.llm_router = llm_router
+        self._cache = cache or TranslationCache()
 
     # -------------------------------------------------------------------
-    # v8: 自动翻译（检测源语言 → 翻译到目标语言）
+    # v10: 批量翻译（batch_size=20）— 带缓存
+    # -------------------------------------------------------------------
+    async def batch_translate(
+        self,
+        items: List[Any],
+        target_language: LanguageCode,
+        batch_size: int = 20,
+    ) -> List[Any]:
+        """批量翻译新闻列表。
+
+        v10 新增：
+        - 每次最多 batch_size 条一起翻译
+        - 缓存命中跳过 LLM 调用
+        - 保留 fallback（单条失败不影响其他）
+        - 保留错误隔离
+        - 保留翻译质量评分
+        """
+        from fzq_ai.schemas.real import TranslatedNewsItem
+        results: List[TranslatedNewsItem] = []
+
+        for i in range(0, len(items), batch_size):
+            batch = items[i:i + batch_size]
+
+            # v10: 先检查缓存
+            uncached_batch: List[Any] = []
+            cached_results: List[Tuple[int, Any]] = []
+            for idx, item in enumerate(batch):
+                cache_key_text = f"{item.title}::{item.content[:500]}"
+                cached = self._cache.get(cache_key_text, target_language) if self._cache else None
+                if cached:
+                    cached_results.append((idx, TranslatedNewsItem(
+                        original=item,
+                        translated_title=cached.get("title", item.title),
+                        translated_content=cached.get("content", item.content),
+                        target_language=target_language,
+                        translation_provider="cache",
+                        translation_confidence=cached.get("confidence", 0.9),
+                        translation_latency_ms=0,
+                    )))
+                else:
+                    uncached_batch.append(item)
+
+            if not uncached_batch:
+                # 全部缓存命中
+                for idx, res in sorted(cached_results, key=lambda x: x[0]):
+                    results.append(res)
+                continue
+
+            # 构建批量 prompt（仅对未缓存条目）
+            batch_text = "\n\n".join(
+                f"[ITEM_{idx}]\nTitle: {item.title}\nContent: {item.content[:500]}"
+                for idx, item in enumerate(uncached_batch)
+            )
+
+            prompt = f"""你是一名专业翻译。请将以下 {len(uncached_batch)} 条新闻翻译成 {target_language.value}。
+
+【待翻译内容】
+{batch_text}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法翻译，返回空 JSON：{{}}
+
+严格输出 JSON 格式：
+{{
+    "translations": [
+        {{
+            "title": "翻译后的标题",
+            "content": "翻译后的内容",
+            "confidence": 0.95
+        }}
+    ]
+}}
+"""
+
+            if self.llm_router is None:
+                # 无 LLM → simple fallback 逐条
+                for item in uncached_batch:
+                    results.append(self._simple_translate_item(item, target_language))
+                continue
+
+            try:
+                request = LLMRequest(
+                    prompt=prompt,
+                    provider=ModelProvider.DEEPSEEK,
+                    temperature=0.1,
+                    max_tokens=4096,
+                )
+                resp = await self.llm_router.generate(request)
+                data = _try_parse_json(resp.content)
+
+                translations = []
+                if data and "translations" in data and isinstance(data["translations"], list):
+                    translations = data["translations"]
+
+                for idx, item in enumerate(uncached_batch):
+                    if idx < len(translations) and isinstance(translations[idx], dict):
+                        t = translations[idx]
+                        title = _safe_str(t, "title", item.title)
+                        content = _safe_str(t, "content", item.content)
+                        confidence = _safe_float(t, "confidence", 0.8)
+                        # v10: 写入缓存
+                        if self._cache:
+                            cache_key_text = f"{item.title}::{item.content[:500]}"
+                            self._cache.set(cache_key_text, target_language, {
+                                "title": title, "content": content, "confidence": confidence
+                            })
+                        results.append(
+                            TranslatedNewsItem(
+                                original=item,
+                                translated_title=title,
+                                translated_content=content,
+                                target_language=target_language,
+                                translation_provider="llm-batch",
+                                translation_confidence=confidence,
+                                translation_latency_ms=resp.latency_ms,
+                            )
+                        )
+                    else:
+                        # 单条 fallback
+                        results.append(self._simple_translate_item(item, target_language))
+
+            except Exception:
+                # 批量失败 → 逐条 simple fallback
+                for item in uncached_batch:
+                    results.append(self._simple_translate_item(item, target_language))
+
+        return results
+
+    def _simple_translate_item(self, item: Any, target_language: LanguageCode) -> Any:
+        from fzq_ai.schemas.real import TranslatedNewsItem
+        return TranslatedNewsItem(
+            original=item,
+            translated_title=item.title,
+            translated_content=item.content,
+            target_language=target_language,
+            translation_provider="simple_fallback",
+            translation_confidence=0.5,
+            translation_latency_ms=0,
+        )
+
+    # -------------------------------------------------------------------
+    # v8: 单条翻译（保留原有接口）— v10 增加缓存
     # -------------------------------------------------------------------
     async def translate(
         self,
@@ -185,9 +369,26 @@ class Translator:
                 "latency_ms": 0,
             }
 
+        # v10: 检查缓存
+        if self._cache:
+            cached = self._cache.get(text, target_language)
+            if cached:
+                return {
+                    "text": cached.get("text", text),
+                    "source_language": source_language.value,
+                    "target_language": target_language.value,
+                    "confidence": cached.get("confidence", 0.9),
+                    "quality_score": cached.get("quality_score", 0.9),
+                    "provider": "cache",
+                    "latency_ms": 0,
+                }
+
         # 3. 如果无 LLM router，使用简单 fallback
         if self.llm_router is None:
-            return self._simple_translate(text, source_language, target_language)
+            result = self._simple_translate(text, source_language, target_language)
+            if self._cache:
+                self._cache.set(text, target_language, result)
+            return result
 
         # 4. LLM 翻译
         start = asyncio.get_event_loop().time()
@@ -202,7 +403,7 @@ class Translator:
             )
             request = LLMRequest(
                 prompt=prompt,
-                provider=ModelProvider.OPENAI,
+                provider=ModelProvider.DEEPSEEK,
                 temperature=0.1,
                 max_tokens=2048,
             )
@@ -220,7 +421,7 @@ class Translator:
                     text, translated, source_language, target_language
                 )
 
-                return {
+                result = {
                     "text": translated,
                     "source_language": source_language.value,
                     "target_language": target_language.value,
@@ -229,12 +430,19 @@ class Translator:
                     "provider": provider,
                     "latency_ms": latency_ms,
                 }
+                # v10: 写入缓存
+                if self._cache:
+                    self._cache.set(text, target_language, result)
+                return result
 
         except Exception as exc:
             pass
 
         # 5. Fallback
-        return self._simple_translate(text, source_language, target_language)
+        result = self._simple_translate(text, source_language, target_language)
+        if self._cache:
+            self._cache.set(text, target_language, result)
+        return result
 
     # -------------------------------------------------------------------
     # v8: 翻译质量评分（LLM）
@@ -267,7 +475,7 @@ class Translator:
 """
             request = LLMRequest(
                 prompt=prompt,
-                provider=ModelProvider.OPENAI,
+                provider=ModelProvider.DEEPSEEK,
                 temperature=0.0,
                 max_tokens=10,
             )
@@ -348,3 +556,22 @@ def _try_parse_json(text: str) -> Optional[Dict[str, Any]]:
         return json.loads(text.strip())
     except Exception:
         return None
+
+
+def _safe_str(data: Dict[str, Any], key: str, default: str = "") -> str:
+    val = data.get(key, default)
+    if val is None:
+        return default
+    return str(val) if not isinstance(val, str) else val
+
+
+def _safe_float(data: Dict[str, Any], key: str, default: float = 0.0) -> float:
+    val = data.get(key, default)
+    if val is None:
+        return default
+    if isinstance(val, (int, float)):
+        return float(val)
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default

@@ -42,6 +42,7 @@ class RawNewsItem(BaseModel):
     published_at: datetime
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
     language: LanguageCode
+    detected_language: Optional[LanguageCode] = None  # v10: 自动检测的源语言
     region: RegionCode
     url: Optional[str] = None
     author: Optional[str] = None
@@ -50,6 +51,7 @@ class RawNewsItem(BaseModel):
     translated_title: Optional[str] = None
     translated_content: Optional[str] = None
     translation_confidence: float = 0.0
+    relevance_score: float = 0.0  # v10: 与 topic 的相关性评分 (0-1)
 
 class TranslatedNewsItem(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
@@ -119,6 +121,7 @@ class ScenarioProjection(BaseModel):
     scenario_name: str = ""
     description: str = ""
     probability: float = 0.5
+    confidence: float = 0.5  # v10: 情景投影的置信度
     key_triggers: List[str] = Field(default_factory=list)
     expected_outcomes: List[str] = Field(default_factory=list)
     time_horizon: str = "short_term"
@@ -273,12 +276,12 @@ class ProviderConfig(BaseModel):
 
 class RouterConfig(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    default_provider: ModelProvider = ModelProvider.OPENAI
+    default_provider: ModelProvider = ModelProvider.DEEPSEEK
     fallback_chain: List[ModelProvider] = Field(
         default_factory=lambda: [
-            ModelProvider.OPENAI,
             ModelProvider.DEEPSEEK,
             ModelProvider.GEMINI,
+            ModelProvider.OPENAI,
         ]
     )
     providers: List[ProviderConfig] = Field(default_factory=list)

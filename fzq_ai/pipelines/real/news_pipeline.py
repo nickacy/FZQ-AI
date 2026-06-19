@@ -316,15 +316,15 @@ class NewsPipeline:
         )
 
     # -----------------------------------------------------------------------
-    # Translation v7 — 增强：自动检测、错误记录、完整元数据
+    # Translation v10 — 统一使用 Translator，消除内联 LLM 翻译
     # -----------------------------------------------------------------------
     async def _translate_if_needed(
         self,
         item: RawNewsItem,
         target_language: LanguageCode,
     ) -> TranslatedNewsItem:
-        """Translate item if needed. v7 增强：自动检测、错误记录、完整元数据。"""
-        # 如果已经是目标语言且已有翻译，直接返回缓存结果
+        """Translate item if needed. v10: 统一使用 Translator，消除内联翻译。"""
+        # 1. 如果已经是目标语言且已有翻译，直接返回缓存结果
         if item.language == target_language and item.translated_content:
             return TranslatedNewsItem(
                 original=item,
@@ -336,70 +336,48 @@ class NewsPipeline:
                 translation_latency_ms=0,
             )
 
-        # 如果提供了外部 translator，优先使用
+        # 2. 使用 Translator（统一翻译入口）
         if self.translator is not None:
             try:
-                translated = await self.translator.translate(item, target_language)
-                return translated
-            except Exception as exc:
-                # v7: 翻译失败 → 记录并 fallback 到 LLM
+                # 尝试批量翻译接口（如果 translator 支持）
+                if hasattr(self.translator, 'batch_translate'):
+                    # 注意：batch_translate 接收列表，这里只传单条
+                    results = await self.translator.batch_translate(
+                        [item], target_language, batch_size=1
+                    )
+                    if results and len(results) > 0:
+                        return results[0]
+                # Fallback 到单条翻译
+                if hasattr(self.translator, 'translate'):
+                    result = await self.translator.translate(
+                        f"{item.title}\n{item.content}", target_language
+                    )
+                    return TranslatedNewsItem(
+                        original=item,
+                        translated_title=result.get("text", item.title)[:200],
+                        translated_content=result.get("text", item.content),
+                        target_language=target_language,
+                        translation_provider=result.get("provider", "translator"),
+                        translation_confidence=result.get("confidence", 0.8),
+                        translation_latency_ms=result.get("latency_ms", 0),
+                    )
+            except Exception:
+                # 翻译失败 → 返回原文
                 pass
 
-        # v7: LLM 翻译 via structured JSON prompt
-        prompt = PromptTemplates.render(
-            PromptTemplates.TRANSLATION_V1,
-            {
-                "target_language": target_language.value,
-                "title": item.title,
-                "content": item.content[:2000],
-            },
-        )
-        request = LLMRequest(
-            prompt=prompt,
-            provider=ModelProvider.OPENAI,
-            temperature=0.1,
-            max_tokens=2048,
-        )
-        try:
-            resp = await self.llm_router.generate(request)
-        except Exception as exc:
-            # v7: LLM 调用失败 → 返回原文并标记错误
-            return TranslatedNewsItem(
-                original=item,
-                translated_title=item.title,
-                translated_content=item.content,
-                target_language=target_language,
-                translation_provider="fallback_error",
-                translation_confidence=0.0,
-                translation_latency_ms=0,
-            )
-
-        data = _safe_json_parse_v2(resp.content)
-
-        if data and any(k in data for k in ("title", "content")):
-            translated_title = _safe_str(data, "title", item.title)
-            translated_content = _safe_str(data, "content", item.content)
-            confidence = _safe_float(data, "confidence", 0.8)
-            provider = _safe_str(data, "provider", "llm")
-        else:
-            # v7: JSON 解析失败 → 返回原文
-            translated_title = item.title
-            translated_content = item.content
-            confidence = 0.0
-            provider = "fallback_error"
-
+        # 3. 无 Translator 或翻译失败 → 返回原文（不再内联调用 LLM）
         return TranslatedNewsItem(
             original=item,
-            translated_title=translated_title,
-            translated_content=translated_content,
+            translated_title=item.title,
+            translated_content=item.content,
             target_language=target_language,
-            translation_provider=provider,
-            translation_confidence=confidence,
-            translation_latency_ms=resp.latency_ms,
+            translation_provider="passthrough",
+            translation_confidence=1.0 if item.language == target_language else 0.0,
+            translation_latency_ms=0,
         )
 
     # -----------------------------------------------------------------------
-    # Multi-dimension analysis — 接口不变
+    # Multi-dimension analysis — v10: 合并为单 prompt
     # -----------------------------------------------------------------------
     async def _analyze_item(
         self,
@@ -410,27 +388,40 @@ class NewsPipeline:
         text = f"{item.translated_title}\n{item.translated_content}"
         news_id = item.original.id
 
-        # 初始化默认值
+        # v10: 当请求全部 4 个标准维度时，使用单次 LLM 调用（合并分析）
+        all_standard = {
+            AnalysisDimension.NARRATIVE,
+            AnalysisDimension.RISK,
+            AnalysisDimension.SENTIMENT,
+            AnalysisDimension.SCENARIO,
+        }
+        requested = set(dimensions)
+
+        if requested == all_standard:
+            # 全部 4 维度 → 使用合并 prompt，1 次 LLM 调用（降低 75% 成本）
+            return await self._run_multi_dimension(text, news_id)
+
+        # 部分维度 → 初始化默认值，按需调用原有方法
         narrative = NarrativeAnalysis(
             news_id=news_id,
             primary_narrative="",
             narrative_strength=0.0,
             confidence=0.0,
-            model_used=ModelProvider.OPENAI,
+            model_used=ModelProvider.DEEPSEEK,
         )
         risk = RiskAnalysis(
             news_id=news_id,
             overall_risk_level=RiskLevel.LOW,
             composite_risk_score=0.0,
             confidence=0.0,
-            model_used=ModelProvider.OPENAI,
+            model_used=ModelProvider.DEEPSEEK,
         )
         sentiment = SentimentAnalysis(
             news_id=news_id,
             overall_sentiment=SentimentLabel.NEUTRAL,
             sentiment_score=0.0,
             confidence=0.0,
-            model_used=ModelProvider.OPENAI,
+            model_used=ModelProvider.DEEPSEEK,
         )
         scenario = ScenarioAnalysis(
             news_id=news_id,
@@ -441,10 +432,9 @@ class NewsPipeline:
                 time_horizon="short_term",
             ),
             confidence=0.0,
-            model_used=ModelProvider.OPENAI,
+            model_used=ModelProvider.DEEPSEEK,
         )
 
-        # 按维度调用分析（带 fallback）
         if AnalysisDimension.NARRATIVE in dimensions:
             narrative = await self._run_narrative(text, news_id)
         if AnalysisDimension.RISK in dimensions:
@@ -463,12 +453,214 @@ class NewsPipeline:
         )
 
     # -----------------------------------------------------------------------
+    # v10: 合并多维度分析 — 单次 LLM 调用（降低 75% 成本）
+    # -----------------------------------------------------------------------
+    async def _run_multi_dimension(self, text: str, news_id: str) -> MultiDimensionAnalysis:
+        """Run all 4 dimension analysis in a single LLM call."""
+        prompt = PromptTemplates.render(
+            PromptTemplates.MULTI_DIMENSION_ANALYSIS_V1,
+            {"text": text[:3000]},
+        )
+        resp, latency_ms, provider_used = await self._call_llm_with_fallback(prompt)
+        data = _safe_json_parse_v2(resp.content)
+
+        if not data or len(data) == 0:
+            # Fallback: all defaults with raw text
+            return MultiDimensionAnalysis(
+                news_id=news_id,
+                narrative=NarrativeAnalysis(
+                    news_id=news_id,
+                    primary_narrative=resp.content[:500] if resp.content else "",
+                    confidence=0.3,
+                    model_used=provider_used,
+                    processed_at=datetime.utcnow(),
+                ),
+                risk=RiskAnalysis(
+                    news_id=news_id,
+                    overall_risk_level=RiskLevel.LOW,
+                    composite_risk_score=0.3,
+                    risk_factors=[
+                        RiskFactor(
+                            risk_type="general",
+                            description=resp.content[:300] if resp.content else "",
+                            level=RiskLevel.LOW,
+                            probability=0.3,
+                            impact_score=0.3,
+                        )
+                    ],
+                    confidence=0.3,
+                    model_used=provider_used,
+                    processed_at=datetime.utcnow(),
+                ),
+                sentiment=SentimentAnalysis(
+                    news_id=news_id,
+                    overall_sentiment=SentimentLabel.NEUTRAL,
+                    sentiment_score=0.0,
+                    confidence=0.3,
+                    model_used=provider_used,
+                    processed_at=datetime.utcnow(),
+                ),
+                scenario=ScenarioAnalysis(
+                    news_id=news_id,
+                    base_case=ScenarioProjection(
+                        scenario_name="Base Case",
+                        description=resp.content[:500] if resp.content else "",
+                        probability=0.5,
+                        time_horizon="short_term",
+                    ),
+                    confidence=0.3,
+                    model_used=provider_used,
+                    processed_at=datetime.utcnow(),
+                ),
+            )
+
+        # Parse narrative
+        narrative_data = data.get("narrative", {}) if isinstance(data.get("narrative"), dict) else {}
+        narrative = NarrativeAnalysis(
+            news_id=news_id,
+            primary_narrative=_safe_str(narrative_data, "primary_narrative")[:500],
+            secondary_narratives=_safe_str_list(narrative_data, "secondary_narratives"),
+            narrative_strength=_safe_float(narrative_data, "narrative_strength", 0.5),
+            key_actors=_safe_str_list(narrative_data, "key_actors"),
+            key_themes=_safe_str_list(narrative_data, "key_themes"),
+            timeline_indicators=_safe_str_list(narrative_data, "timeline_indicators"),
+            related_events=_safe_str_list(narrative_data, "related_events"),
+            confidence=_safe_float(data, "confidence", 0.85),
+            model_used=provider_used,
+            processed_at=datetime.utcnow(),
+        )
+
+        # Parse risk
+        risk_data = data.get("risk", {}) if isinstance(data.get("risk"), dict) else {}
+        overall_level = _safe_enum(risk_data, "overall_risk_level", RiskLevel, RiskLevel.LOW)
+        composite_score = _safe_float(risk_data, "composite_risk_score", 0.5)
+        raw_factors = risk_data.get("risk_factors", [])
+        risk_factors: List[RiskFactor] = []
+        if isinstance(raw_factors, list):
+            for rf in raw_factors:
+                if isinstance(rf, dict):
+                    risk_factors.append(
+                        RiskFactor(
+                            risk_type=_safe_str(rf, "risk_type", "general"),
+                            description=_safe_str(rf, "description", ""),
+                            level=_safe_enum(rf, "level", RiskLevel, RiskLevel.LOW),
+                            probability=_safe_float(rf, "probability", 0.5),
+                            impact_score=_safe_float(rf, "impact_score", 0.5),
+                            affected_regions=_safe_str_list(rf, "affected_regions"),
+                            affected_sectors=_safe_str_list(rf, "affected_sectors"),
+                            time_horizon=_safe_str(rf, "time_horizon", "short_term"),
+                            evidence=_safe_str_list(rf, "evidence"),
+                        )
+                    )
+        if not risk_factors:
+            risk_factors = [
+                RiskFactor(
+                    risk_type="general",
+                    description="No specific risk factors identified",
+                    level=RiskLevel.LOW,
+                    probability=0.3,
+                    impact_score=0.3,
+                )
+            ]
+        risk = RiskAnalysis(
+            news_id=news_id,
+            overall_risk_level=overall_level,
+            composite_risk_score=composite_score,
+            risk_factors=risk_factors,
+            systemic_risk_indicators=_safe_str_list(risk_data, "systemic_risk_indicators"),
+            confidence=_safe_float(data, "confidence", 0.8),
+            model_used=provider_used,
+            processed_at=datetime.utcnow(),
+        )
+
+        # Parse sentiment
+        sentiment_data = data.get("sentiment", {}) if isinstance(data.get("sentiment"), dict) else {}
+
+        def _parse_sentiment(val: str) -> SentimentLabel:
+            try:
+                return SentimentLabel(val.lower())
+            except ValueError:
+                return SentimentLabel.NEUTRAL
+
+        entity_sentiments: Dict[str, float] = {}
+        raw_entities = sentiment_data.get("entity_sentiments", {})
+        if isinstance(raw_entities, dict):
+            for k, v in raw_entities.items():
+                try:
+                    entity_sentiments[str(k)] = float(v)
+                except (ValueError, TypeError):
+                    continue
+        sentiment = SentimentAnalysis(
+            news_id=news_id,
+            overall_sentiment=_parse_sentiment(_safe_str(sentiment_data, "overall_sentiment", "neutral")),
+            sentiment_score=_safe_float(sentiment_data, "sentiment_score", 0.0),
+            headline_sentiment=_parse_sentiment(_safe_str(sentiment_data, "headline_sentiment", "neutral")),
+            headline_score=_safe_float(sentiment_data, "headline_score", 0.0),
+            content_sentiment=_parse_sentiment(_safe_str(sentiment_data, "content_sentiment", "neutral")),
+            content_score=_safe_float(sentiment_data, "content_score", 0.0),
+            entity_sentiments=entity_sentiments,
+            market_indicators=_safe_str_list(sentiment_data, "market_indicators"),
+            confidence=_safe_float(data, "confidence", 0.8),
+            model_used=provider_used,
+            processed_at=datetime.utcnow(),
+        )
+
+        # Parse scenario
+        scenario_data = data.get("scenario", {}) if isinstance(data.get("scenario"), dict) else {}
+
+        def _build_projection(obj: Optional[Dict[str, Any]]) -> Optional[ScenarioProjection]:
+            if not isinstance(obj, dict):
+                return None
+            return ScenarioProjection(
+                scenario_name=_safe_str(obj, "scenario_name", ""),
+                description=_safe_str(obj, "description", ""),
+                probability=_safe_float(obj, "probability", 0.0),
+                key_triggers=_safe_str_list(obj, "key_triggers"),
+                expected_outcomes=_safe_str_list(obj, "expected_outcomes"),
+                time_horizon=_safe_str(obj, "time_horizon", "short_term"),
+                affected_regions=_safe_str_list(obj, "affected_regions"),
+            )
+
+        alternatives: List[ScenarioProjection] = []
+        raw_alts = scenario_data.get("alternative_scenarios", [])
+        if isinstance(raw_alts, list):
+            for alt in raw_alts:
+                proj = _build_projection(alt)
+                if proj:
+                    alternatives.append(proj)
+        base = _build_projection(scenario_data.get("base_case"))
+        if base is None:
+            base = ScenarioProjection(
+                scenario_name="Base", description="", probability=0.0, time_horizon="short_term"
+            )
+
+        scenario = ScenarioAnalysis(
+            news_id=news_id,
+            base_case=base,
+            optimistic_case=_build_projection(scenario_data.get("optimistic_case")),
+            pessimistic_case=_build_projection(scenario_data.get("pessimistic_case")),
+            alternative_scenarios=alternatives,
+            confidence=_safe_float(data, "confidence", 0.8),
+            model_used=provider_used,
+            processed_at=datetime.utcnow(),
+        )
+
+        return MultiDimensionAnalysis(
+            news_id=news_id,
+            narrative=narrative,
+            risk=risk,
+            sentiment=sentiment,
+            scenario=scenario,
+            processed_at=datetime.utcnow(),
+        )
+
+    # -----------------------------------------------------------------------
     # v7: LLM 调用辅助 — 带 fallback 链和 latency 记录
     # -----------------------------------------------------------------------
     async def _call_llm_with_fallback(
         self,
         prompt: str,
-        preferred_provider: ModelProvider = ModelProvider.OPENAI,
+        preferred_provider: ModelProvider = ModelProvider.DEEPSEEK,
     ) -> tuple:
         """调用 LLM 并返回 (resp, latency_ms, provider_used)。
 

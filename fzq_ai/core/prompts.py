@@ -348,6 +348,97 @@ class PromptTemplates:
 """
 
     # ============================
+    # v10: 合并多维度分析模板 Multi-Dimension Analysis v1
+    # 将 narrative / risk / sentiment / scenario 合并为单 prompt
+    # 降低 75% LLM 调用成本（4 次 → 1 次）
+    # ============================
+    MULTI_DIMENSION_ANALYSIS_V1 = """
+你是一名全球情报分析专家。请对以下新闻内容进行全面的多维度分析，输出叙事、风险、情感、情景四个维度。
+
+【新闻内容】
+{{text}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "narrative": {
+        "primary_narrative": "主要叙事（一句话描述核心故事）",
+        "secondary_narratives": ["次要叙事1", "次要叙事2"],
+        "narrative_strength": 0.8,
+        "key_actors": ["关键行为者1", "关键行为者2"],
+        "key_themes": ["主题1", "主题2"],
+        "timeline_indicators": ["时间指标1"],
+        "related_events": ["相关事件1"]
+    },
+    "risk": {
+        "overall_risk_level": "medium",
+        "composite_risk_score": 0.7,
+        "risk_factors": [
+            {
+                "risk_type": "地缘政治",
+                "description": "风险描述",
+                "level": "medium",
+                "probability": 0.6,
+                "impact_score": 0.7,
+                "affected_regions": ["us", "cn"],
+                "affected_sectors": ["科技"],
+                "time_horizon": "short_term",
+                "evidence": ["证据1"]
+            }
+        ],
+        "systemic_risk_indicators": ["系统性风险指标1"]
+    },
+    "sentiment": {
+        "overall_sentiment": "positive",
+        "sentiment_score": 0.6,
+        "headline_sentiment": "positive",
+        "headline_score": 0.5,
+        "content_sentiment": "neutral",
+        "content_score": 0.0,
+        "entity_sentiments": {"Entity Name": 0.5},
+        "market_indicators": ["市场指标1"]
+    },
+    "scenario": {
+        "base_case": {
+            "scenario_name": "基准情景",
+            "description": "最可能的情景描述",
+            "probability": 0.5,
+            "key_triggers": ["触发因素1"],
+            "expected_outcomes": ["预期结果1"],
+            "time_horizon": "short_term",
+            "affected_regions": ["global"]
+        },
+        "optimistic_case": {
+            "scenario_name": "乐观情景",
+            "description": "乐观情景描述",
+            "probability": 0.2,
+            "key_triggers": ["触发因素1"],
+            "expected_outcomes": ["预期结果1"],
+            "time_horizon": "short_term",
+            "affected_regions": ["global"]
+        },
+        "pessimistic_case": {
+            "scenario_name": "悲观情景",
+            "description": "悲观情景描述",
+            "probability": 0.2,
+            "key_triggers": ["触发因素1"],
+            "expected_outcomes": ["预期结果1"],
+            "time_horizon": "short_term",
+            "affected_regions": ["global"]
+        },
+        "alternative_scenarios": []
+    },
+    "confidence": 0.85,
+    "provider_used": "deepseek",
+    "latency_ms": 0
+}
+"""
+
+    # ============================
     # 日报模板 Daily Report v1
     # ============================
     DAILY_REPORT_V1 = """

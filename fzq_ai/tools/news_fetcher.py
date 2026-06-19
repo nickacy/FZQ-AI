@@ -25,44 +25,86 @@ from fzq_ai.core.prompts import PromptTemplates
 # 内置多源 RSS 配置（按区域 + 语言）
 # ===========================================================================
 
-RSS_SOURCES_BY_REGION: Dict[RegionCode, List[Dict[str, Any]]] = {
+# ===========================================================================
+# v10: RSS 源配置从 YAML 加载
+# ===========================================================================
+
+def _load_rss_sources_from_yaml() -> Dict[RegionCode, List[Dict[str, Any]]]:
+    """从 rss_sources.yaml 加载 RSS 源配置。"""
+    import os
+    yaml_path = os.path.join(os.path.dirname(__file__), "rss_sources.yaml")
+    
+    try:
+        import yaml
+        with open(yaml_path, "r", encoding="utf-8") as f:
+            raw = yaml.safe_load(f)
+    except Exception:
+        # YAML 不可用或文件不存在 → 使用内置 fallback
+        return _RSS_SOURCES_FALLBACK
+    
+    result: Dict[RegionCode, List[Dict[str, Any]]] = {}
+    for region_key, sources in raw.items():
+        try:
+            region = RegionCode(region_key)
+        except ValueError:
+            continue
+        result[region] = []
+        for src in sources:
+            try:
+                lang = LanguageCode(src.get("language", "en"))
+            except ValueError:
+                lang = LanguageCode.EN
+            result[region].append({
+                "name": src.get("name", "Unknown"),
+                "url": src.get("url", ""),
+                "language": lang,
+                "reliability_score": src.get("reliability_score", 0.8),
+                "source_type": src.get("source_type", "rss"),
+            })
+    return result
+
+
+# v10: Fallback（YAML 不可用时）
+_RSS_SOURCES_FALLBACK: Dict[RegionCode, List[Dict[str, Any]]] = {
     RegionCode.GLOBAL: [
-        {"name": "Reuters", "url": "https://www.reutersagency.com/feed/?taxonomy=markets&post_type=reuters-best", "language": LanguageCode.EN, "reliability_score": 0.9},
-        {"name": "BBC World", "url": "http://feeds.bbci.co.uk/news/world/rss.xml", "language": LanguageCode.EN, "reliability_score": 0.9},
-        {"name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "language": LanguageCode.EN, "reliability_score": 0.85},
+        {"name": "Reuters", "url": "https://www.reutersagency.com/feed/?taxonomy=markets&post_type=reuters-best", "language": LanguageCode.EN, "reliability_score": 0.9, "source_type": "rss"},
+        {"name": "BBC World", "url": "http://feeds.bbci.co.uk/news/world/rss.xml", "language": LanguageCode.EN, "reliability_score": 0.9, "source_type": "rss"},
+        {"name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "language": LanguageCode.EN, "reliability_score": 0.85, "source_type": "rss"},
     ],
     RegionCode.US: [
-        {"name": "CNN", "url": "http://rss.cnn.com/rss/edition.rss", "language": LanguageCode.EN, "reliability_score": 0.8},
-        {"name": "Washington Post", "url": "https://feeds.washingtonpost.com/rss/world", "language": LanguageCode.EN, "reliability_score": 0.85},
-        {"name": "NYT", "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "language": LanguageCode.EN, "reliability_score": 0.9},
+        {"name": "CNN", "url": "http://rss.cnn.com/rss/edition.rss", "language": LanguageCode.EN, "reliability_score": 0.8, "source_type": "rss"},
+        {"name": "Washington Post", "url": "https://feeds.washingtonpost.com/rss/world", "language": LanguageCode.EN, "reliability_score": 0.85, "source_type": "rss"},
+        {"name": "NYT", "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "language": LanguageCode.EN, "reliability_score": 0.9, "source_type": "rss"},
     ],
     RegionCode.CN: [
-        {"name": "财联社", "url": "https://www.cls.cn/telegraph", "language": LanguageCode.ZH, "reliability_score": 0.85},
-        {"name": "澎湃新闻", "url": "https://www.thepaper.cn/rss", "language": LanguageCode.ZH, "reliability_score": 0.8},
+        {"name": "财联社", "url": "https://www.cls.cn/telegraph", "language": LanguageCode.ZH, "reliability_score": 0.85, "source_type": "rss"},
+        {"name": "澎湃新闻", "url": "https://www.thepaper.cn/rss", "language": LanguageCode.ZH, "reliability_score": 0.8, "source_type": "rss"},
     ],
     RegionCode.EU: [
-        {"name": "Politico EU", "url": "https://www.politico.eu/rss", "language": LanguageCode.EN, "reliability_score": 0.85},
-        {"name": "Le Monde", "url": "https://www.lemonde.fr/rss/une.xml", "language": LanguageCode.FR, "reliability_score": 0.85},
+        {"name": "Politico EU", "url": "https://www.politico.eu/rss", "language": LanguageCode.EN, "reliability_score": 0.85, "source_type": "rss"},
+        {"name": "Le Monde", "url": "https://www.lemonde.fr/rss/une.xml", "language": LanguageCode.FR, "reliability_score": 0.85, "source_type": "rss"},
     ],
     RegionCode.AE: [
-        {"name": "Gulf News", "url": "https://gulfnews.com/rss", "language": LanguageCode.EN, "reliability_score": 0.8},
+        {"name": "Gulf News", "url": "https://gulfnews.com/rss", "language": LanguageCode.EN, "reliability_score": 0.8, "source_type": "rss"},
     ],
     RegionCode.SA: [
-        {"name": "Arab News", "url": "https://www.arabnews.com/rss", "language": LanguageCode.EN, "reliability_score": 0.8},
+        {"name": "Arab News", "url": "https://www.arabnews.com/rss", "language": LanguageCode.EN, "reliability_score": 0.8, "source_type": "rss"},
     ],
     RegionCode.JP: [
-        {"name": "Japan Times", "url": "https://www.japantimes.co.jp/feed/", "language": LanguageCode.EN, "reliability_score": 0.85},
+        {"name": "Japan Times", "url": "https://www.japantimes.co.jp/feed/", "language": LanguageCode.EN, "reliability_score": 0.85, "source_type": "rss"},
     ],
     RegionCode.BR: [
-        {"name": "Globo", "url": "https://oglobo.globo.com/rss.xml", "language": LanguageCode.PT, "reliability_score": 0.8},
+        {"name": "Globo", "url": "https://oglobo.globo.com/rss.xml", "language": LanguageCode.PT, "reliability_score": 0.8, "source_type": "rss"},
     ],
     RegionCode.IN: [
-        {"name": "The Hindu", "url": "https://www.thehindu.com/news/?service=rss", "language": LanguageCode.EN, "reliability_score": 0.85},
+        {"name": "The Hindu", "url": "https://www.thehindu.com/news/?service=rss", "language": LanguageCode.EN, "reliability_score": 0.85, "source_type": "rss"},
     ],
     RegionCode.RU: [
-        {"name": "TASS", "url": "https://tass.com/rss/v2.xml", "language": LanguageCode.EN, "reliability_score": 0.75},
+        {"name": "TASS", "url": "https://tass.com/rss/v2.xml", "language": LanguageCode.EN, "reliability_score": 0.75, "source_type": "rss"},
     ],
 }
+
+RSS_SOURCES_BY_REGION: Dict[RegionCode, List[Dict[str, Any]]] = _load_rss_sources_from_yaml()
 
 # Google News RSS 搜索模板（按语言）
 GOOGLE_NEWS_RSS_TEMPLATES: Dict[LanguageCode, str] = {
@@ -129,6 +171,9 @@ class NewsFetcher:
         self.newsapi_key = newsapi_key
         self.http_timeout = http_timeout
         self._session: Optional[aiohttp.ClientSession] = None
+        # v10: 缓存
+        from fzq_ai.tools.topic_expansion_cache import TopicExpansionCache
+        self._topic_cache = TopicExpansionCache(ttl_seconds=86400)
 
     # -----------------------------------------------------------------------
     # 生命周期
@@ -152,21 +197,28 @@ class NewsFetcher:
         self.sources.append(source)
 
     # -----------------------------------------------------------------------
-    # v8: 议题扩展（topic → 相关关键词）
+    # v8/v10: 议题扩展（topic → 相关关键词），带缓存
     # -----------------------------------------------------------------------
     async def expand_topic_keywords(self, topic: str) -> List[str]:
-        """使用 LLM 扩展议题关键词，生成多语言相关关键词。"""
+        """使用 LLM 扩展议题关键词，生成多语言相关关键词。
+
+        v10 增强：使用 24 小时缓存，避免重复 LLM 调用。
+        """
+        # 1. 尝试缓存
+        cached = self._topic_cache.get(topic)
+        if cached is not None:
+            return cached
+
         keywords = [topic]
 
-        # 1. 简单规则扩展（无需 LLM）
+        # 2. 简单规则扩展（无需 LLM）
         lower_topic = topic.lower()
         for key, regions in TOPIC_REGION_MAP.items():
             if key in lower_topic or lower_topic in key:
-                # 添加区域相关变体
                 for region in regions:
                     keywords.append(f"{topic} {region.value}")
 
-        # 2. 如果有 LLM，使用 LLM 扩展
+        # 3. 如果有 LLM，使用 LLM 扩展
         if self.llm_router:
             try:
                 prompt = PromptTemplates.render(
@@ -175,7 +227,7 @@ class NewsFetcher:
                 )
                 request = LLMRequest(
                     prompt=prompt,
-                    provider=ModelProvider.OPENAI,
+                    provider=ModelProvider.DEEPSEEK,
                     temperature=0.3,
                     max_tokens=512,
                 )
@@ -190,6 +242,8 @@ class NewsFetcher:
             except Exception:
                 pass
 
+        # 4. 写入缓存
+        self._topic_cache.set(topic, keywords[:20])
         return keywords[:20]  # 最多 20 个
 
     # -----------------------------------------------------------------------
@@ -546,7 +600,80 @@ class NewsFetcher:
         return items
 
     # -----------------------------------------------------------------------
-    # v8: 相关性过滤（LLM 评分）
+    # v10: 规则相关性过滤（减少 80% LLM 调用）
+    # -----------------------------------------------------------------------
+    def filter_by_relevance_rules(
+        self,
+        items: List[RawNewsItem],
+        topic: str,
+        min_score: float = 0.3,
+    ) -> List[RawNewsItem]:
+        """v10 规则过滤层：关键词匹配 + 来源白名单 + 标题长度。
+
+        在 LLM 评分之前执行，过滤掉明显无关的新闻，减少 LLM 调用量。
+        """
+        # 来源域名白名单（可信新闻源）
+        trusted_domains = [
+            "reuters", "bbc", "nytimes", "washingtonpost", "cnn",
+            "aljazeera", "theguardian", "politico", "lemonde",
+            "chinadaily", "thepaper", "cls.cn", "japantimes",
+            "thehindu", "tass", "arabnews", "gulfnews",
+            "apnews", "bloomberg", "ft.com", "wsj",
+            "news.google.com", "bing.com",
+        ]
+
+        # 非新闻模式（娱乐/体育/生活方式等）
+        non_news_patterns = [
+            "celebrity", "fashion", "recipe", "sports", "football",
+            "basketball", "tennis", "golf", "entertainment", "movie",
+            "music", "album", "concert", "travel", "hotel",
+            "restaurant", "food", "cooking", "dating", "horoscope",
+        ]
+
+        topic_keywords = topic.lower().split()
+        filtered: List[RawNewsItem] = []
+
+        for item in items:
+            title_lower = item.title.lower()
+            content_lower = (item.content or "").lower()[:500]
+            combined = title_lower + " " + content_lower
+
+            score = 0.0
+
+            # 1. 关键词匹配（topic 关键词出现在 title 中权重更高）
+            for kw in topic_keywords:
+                if kw in title_lower:
+                    score += 0.4
+                if kw in content_lower:
+                    score += 0.2
+
+            # 2. 来源域名白名单加分
+            source_url = (item.source.url or "").lower()
+            if any(d in source_url for d in trusted_domains):
+                score += 0.15
+
+            # 3. 标题长度过滤（太短可能是广告/垃圾）
+            if len(item.title) < 15:
+                score -= 0.2
+            if len(item.title) > 80:
+                score += 0.05
+
+            # 4. 非新闻模式过滤
+            if any(p in combined for p in non_news_patterns):
+                score -= 0.3
+
+            # 5. 内容为空或极短 → 降低评分
+            if len(item.content or "") < 50:
+                score -= 0.1
+
+            if score >= min_score:
+                item.raw_metadata["relevance_score"] = round(min(score, 1.0), 2)
+                filtered.append(item)
+
+        return filtered
+
+    # -----------------------------------------------------------------------
+    # v8/v10: 相关性过滤（LLM 评分，仅用于模糊相关性）
     # -----------------------------------------------------------------------
     async def filter_by_relevance(
         self,
@@ -554,9 +681,15 @@ class NewsFetcher:
         topic: str,
         min_score: float = 0.5,
     ) -> List[RawNewsItem]:
-        """使用 LLM 过滤低相关性新闻。"""
+        """使用 LLM 过滤低相关性新闻。
+
+        v10 优化：先经过规则过滤，只将模糊相关的新闻送入 LLM 评分。
+        """
         if not self.llm_router or not items:
             return items
+
+        # v10: 先规则过滤
+        items = self.filter_by_relevance_rules(items, topic, min_score=0.2)
 
         # 批量过滤（每次最多 10 条）
         filtered: List[RawNewsItem] = []
@@ -579,7 +712,7 @@ class NewsFetcher:
                 )
                 request = LLMRequest(
                     prompt=prompt,
-                    provider=ModelProvider.OPENAI,
+                    provider=ModelProvider.DEEPSEEK,
                     temperature=0.1,
                     max_tokens=1024,
                 )
