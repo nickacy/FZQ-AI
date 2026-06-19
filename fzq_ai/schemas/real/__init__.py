@@ -52,6 +52,7 @@ class RawNewsItem(BaseModel):
     translated_content: Optional[str] = None
     translation_confidence: float = 0.0
     relevance_score: float = 0.0  # v10: 与 topic 的相关性评分 (0-1)
+    
 
 class TranslatedNewsItem(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())

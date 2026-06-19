@@ -1,5 +1,4 @@
-# ui_app.py — Phase 4‑3 最终版
-# FastAPI 版本（推荐）
+# ui_app.py — Phase 4‑3 修补兼容版（FastAPI ≥ 0.110）
 
 import uvicorn
 from fastapi import FastAPI
@@ -26,6 +25,19 @@ app = FastAPI(
     description="Daily Intelligence Report Generator",
     version="4.0",
 )
+
+
+# -----------------------------
+# 启动事件（替代 on_startup 参数）
+# -----------------------------
+@app.on_event("startup")
+async def startup_event():
+    """
+    FastAPI ≥ 0.110 不再支持 FastAPI(on_startup=[...])
+    改为使用事件装饰器。
+    """
+    # 如果未来需要初始化缓存、加载模型、warm-up 等，可放在这里
+    pass
 
 
 # -----------------------------
