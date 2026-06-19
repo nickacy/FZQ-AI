@@ -1,0 +1,38 @@
+[SYSTEM]
+{system_prompt}
+
+[USER]
+# 任务
+请对以下政策文本执行 zh_policy_brief（政策解读 / 要点提炼）。
+
+# 输入
+doc_id: {doc_id}
+source: {source}
+publish_date: {publish_date}
+title: {title}
+
+content:
+"""
+{content}
+"""
+
+related_docs: {related_docs}
+user_focus: {user_focus}
+
+# 输出要求
+1. 输出 JSON，Schema 见 zh_policy_brief.schema.json。
+2. key_points ≥ 5 条，按分类输出。
+3. affected_entities ≥ 3 个主体。
+4. user_focus 中每个焦点追加 key_point。
+5. risk_flags 标注“未明确 / 待细则 / 司法解释空间大”。
+6. confidence ∈ [0,1]。
+
+# Few-shot（节选）
+title="关于进一步优化外商投资环境的若干措施"
+输出示例（节选）：
+{
+  "key_points": [
+    {"point": "全面取消制造业领域外资准入限制", "category": "目标", "evidence_span": "全面取消制造业领域外资准入限制"},
+    {"point": "商务部牵头，工信部、网信办协同推进", "category": "执行", "evidence_span": "由商务部会同工业和信息化部、国家网信办等部门落实"}
+  ]
+}
