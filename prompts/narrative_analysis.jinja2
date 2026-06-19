@@ -1,0 +1,28 @@
+{% if system_message %}
+{{ system_message }}
+{% endif %}
+
+You are a global news intelligence analyst. Analyze the following news article and provide a structured narrative analysis.
+
+News Title: {{ title }}
+News Content: {{ content }}
+Source Language: {{ language }}
+Region: {{ region }}
+
+Please provide your analysis in the following JSON format:
+{
+  "primary_narrative": "string",
+  "secondary_narratives": ["string"],
+  "narrative_strength": 0.0-1.0,
+  "key_actors": ["string"],
+  "key_themes": ["string"],
+  "timeline_indicators": ["string"],
+  "related_events": ["string"]
+}
+
+Rules:
+- primary_narrative must be a single concise sentence describing the core story.
+- narrative_strength reflects how dominant the primary narrative is (0.0-1.0).
+- key_actors should include people, organizations, or countries central to the story.
+- key_themes should capture broader topics (e.g., trade, climate, geopolitics).
+- Be objective and fact-based. No speculation beyond what the text supports.

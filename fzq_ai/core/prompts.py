@@ -21,8 +21,275 @@ class PromptTemplates:
     """
 
     # ============================
-    # 叙事分析模板 Narrative v1
+    # v8: 议题扩展模板 Topic Expansion v1
     # ============================
+    TOPIC_EXPANSION_V1 = """
+你是一名全球情报分析师。请根据以下议题，生成相关搜索关键词。
+
+【议题】
+{{topic}}
+
+【任务要求】
+1. 生成 5-10 个与议题直接相关的搜索关键词
+2. 包括中英文双语关键词
+3. 包括不同区域/角度的变体
+4. 每个关键词应独立且具体，适合搜索引擎使用
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "keywords": ["关键词1", "keyword 2", "关键词3", "keyword 4"]
+}
+"""
+
+    # ============================
+    # v8: 议题区域分类模板 Topic Region Classification v1
+    # ============================
+    TOPIC_REGION_CLASSIFICATION_V1 = """
+你是一名地缘政治分析师。请根据以下议题，判断其最相关的地理区域。
+
+【议题】
+{{topic}}
+
+【任务要求】
+1. 判断议题主要涉及哪些地理区域
+2. 区域选项：global, us, cn, eu, uk, jp, kr, in, br, ru, ae, sa, tw, hk, sg, id, th, vn, my, ph, de, fr, it, es, nl, mx, ca, au
+3. 可以返回多个相关区域
+4. 返回区域的重要性排序（从高到低）
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "regions": ["us", "cn", "eu"],
+    "primary_region": "us",
+    "confidence": 0.85
+}
+"""
+
+    # ============================
+    # v8: 议题语言分类模板 Topic Language Classification v1
+    # ============================
+    TOPIC_LANGUAGE_CLASSIFICATION_V1 = """
+你是一名语言分析专家。请根据以下议题，判断应使用哪些语言进行搜索。
+
+【议题】
+{{topic}}
+
+【任务要求】
+1. 判断议题原始语言
+2. 判断搜索时应覆盖哪些语言
+3. 语言选项：en, zh, es, fr, de, ja, ko, ar, ru, pt, it, nl, tr, pl, vi, th, id
+4. 返回推荐的搜索语言列表
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "original_language": "en",
+    "search_languages": ["en", "zh", "es"],
+    "confidence": 0.9
+}
+"""
+
+    # ============================
+    # v8: 新闻相关性过滤模板 News Relevance Filter v1
+    # ============================
+    NEWS_RELEVANCE_FILTER_V1 = """
+你是一名新闻编辑。请评估以下新闻与指定议题的相关性。
+
+【议题】
+{{topic}}
+
+【待评估新闻】
+{{news_batch}}
+
+【任务要求】
+1. 逐条评估每条新闻与议题的相关性
+2. 评分标准：0-1（0=完全无关，1=高度相关）
+3. 关注：主题匹配度、内容深度、时效性、来源可信度
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "scores": [0.85, 0.3, 0.7, 0.9]
+}
+"""
+
+    # ============================
+    # 翻译模板 Translation v1
+    # ============================
+    TRANSLATION_V1 = """
+你是一名专业翻译。请将以下新闻翻译成 {{target_language}}。
+
+【原文标题】
+{{title}}
+
+【原文内容】
+{{content}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法翻译，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "title": "翻译后的标题",
+    "content": "翻译后的内容",
+    "confidence": 0.95,
+    "provider": "llm-translation"
+}
+"""
+
+    # ============================
+    # 叙事分析模板 Narrative Analysis v1
+    # ============================
+    NARRATIVE_ANALYSIS_V1 = """
+你是一名叙事分析专家。请分析以下新闻内容，提取核心叙事结构。
+
+【新闻内容】
+{{text}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "primary_narrative": "主要叙事（一句话描述核心故事）",
+    "secondary_narratives": ["次要叙事1", "次要叙事2"],
+    "narrative_strength": 0.8,
+    "key_actors": ["关键行为者1", "关键行为者2"],
+    "key_themes": ["主题1", "主题2"],
+    "timeline_indicators": ["时间指标1"],
+    "related_events": ["相关事件1"]
+}
+"""
+
+    # ============================
+    # 风险分析模板 Risk Analysis v1
+    # ============================
+    RISK_ANALYSIS_V1 = """
+你是一名风险分析专家。请评估以下新闻内容的风险。
+
+【新闻内容】
+{{text}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "overall_risk_level": "medium",
+    "composite_risk_score": 0.7,
+    "risk_factors": [
+        {
+            "risk_type": "地缘政治",
+            "description": "风险描述",
+            "level": "medium",
+            "probability": 0.6,
+            "impact_score": 0.7,
+            "affected_regions": ["us", "cn"],
+            "affected_sectors": ["科技"],
+            "time_horizon": "short_term",
+            "evidence": ["证据1"]
+        }
+    ],
+    "systemic_risk_indicators": ["系统性风险指标1"]
+}
+"""
+
+    # ============================
+    # 情感分析模板 Sentiment Analysis v1
+    # ============================
+    SENTIMENT_ANALYSIS_V1 = """
+你是一名情感分析专家。请分析以下新闻内容的情感倾向。
+
+【新闻内容】
+{{text}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "overall_sentiment": "positive",
+    "sentiment_score": 0.6,
+    "headline_sentiment": "positive",
+    "headline_score": 0.5,
+    "content_sentiment": "neutral",
+    "content_score": 0.0,
+    "entity_sentiments": {"Entity Name": 0.5},
+    "market_indicators": ["市场指标1"]
+}
+"""
+
+    # ============================
+    # 情景分析模板 Scenario Analysis v1
+    # ============================
+    SCENARIO_ANALYSIS_V1 = """
+你是一名情景分析专家。请基于以下新闻内容构建未来情景。
+
+【新闻内容】
+{{text}}
+
+【输出要求】
+1. 只输出 JSON，不要输出任何解释性文字、Markdown 代码块标记或自然语言。
+2. 不要输出 ```json 或 ``` 等标记。
+3. 如果无法分析，返回空 JSON：{}
+
+严格输出 JSON 格式：
+{
+    "base_case": {
+        "scenario_name": "基准情景",
+        "description": "最可能的情景描述",
+        "probability": 0.5,
+        "key_triggers": ["触发因素1"],
+        "expected_outcomes": ["预期结果1"],
+        "time_horizon": "short_term",
+        "affected_regions": ["global"]
+    },
+    "optimistic_case": {
+        "scenario_name": "乐观情景",
+        "description": "乐观情景描述",
+        "probability": 0.2,
+        "key_triggers": ["触发因素1"],
+        "expected_outcomes": ["预期结果1"],
+        "time_horizon": "short_term",
+        "affected_regions": ["global"]
+    },
+    "pessimistic_case": {
+        "scenario_name": "悲观情景",
+        "description": "悲观情景描述",
+        "probability": 0.2,
+        "key_triggers": ["触发因素1"],
+        "expected_outcomes": ["预期结果1"],
+        "time_horizon": "short_term",
+        "affected_regions": ["global"]
+    },
+    "alternative_scenarios": []
+}
+"""
     NARRATIVE_V1 = """
 你是一名资深国际关系叙事分析专家。请基于以下新闻内容，提取叙事结构并输出结构化 JSON。
 

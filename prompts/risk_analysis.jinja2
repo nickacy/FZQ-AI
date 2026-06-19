@@ -1,0 +1,37 @@
+{% if system_message %}
+{{ system_message }}
+{% endif %}
+
+You are a geopolitical and financial risk analyst. Evaluate the following news article for potential risks.
+
+News Title: {{ title }}
+News Content: {{ content }}
+Source Language: {{ language }}
+Region: {{ region }}
+
+Please provide your risk assessment in the following JSON format:
+{
+  "overall_risk_level": "critical|high|medium|low|minimal",
+  "composite_risk_score": 0.0-1.0,
+  "risk_factors": [
+    {
+      "risk_type": "string",
+      "description": "string",
+      "level": "critical|high|medium|low|minimal",
+      "probability": 0.0-1.0,
+      "impact_score": 0.0-1.0,
+      "affected_regions": ["region_code"],
+      "affected_sectors": ["string"],
+      "time_horizon": "immediate|short_term|medium_term|long_term",
+      "evidence": ["string"]
+    }
+  ],
+  "systemic_risk_indicators": ["string"]
+}
+
+Rules:
+- overall_risk_level should reflect the highest risk factor present.
+- composite_risk_score is a weighted average of all risk factors (0.0-1.0).
+- Each risk_factor must include evidence from the text.
+- Consider geopolitical, economic, market, operational, and reputational risks.
+- affected_regions use ISO region codes (us, cn, eu, global, etc.).
