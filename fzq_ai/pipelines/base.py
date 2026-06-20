@@ -1,87 +1,90 @@
-from typing import Generic, TypeVar, Optional, List, Dict, Any
-from fzq_ai.schemas.base import PipelineOutputSchema
+"""
+Base Pipeline with Metrics Instrumentation
+带自动埋点的基础 Pipeline（中英文双语）
+----------------------------------------------------
+All pipelines inherit from this class.
+It automatically records:
+- system-level metrics
+- provider-level metrics
+- pipeline-level metrics
 
-T = TypeVar("T", bound=PipelineOutputSchema)
+所有 Pipeline 都继承本类。
+本类自动记录：
+- 系统级指标
+- Provider 级指标
+- Pipeline 级指标
+"""
 
-class BasePipeline(Generic[T]):
-    """所有 Pipeline 的泛型基类
+import time
+from abc import ABC, abstractmethod
+from typing import Any, Dict
 
-    v7.0 增强：
-    - 可选的自动注册支持（通过 _pipeline_name 类属性）
-    - 向后兼容：不设置 _pipeline_name 则行为不变
-    - 支持新旧两套架构的 bridge
+from fzq_ai.metrics.metrics_store import metrics_store
 
-    使用：
-        class NewsPipeline(BasePipeline[NewsOutput]):
-            _pipeline_name = "news_v1"  # 可选：自动注册到 PipelineRegistry
-            _pipeline_description = "News analysis v1"
-            _pipeline_tags = ["news", "analysis"]
 
-            async def run_async(self, *args, **kwargs) -> NewsOutput:
-                ...
+class BasePipeline(ABC):
+    """
+    Base class for all pipelines.
+    所有 Pipeline 的基础类。
     """
 
-    # v7.0: 可选的注册属性（子类可覆盖）
-    _pipeline_name: Optional[str] = None
-    _pipeline_version: Optional[str] = None
-    _pipeline_description: str = ""
-    _pipeline_tags: Optional[List[str]] = None
-    _pipeline_dependencies: Optional[List[str]] = None
+    pipeline_name: str = "base_pipeline"
 
-    async def run_async(self, *args, **kwargs) -> T:
-        """子类必须实现"""
-        raise NotImplementedError
-
-    def run(self, *args, **kwargs) -> T:
-        """同步入口（默认调用 run_async 的同步包装）
-
-        子类可覆盖为纯同步实现。
+    @abstractmethod
+    async def run(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
-        import asyncio
+        Each pipeline must implement this method.
+        每个 Pipeline 必须实现此方法。
+        """
+        pass
+
+    # ----------------------------------------------------
+    # Wrapper with automatic metrics instrumentation
+    # 自动埋点包装器
+    # ----------------------------------------------------
+    async def run_with_metrics(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Execute pipeline with automatic metrics recording.
+        执行 Pipeline，并自动记录指标。
+        """
+        start_time = time.time()
+        error_occurred = False
+        provider_used = None
+
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # 在异步上下文中，创建新任务
-                return asyncio.create_task(self.run_async(*args, **kwargs))
-            return loop.run_until_complete(self.run_async(*args, **kwargs))
-        except RuntimeError:
-            # 无事件循环，创建新的
-            return asyncio.run(self.run_async(*args, **kwargs))
+            # 执行 Pipeline 主逻辑
+            result = await self.run(payload)
 
-    # v7.0: 注册到 PipelineRegistry（可选调用）
-    @classmethod
-    def register(cls, name: Optional[str] = None, **kwargs: Any):
-        """将本类注册到 PipelineRegistry。
+            # 从返回结果中提取 provider（如果有）
+            provider_used = result.get("provider")
 
-        可以在模块导入时自动调用，或显式调用。
+            return result
 
-        Args:
-            name: 注册名，默认使用 cls._pipeline_name 或类名
-            **kwargs: 传递给 PipelineRegistry.register 的额外参数
+        except Exception as e:
+            error_occurred = True
+            raise e
 
-        示例：
-            # 方式1：模块导入时自动注册
-            NewsPipeline.register()
+        finally:
+            # 计算耗时
+            latency_ms = (time.time() - start_time) * 1000
 
-            # 方式2：显式注册（覆盖参数）
-            NewsPipeline.register(
-                name="news_v2",
-                description="Enhanced news pipeline",
-                set_default=True,
+            # -------- System-level metrics --------
+            metrics_store.record_request(
+                latency_ms=latency_ms,
+                error=error_occurred
             )
-        """
-        from fzq_ai.pipelines.registry import PipelineRegistry
 
-        reg_name = name or cls._pipeline_name or cls.__name__
-        description = kwargs.pop("description", cls._pipeline_description)
-        tags = kwargs.pop("tags", cls._pipeline_tags)
-        dependencies = kwargs.pop("dependencies", cls._pipeline_dependencies)
+            # -------- Pipeline-level metrics --------
+            metrics_store.record_pipeline_call(
+                pipeline_name=self.pipeline_name,
+                latency_ms=latency_ms,
+                error=error_occurred
+            )
 
-        return PipelineRegistry.register(
-            reg_name,
-            description=description,
-            tags=tags,
-            dependencies=dependencies,
-            **kwargs,
-        )(cls)
-
+            # -------- Provider-level metrics --------
+            if provider_used:
+                metrics_store.record_provider_call(
+                    provider_name=provider_used,
+                    latency_ms=latency_ms,
+                    success=not error_occurred
+                )

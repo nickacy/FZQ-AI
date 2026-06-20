@@ -13,6 +13,7 @@ It provides:
 - 中文情报中心
 - 系统指标仪表盘（v8.6 占位）
 """
+from fzq_ai.ui.views.metrics_dashboard import render_metrics_page
 
 import streamlit as st
 
@@ -67,3 +68,4 @@ elif page == "Chinese Intelligence / 中文情报中心":
 elif page == "System Metrics / 系统指标（v8.6）":
     st.title("📊 System Metrics Dashboard / 系统指标仪表盘")
     st.info("Metrics Dashboard will be added in Step 6. / 指标仪表盘将在第 6 步加入。")
+    render_metrics_page()
