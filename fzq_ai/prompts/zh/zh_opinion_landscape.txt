@@ -1,0 +1,26 @@
+[SYSTEM]
+{system_prompt}
+
+[USER]
+# 任务
+请对以下输入执行 zh_opinion_landscape（舆论版图）。
+
+# 输入
+topic: {topic}
+time_range: {time_range}
+
+items（共 {n} 条，覆盖平台：{platforms}）：
+{items_json}
+
+# 输出要求
+1. camps 数量 2–6 个；若样本难以区分阵营，输出 1 个 label="单一声浪" 的阵营并说明原因。
+2. 每个阵营必须给出至少 2 条 representative_quotes，并标注来源 id。
+3. frame_analysis 至少识别 2 个话语框架（如“安全框架”“民生框架”“技术框架”“民族框架”）。
+4. key_nodes 按 influence_score 降序，最多 10 个。
+5. stance 字段描述阵营对议题的态度，不得与事实混同。
+6. 若阵营内部存在显著子分歧，需在 core_claim 中标注“（内部分歧：…）”。
+7. 禁止使用未经证据支撑的标签（如“水军”），如需推断必须标注为推理。
+
+# 降级策略
+- 若 items < 5 条：status=degraded, reason="样本不足，舆论聚类不稳定"
+- 若平台单一：在 summary 中标注“平台单一，阵营可能偏差”

@@ -8,11 +8,17 @@ FastAPI 应用入口：
 """
 
 from __future__ import annotations
+from fastapi import FastAPI
+from fzq_ai.api.zh_endpoints import router as zh_router
+
+app = FastAPI()
+
+# 挂载中文情报 API
+app.include_router(zh_router)
 
 import logging
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-
 from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 from fzq_ai.domain.models import ServiceResult
 

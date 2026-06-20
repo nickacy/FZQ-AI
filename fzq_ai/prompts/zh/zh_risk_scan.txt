@@ -1,0 +1,30 @@
+[SYSTEM]
+{system_prompt}
+
+[USER]
+# 任务
+请对以下输入执行 zh_risk_scan（风险点扫描）。扫描范围：{scope}。
+
+# 输入
+scan_window: {scan_window}
+
+items（共 {n} 条）：
+{items_json}
+
+entity_watchlist: {entity_watchlist}
+
+# 输出要求
+1. 按 scope 中每一类输出风险条目；scope 未覆盖的类型不输出。
+2. 每条风险必须至少包含 1 条 evidence（item_id + span + source）。
+3. convey_chain 使用箭头表示传导：A → B → C。
+4. level 判定参考：
+   - 高：已发生且影响范围跨行业 / 跨境；
+   - 中：已发生但范围有限，或为政策草案阶段；
+   - 低：信号级，尚未落地；
+   - 观察：方向不明，需持续监测。
+5. suggested_action 必须可执行（如“监测 X 指标”、“联系 Y 部门确认”）。
+6. 若 entity_watchlist 中的实体在 items 中出现但未被识别为风险，需单独输出 level=观察 的条目。
+
+# 降级策略
+- 若 items 少于 3 条：status=degraded, reason="输入样本不足，扫描结果仅供参考"
+- 若 scope 中某类无匹配：该类输出空数组，并在 summary 中说明

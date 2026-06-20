@@ -1,0 +1,36 @@
+[SYSTEM]
+{system_prompt}
+
+[USER]
+# 任务
+请对以下同一事件的多源新闻执行 zh_multisource_merge（多源去重 + 视角合并）。
+
+# 输入
+event_topic: {event_topic}
+
+sources（共 {n} 条）：
+{sources_json}
+
+# 输出要求
+1. main_axis 中的 5W1H 字段：
+   - 若各源一致 → 直接填入
+   - 若存在分歧 → 填“存在分歧”，并在 perspective_diffs 中列出差异
+2. perspective_diffs 至少识别 3 个差异维度：
+   - 归因
+   - 措辞强度
+   - 被引主体
+   - 时间线侧重
+   - 数据口径
+3. source_reliability 评分依据：
+   - 是否具名
+   - 是否首信源
+   - 是否引用官方或权威机构
+   - 历史信誉
+4. consistency_score ∈ [0,1]：
+   - 1 = 完全一致
+   - 0 = 完全矛盾
+5. 不得将矛盾事实强行合并为“统一版本”，必须保留差异。
+
+# 降级策略
+- 若 sources < 2 条：status=degraded, reason="样本不足，无法进行多源合并"
+- 若来源单一：summary 中标注“来源单一，视角可能偏差”

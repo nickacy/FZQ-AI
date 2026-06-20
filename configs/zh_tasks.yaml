@@ -5,3 +5,6 @@ tasks:
   zh_risk_scan: "fzq_ai/prompts/zh/zh_risk_scan.txt"
   zh_opinion_landscape: "fzq_ai/prompts/zh/zh_opinion_landscape.txt"
   zh_multisource_merge: "fzq_ai/prompts/zh/zh_multisource_merge.txt"
+  zh_risk_scan: "fzq_ai/prompts/zh/zh_risk_scan.txt"
+  zh_opinion_landscape: "fzq_ai/prompts/zh/zh_opinion_landscape.txt"
+  zh_multisource_merge: "fzq_ai/prompts/zh/zh_multisource_merge.txt"

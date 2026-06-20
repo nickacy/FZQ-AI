@@ -5,9 +5,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 from contextlib import asynccontextmanager
-
 from fzq_ai.pipelines.daily_report_pipeline import DailyReportPipeline
 from fzq_ai.schemas.pipeline_output import DailyReportPipelineOutput
+from fzq_ai.ui.views.zh_intel import render_zh_intel_page
+
+if page == "Chinese Intelligence / 中文情报中心":
+    render_zh_intel_page()
 
 
 # -----------------------------
