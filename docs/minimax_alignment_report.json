@@ -1,0 +1,230 @@
+{
+  "summary": {
+    "total_schemas": 4,
+    "average_alignment": "68.1%",
+    "lowest_alignment": [
+      0.3076923076923077,
+      "zh_opinion_landscape"
+    ]
+  },
+  "reports": {
+    "zh_policy_brief": {
+      "schema_name": "zh_policy_brief",
+      "schema_fields": [
+        "task_type",
+        "doc_id",
+        "summary",
+        "key_points",
+        "affected_entities",
+        "timeline",
+        "quantitative_targets",
+        "risk_flags",
+        "confidence"
+      ],
+      "prompt_mentioned_fields": [
+        "task_type",
+        "doc_id",
+        "summary",
+        "key_points",
+        "affected_entities",
+        "timeline",
+        "quantitative_targets",
+        "risk_flags",
+        "confidence"
+      ],
+      "missing_in_prompt": [],
+      "extra_in_prompt": [],
+      "enum_check": {
+        "task_type": {
+          "schema_values": [
+            "zh_policy_brief"
+          ],
+          "prompt_mentioned": [
+            "zh_policy_brief"
+          ],
+          "missing_in_prompt": [],
+          "alignment_rate": 1.0
+        }
+      },
+      "overall_alignment": 1.0
+    },
+    "zh_risk_scan": {
+      "schema_name": "zh_risk_scan",
+      "schema_fields": [
+        "task_type",
+        "scan_window",
+        "risks",
+        "overall_risk_level",
+        "entity_watchlist",
+        "suggested_actions",
+        "summary",
+        "confidence"
+      ],
+      "prompt_mentioned_fields": [
+        "task_type",
+        "scan_window",
+        "risks",
+        "entity_watchlist",
+        "summary",
+        "confidence"
+      ],
+      "missing_in_prompt": [
+        "overall_risk_level",
+        "suggested_actions"
+      ],
+      "extra_in_prompt": [],
+      "enum_check": {
+        "task_type": {
+          "schema_values": [
+            "zh_risk_scan"
+          ],
+          "prompt_mentioned": [
+            "zh_risk_scan"
+          ],
+          "missing_in_prompt": [],
+          "alignment_rate": 1.0
+        },
+        "overall_risk_level": {
+          "schema_values": [
+            "高",
+            "中",
+            "低",
+            "观察"
+          ],
+          "prompt_mentioned": [
+            "高",
+            "中",
+            "低",
+            "观察"
+          ],
+          "missing_in_prompt": [],
+          "alignment_rate": 1.0
+        }
+      },
+      "overall_alignment": 0.75
+    },
+    "zh_opinion_landscape": {
+      "schema_name": "zh_opinion_landscape",
+      "schema_fields": [
+        "task_type",
+        "topic",
+        "time_range",
+        "clusters",
+        "stance_map",
+        "sentiment_map",
+        "key_frames",
+        "influencers",
+        "heat_trend",
+        "representative_quotes",
+        "overall_stance",
+        "overall_sentiment",
+        "confidence"
+      ],
+      "prompt_mentioned_fields": [
+        "task_type",
+        "topic",
+        "time_range",
+        "representative_quotes"
+      ],
+      "missing_in_prompt": [
+        "clusters",
+        "stance_map",
+        "sentiment_map",
+        "key_frames",
+        "influencers",
+        "heat_trend",
+        "overall_stance",
+        "overall_sentiment",
+        "confidence"
+      ],
+      "extra_in_prompt": [],
+      "enum_check": {
+        "task_type": {
+          "schema_values": [
+            "zh_opinion_landscape"
+          ],
+          "prompt_mentioned": [
+            "zh_opinion_landscape"
+          ],
+          "missing_in_prompt": [],
+          "alignment_rate": 1.0
+        },
+        "overall_stance": {
+          "schema_values": [
+            "支持",
+            "反对",
+            "中性",
+            "分裂"
+          ],
+          "prompt_mentioned": [
+            "支持",
+            "反对"
+          ],
+          "missing_in_prompt": [
+            "中性",
+            "分裂"
+          ],
+          "alignment_rate": 0.5
+        },
+        "overall_sentiment": {
+          "schema_values": [
+            "正面",
+            "负面",
+            "中性",
+            "分化"
+          ],
+          "prompt_mentioned": [],
+          "missing_in_prompt": [
+            "正面",
+            "负面",
+            "中性",
+            "分化"
+          ],
+          "alignment_rate": 0.0
+        }
+      },
+      "overall_alignment": 0.3076923076923077
+    },
+    "zh_multisource_merge": {
+      "schema_name": "zh_multisource_merge",
+      "schema_fields": [
+        "task_type",
+        "event_id",
+        "main_axis",
+        "perspective_diffs",
+        "source_reliability",
+        "consistency_score",
+        "missing_sources",
+        "conflict_sources",
+        "evidence_map"
+      ],
+      "prompt_mentioned_fields": [
+        "task_type",
+        "event_id",
+        "main_axis",
+        "perspective_diffs",
+        "source_reliability",
+        "consistency_score"
+      ],
+      "missing_in_prompt": [
+        "missing_sources",
+        "conflict_sources",
+        "evidence_map"
+      ],
+      "extra_in_prompt": [],
+      "enum_check": {
+        "task_type": {
+          "schema_values": [
+            "zh_multisource_merge"
+          ],
+          "prompt_mentioned": [
+            "zh_multisource_merge"
+          ],
+          "missing_in_prompt": [],
+          "alignment_rate": 1.0
+        }
+      },
+      "overall_alignment": 0.6666666666666666
+    }
+  }
+}

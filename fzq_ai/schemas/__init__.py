@@ -7,6 +7,14 @@ from fzq_ai.schemas.pipeline_output import (
     ScenarioPipelineOutput,
     DailyReportPipelineOutput,
 )
+from fzq_ai.schemas.validator import (
+    SchemaValidator,
+    ValidationResult,
+    SchemaRegistry,
+    SchemaAlignmentChecker,
+    validate_json,
+    quick_check,
+)
 
 __all__ = [
     "PipelineOutputSchema",
@@ -16,4 +24,11 @@ __all__ = [
     "SentimentPipelineOutput",
     "ScenarioPipelineOutput",
     "DailyReportPipelineOutput",
+    # v9.2: Minimax 验证器
+    "SchemaValidator",
+    "ValidationResult",
+    "SchemaRegistry",
+    "SchemaAlignmentChecker",
+    "validate_json",
+    "quick_check",
 ]
