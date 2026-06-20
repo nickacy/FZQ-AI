@@ -1,6 +1,8 @@
 """
-fzq_ai.api.app
+FastAPI 模块化 API（子模块）
+C:\Users\nicka\FZQ-AI-WORKSPACE\FZQ-AI\fzq_ai\api\app.py
 
+fzq_ai.api.app
 FastAPI 应用入口：
 - 提供 /health 健康检查
 - 提供 /run-report 触发 orchestrator
