@@ -156,12 +156,12 @@ class AutonomyAgent:
                         )
 
                 elif task_type == "report":
-                    from fzq_ai.agent.report_agent import ReportAgent
+                    from fzq_ai.agents.report_agent import ReportAgent
                     agent = ReportAgent(store=self._store)
                     results[task_name] = agent.generate_markdown_report(task_name)
 
                 elif task_type == "watchlist":
-                    from fzq_ai.agent.watchlist_agent import WatchlistAgent
+                    from fzq_ai.agents.watchlist_agent import WatchlistAgent
                     agent = WatchlistAgent(orchestrator=self._orchestrator)
                     results["watchlist"] = agent.run_once()
 
