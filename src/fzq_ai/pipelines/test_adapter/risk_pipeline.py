@@ -1,5 +1,5 @@
 """
-FZQ-AI Pipelines — Test Adapter Risk Pipeline
+FZQ-AI Pipelines – Test Adapter Risk Pipeline
 Mock RiskPipeline. Returns fixed RiskAnalysis with MEDIUM risk. No real LLM calls.
 """
 from typing import List
@@ -26,7 +26,7 @@ class MockRiskPipeline:
     def __init__(self):
         self.pipeline_name = "mock_risk_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with RiskAnalysis (MEDIUM risk)."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
