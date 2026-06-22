@@ -1,5 +1,5 @@
 """
-FZQ-AI Pipelines — Test Adapter Sentiment Pipeline
+FZQ-AI Pipelines – Test Adapter Sentiment Pipeline
 Mock SentimentPipeline. Returns fixed SentimentAnalysis with NEUTRAL. No real LLM calls.
 """
 from typing import List
@@ -25,7 +25,7 @@ class MockSentimentPipeline:
     def __init__(self):
         self.pipeline_name = "mock_sentiment_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with SentimentAnalysis (NEUTRAL)."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
