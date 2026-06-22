@@ -38,7 +38,7 @@ class NarrativePipeline(BasePipeline):
     def __init__(self):
         self.llm = LLMRouter()
 
-    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
             self.llm.route("narrative_summary", SUMMARY_TEMPLATE.render(query=query)),
             self.llm.route("narrative_keypoints", KEYPOINTS_TEMPLATE.render(query=query)),

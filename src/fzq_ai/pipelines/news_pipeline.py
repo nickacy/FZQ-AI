@@ -20,7 +20,7 @@ class NewsPipeline(BasePipeline):
         self.llm = llm or LLMRouter()
         self._articles: List[Article] = []
 
-    async def _run_async(self, *args, query: str = "", topic: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", topic: str = "", **kwargs) -> ServiceResult:
         query = query or topic
         articles = fetch_all_news(query)
         self._articles = articles
