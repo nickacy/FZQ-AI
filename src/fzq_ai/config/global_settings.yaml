@@ -1,5 +1,73 @@
+# ============================================================
+# FZQ‑AI Global Settings (v13)
+# ============================================================
+
+# ------------------------------------------------------------
+# Budget & Token Monitoring
+# ------------------------------------------------------------
 budget:
-  daily_cap_usd: 3          # 每日预算上限（美元）
-  weekly_cap_usd: 10        # 每周预算上限（美元）
-  alert_threshold: 0.8      # 达到 80% 时提醒
-  auto_downgrade: true      # 是否自动降级模型（OpenAI → Qwen/GLM/DeepSeek）
+  daily_cap_usd: 3
+  weekly_cap_usd: 10
+  alert_threshold: 0.8
+  auto_downgrade: true
+
+token_monitor:
+  log_path: "fzqai_token_log.jsonl"
+  model_cost:
+    openai: 0.01
+    deepseek: 0.002
+    qwen: 0.0008
+    glm: 0.001
+
+# ------------------------------------------------------------
+# Model Priority (for model_selector)
+# ------------------------------------------------------------
+model_priority:
+  default_primary: "deepseek"
+  fallback:
+    - "qwen"
+    - "glm"
+    - "openai"
+
+# ------------------------------------------------------------
+# LLM Router Settings
+# ------------------------------------------------------------
+router:
+  enable_cache: true
+  enable_redis_cache: true
+  redis_ttl_seconds: 86400
+
+# ------------------------------------------------------------
+# Provider Settings
+# ------------------------------------------------------------
+providers:
+  openai:
+    enabled: true
+    max_tokens: 4096
+  deepseek:
+    enabled: true
+    max_tokens: 4096
+  qwen:
+    enabled: true
+    max_tokens: 4096
+  glm:
+    enabled: true
+    max_tokens: 4096
+
+# ------------------------------------------------------------
+# Pipeline Defaults
+# ------------------------------------------------------------
+pipelines:
+  news:
+    max_articles: 30
+  risk:
+    enable_forecast: true
+  sentiment:
+    mode: "standard"
+
+# ------------------------------------------------------------
+# Orchestrator Defaults
+# ------------------------------------------------------------
+orchestrator:
+  enable_parallel: true
+  max_concurrency: 4
