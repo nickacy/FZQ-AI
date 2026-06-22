@@ -1,6 +1,6 @@
 """
-FZQ-AI Pipelines — Test Adapter News Pipeline
-Mock NewsPipeline. Same interface as real NewsPipeline. Async run() → PipelineOutput.
+FZQ-AI Pipelines – Test Adapter News Pipeline
+Mock NewsPipeline. Same interface as real NewsPipeline. Async run_async() → PipelineOutput.
 No real fetching. No translation. Returns fixed mock data with up to 3 dummy
 MultiDimensionAnalysis items.
 """
@@ -25,7 +25,7 @@ class MockNewsPipeline:
     def __init__(self):
         self.pipeline_name = "mock_news_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with up to 3 dummy MultiDimensionAnalysis items."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
