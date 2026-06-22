@@ -1,13 +1,17 @@
 # fzq_ai/llm/router.py
-# FZQ‑AI v12 LLMRouter（Redis + 内存缓存）
+# FZQ‑AI v12 LLMRouter（Redis + 内存缓存 + TokenMonitor 集成）
 
 from typing import Any
+
 from fzq_ai.llm.providers import ProviderRegistry
 from fzq_ai.llm.task_registry import TaskRegistry
 from fzq_ai.llm.model_selector import model_selector
 from fzq_ai.llm.cache import llm_cache
 from fzq_ai.llm.cache_redis import redis_llm_cache
 from fzq_ai.schemas.llm import LLMRequestSchema, LLMResponseSchema
+
+# ★ 新增：Token 监控
+from fzq_ai.monitor.token_monitor import token_monitor
 
 
 class LLMRouter:
@@ -16,46 +20,94 @@ class LLMRouter:
         self.task_registry = TaskRegistry()
         self.provider_registry = ProviderRegistry()
 
+    # ------------------------------------------------------------
+    # 核心 LLM 调用（带缓存 + fallback + token 记录）
+    # ------------------------------------------------------------
     async def _route_llm_call(self, task_type: str, req: LLMRequestSchema) -> LLMResponseSchema:
 
-        primary, fallback = model_selector.select(task_type, req.prompt)
+        # --------------------------------------------------------
+        # Step 0：预算强制保护（新增）
+        # --------------------------------------------------------
+        alerts = token_monitor.check_budget()
+        if any("CRITICAL" in a for a in alerts):
+            print("[Budget] CRITICAL: Budget exceeded. Forcing low-cost models.")
+            primary = "qwen"
+            fallback = ["glm", "deepseek"]
+        else:
+            # 原始模型选择逻辑
+            primary, fallback = model_selector.select(task_type, req.prompt)
 
+        # --------------------------------------------------------
+        # Step 1：缓存 key
+        # --------------------------------------------------------
         cache_key = llm_cache.make_key(task_type, req.prompt, primary)
 
-        # 1. Redis 缓存
+        # Redis 缓存
         redis_cached = redis_llm_cache.get(cache_key)
         if redis_cached:
             return LLMResponseSchema(content=redis_cached)
 
-        # 2. 内存缓存
+        # 内存缓存
         mem_cached = llm_cache.get(cache_key)
         if mem_cached:
             return LLMResponseSchema(content=mem_cached)
 
-        # 3. primary 调用
+        # --------------------------------------------------------
+        # Step 2：primary 调用
+        # --------------------------------------------------------
         try:
             provider = self.provider_registry.get_provider(primary)
             result = await provider.run(req)
 
-            # 写入 Redis + 内存缓存
+            # 写入缓存
             redis_llm_cache.set(cache_key, result, primary)
             llm_cache.set(cache_key, result, primary)
 
+            # ★ 新增：记录 token
+            try:
+                token_monitor.record(
+                    model=primary,
+                    prompt_tokens=result.prompt_tokens,
+                    completion_tokens=result.completion_tokens,
+                    task_type=task_type,
+                )
+            except Exception as e:
+                print("[TokenMonitor] Failed to record tokens:", e)
+
             return LLMResponseSchema(content=result)
+
         except Exception:
             pass
 
-        # 4. fallback 调用
+        # --------------------------------------------------------
+        # Step 3：fallback 调用
+        # --------------------------------------------------------
         for model in fallback:
             try:
                 provider = self.provider_registry.get_provider(model)
                 result = await provider.run(req)
+
+                # ★ 新增：记录 token
+                try:
+                    token_monitor.record(
+                        model=model,
+                        prompt_tokens=result.prompt_tokens,
+                        completion_tokens=result.completion_tokens,
+                        task_type=task_type,
+                    )
+                except Exception as e:
+                    print("[TokenMonitor] Failed to record tokens:", e)
+
                 return LLMResponseSchema(content=result)
+
             except Exception:
                 continue
 
         raise RuntimeError(f"All providers failed for task: {task_type}")
 
+    # ------------------------------------------------------------
+    # 对外 API（保持不变）
+    # ------------------------------------------------------------
     async def route(self, task_type: str, prompt: str, **extra: Any) -> str:
         req = LLMRequestSchema(
             task_type=task_type,
