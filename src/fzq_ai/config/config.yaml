@@ -1,22 +1,42 @@
-{
-  "models": {
-    "deepseek": {
-      "model": "deepseek-chat"
-    },
-    "openai": {
-      "model": "gpt-4o-mini"
-    },
-    "gemini": {
-      "model": "gemini-1.5-flash"
-    }
-  },
+# fzq_ai/config/config.yaml
+# FZQ‑AI v10 全局配置（声明性）
 
-  "news": {
-    "max_items": 50
-  },
+model_priority:
+  # 全局模型优先级（从高到低）
+  # 你给的原则：DeepSeek > Qwen > GLM > Doubao > Kimi > OpenAI > Gemini
+  order:
+    - deepseek
+    - qwen
+    - glm
+    - doubao
+    - kimi
+    - openai
+    - gemini
 
-  "daily_report": {
-    "include_risk": true,
-    "include_narrative": true
-  }
-}
+task_overrides:
+  # 任务级模型覆盖（可选）
+  # 例如：风险类任务强制 DeepSeek
+  risk_summary:
+    primary: deepseek
+  risk_factors:
+    primary: openai
+  risk_forecast:
+    primary: deepseek
+
+  # 叙事类任务 → Qwen
+  narrative_summary:
+    primary: qwen
+  narrative_keypoints:
+    primary: qwen
+  narrative_storyline:
+    primary: qwen
+  narrative_implications:
+    primary: qwen
+
+  # 新闻类任务 → GLM
+  news_intel:
+    primary: glm
+
+  # 长文本任务 → Kimi
+  daily_exec_overview:
+    primary: kimi

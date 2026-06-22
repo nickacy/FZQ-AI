@@ -1,28 +1,30 @@
 # fzq_ai/config/settings.py
 
-from __future__ import annotations
-from pydantic_settings import BaseSettings
-from typing import Dict, Any
+from fzq_ai.config.model_priority import ModelPriority
+from fzq_ai.config.task_overrides import TaskOverrides
 
+class Settings:
+    """全局配置入口"""
 
-class Settings(BaseSettings):
-    # LLM 模型配置（你会在 .env 中定义）
-    llm_models: Dict[str, Any] = {}
+    def __init__(self):
+        self.priority = ModelPriority()
+        self.overrides = TaskOverrides()
 
-    # 默认模型
-    default_model: str = "deepseek"
+    def get_model_for_task(self, task_name: str):
+        """返回任务的 primary_model + fallback_models"""
 
-    # 默认参数
-    default_temperature: float = 0.7
-    default_max_tokens: int = 2048
+        override = self.overrides.get_override(task_name)
 
-    # LLMExecutor 配置
-    llm_executor_retries: int = 2
-    llm_request_timeout: int = 30
+        # 如果 YAML 中有任务覆盖
+        if override and "primary" in override:
+            primary = override["primary"]
+        else:
+            primary = self.priority.get_order()[0]
 
-    class Config:
-        env_file = ".env"
-        extra = "allow"  # ⭐⭐ 关键修复：允许 .env 中的额外字段
+        # fallback = 除 primary 之外的所有模型
+        fallback = [m for m in self.priority.get_order() if m != primary]
+
+        return primary, fallback
 
 
 settings = Settings()
