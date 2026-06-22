@@ -1,5 +1,5 @@
 """
-FZQ-AI Pipelines — Test Adapter Scenario Pipeline
+FZQ-AI Pipelines – Test Adapter Scenario Pipeline
 Mock ScenarioPipeline. Returns fixed ScenarioAnalysis. No real LLM calls.
 """
 from typing import List
@@ -25,7 +25,7 @@ class MockScenarioPipeline:
     def __init__(self):
         self.pipeline_name = "mock_scenario_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with ScenarioAnalysis."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
