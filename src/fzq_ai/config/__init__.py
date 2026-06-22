@@ -1,13 +1,12 @@
-# fzq_ai/config/__init__.py
 """
-配置入口：多源加载（环境变量 > .env > 配置文件默认值）
+FZQ‑AI v10 全局配置中心（终极版）
 
-加载顺序：
-1. 首先尝试加载 config.yaml（默认值）
-2. 然后加载 .env（覆盖）
-3. 最后读取环境变量（最高优先级）
-
-当缺少关键 API Key 时：不崩溃，返回空字符串并提供明确提示。
+职责：
+1. 加载 .env（敏感信息）
+2. 加载 config.yaml / config.json（声明性配置）
+3. 提供 API Keys / RSS / 日志级别 / 版本号
+4. 提供统一 get_config() 接口
+5. 与新版 settings.py（模型优先级 + 任务覆盖）并存，不冲突
 """
 
 from __future__ import annotations
@@ -17,6 +16,9 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+# ------------------------------------------------------------
+# 1. 加载 .env（敏感信息）
+# ------------------------------------------------------------
 try:
     from dotenv import load_dotenv
     _DOTENV_LOADED = False
@@ -31,44 +33,48 @@ except ImportError:
         pass
 
 
-# ── 配置文件路径 ──────────────────────────────────────────────
+# ------------------------------------------------------------
+# 2. 配置文件路径
+# ------------------------------------------------------------
 _CONFIG_DIR = Path(__file__).parent
-_PROJECT_ROOT = _CONFIG_DIR.parent.parent  # FZQ-AI 项目根目录
+_PROJECT_ROOT = _CONFIG_DIR.parent.parent
 
 
+# ------------------------------------------------------------
+# 3. 加载 config.yaml / config.json
+# ------------------------------------------------------------
 def _load_config_yaml() -> Dict[str, Any]:
-    """加载 config.yaml / config.json，返回 dict。"""
     config: Dict[str, Any] = {}
 
-    # 尝试 config.yaml（实际是 JSON 格式）
     yaml_path = _CONFIG_DIR / "config.yaml"
     if yaml_path.exists():
         try:
             with open(yaml_path, "r", encoding="utf-8") as f:
                 config.update(json.load(f))
-        except (json.JSONDecodeError, OSError):
+        except Exception:
             pass
 
-    # 尝试 config.json（项目根目录）
     json_path = _PROJECT_ROOT / "config.json"
     if json_path.exists():
         try:
             with open(json_path, "r", encoding="utf-8") as f:
                 config.update(json.load(f))
-        except (json.JSONDecodeError, OSError):
+        except Exception:
             pass
 
     return config
 
 
+# ------------------------------------------------------------
+# 4. 检查缺失 API Keys
+# ------------------------------------------------------------
 def _check_missing_keys() -> list[str]:
-    """检查缺少的关键 API Key，返回缺失列表。"""
     missing: list[str] = []
     keys_to_check = {
-        "DEEPSEEK_API_KEY": "DeepSeek LLM API Key",
+        "DEEPSEEK_API_KEY": "DeepSeek API Key",
         "OPENAI_API_KEY": "OpenAI API Key",
-        "GEMINI_API_KEY": "Google Gemini API Key",
-        "NEWSAPI_KEY": "NewsAPI Key (新闻抓取)",
+        "GEMINI_API_KEY": "Gemini API Key",
+        "NEWSAPI_KEY": "NewsAPI Key",
     }
     for env_var, desc in keys_to_check.items():
         val = os.getenv(env_var, "")
@@ -77,44 +83,41 @@ def _check_missing_keys() -> list[str]:
     return missing
 
 
-# ── 初始化 ────────────────────────────────────────────────────
+# ------------------------------------------------------------
+# 5. 初始化（加载 .env）
+# ------------------------------------------------------------
 _ensure_dotenv()
 
 # API Keys
-DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_BASE_URL: str = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-DEEPSEEK_MODEL: str = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
-OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 
-NEWSAPI_KEY: str = os.getenv("NEWSAPI_KEY", "")
+NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
 
-# 日志级别
-LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-# 版本信息
-VERSION: str = "2.5.0"
-BUILD_TIME: str = "2026-06-15"
+VERSION = "2.5.0"
+BUILD_TIME = "2026-06-15"
 
 
+# ------------------------------------------------------------
+# 6. get_config()：统一配置入口
+# ------------------------------------------------------------
 def get_config() -> Dict[str, Any]:
-    """
-    获取完整配置（合并所有来源）。
-
-    Returns:
-        包含所有配置项的 dict
-    """
     config: Dict[str, Any] = _load_config_yaml()
 
-    # RSS 源配置
+    # RSS 默认源
     if "rss_sources" not in config:
         config["rss_sources"] = _get_default_rss_sources()
 
-    # API Keys（环境变量优先级最高）
+    # API Keys
     config["api_keys"] = {
         "deepseek": DEEPSEEK_API_KEY,
         "openai": OPENAI_API_KEY,
@@ -125,20 +128,21 @@ def get_config() -> Dict[str, Any]:
     config["version"] = VERSION
     config["log_level"] = LOG_LEVEL
 
-    # 检查缺失的 Key
+    # 缺失 Key 警告
     missing = _check_missing_keys()
     if missing:
         import logging
         logger = logging.getLogger(__name__)
         logger.warning(f"缺少以下 API Key: {', '.join(missing)}")
-        logger.warning("请在 .env 文件或环境变量中配置相应的 API Key")
         config["missing_keys"] = missing
 
     return config
 
 
+# ------------------------------------------------------------
+# 7. 默认 RSS 源
+# ------------------------------------------------------------
 def _get_default_rss_sources() -> list[Dict[str, Any]]:
-    """默认 RSS 源列表（如果配置文件未提供）。"""
     return [
         {
             "id": "bbc",
