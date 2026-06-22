@@ -1,11 +1,12 @@
 # fzq_ai/llm/router.py
-# FZQ‑AI v11 LLMRouter（带缓存）
+# FZQ‑AI v12 LLMRouter（Redis + 内存缓存）
 
 from typing import Any
 from fzq_ai.llm.providers import ProviderRegistry
 from fzq_ai.llm.task_registry import TaskRegistry
 from fzq_ai.llm.model_selector import model_selector
 from fzq_ai.llm.cache import llm_cache
+from fzq_ai.llm.cache_redis import redis_llm_cache
 from fzq_ai.schemas.llm import LLMRequestSchema, LLMResponseSchema
 
 
@@ -17,21 +18,27 @@ class LLMRouter:
 
     async def _route_llm_call(self, task_type: str, req: LLMRequestSchema) -> LLMResponseSchema:
 
-        # 1. 智能选择模型
         primary, fallback = model_selector.select(task_type, req.prompt)
 
-        # 2. 缓存检查
         cache_key = llm_cache.make_key(task_type, req.prompt, primary)
-        cached = llm_cache.get(cache_key)
-        if cached:
-            return LLMResponseSchema(content=cached)
+
+        # 1. Redis 缓存
+        redis_cached = redis_llm_cache.get(cache_key)
+        if redis_cached:
+            return LLMResponseSchema(content=redis_cached)
+
+        # 2. 内存缓存
+        mem_cached = llm_cache.get(cache_key)
+        if mem_cached:
+            return LLMResponseSchema(content=mem_cached)
 
         # 3. primary 调用
         try:
             provider = self.provider_registry.get_provider(primary)
             result = await provider.run(req)
 
-            # 写入缓存
+            # 写入 Redis + 内存缓存
+            redis_llm_cache.set(cache_key, result, primary)
             llm_cache.set(cache_key, result, primary)
 
             return LLMResponseSchema(content=result)
