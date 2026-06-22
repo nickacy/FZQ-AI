@@ -26,7 +26,7 @@ class SentimentPipeline(BasePipeline):
     def __init__(self):
         self.llm = LLMRouter()
 
-    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
             self.llm.route("sentiment_score", SENTIMENT_SCORE_TEMPLATE.render(query=query)),
             self.llm.route("sentiment_summary", SENTIMENT_SUMMARY_TEMPLATE.render(query=query)),

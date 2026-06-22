@@ -32,7 +32,7 @@ class RiskPipeline(BasePipeline):
     def __init__(self):
         self.llm = LLMRouter()
 
-    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
             self.llm.route("risk_summary", RISK_SUMMARY_TEMPLATE.render(query=query)),
             self.llm.route("risk_factors", RISK_FACTORS_TEMPLATE.render(query=query)),
