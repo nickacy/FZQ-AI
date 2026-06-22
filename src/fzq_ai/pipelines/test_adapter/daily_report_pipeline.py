@@ -1,5 +1,5 @@
 """
-FZQ-AI Pipelines — Test Adapter Daily Report Pipeline
+FZQ-AI Pipelines – Test Adapter Daily Report Pipeline
 Mock DailyReportPipeline. Returns fixed DailyReport in PipelineOutput. No real LLM calls.
 """
 from typing import List
@@ -27,7 +27,7 @@ class MockDailyReportPipeline:
     def __init__(self):
         self.pipeline_name = "mock_daily_report_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with DailyReport."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
