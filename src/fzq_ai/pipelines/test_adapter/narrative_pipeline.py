@@ -1,5 +1,5 @@
 """
-FZQ-AI Pipelines — Test Adapter Narrative Pipeline
+FZQ-AI Pipelines – Test Adapter Narrative Pipeline
 Mock NarrativePipeline. Same interface. Returns fixed NarrativeAnalysis. No real LLM calls.
 """
 from typing import List
@@ -24,7 +24,7 @@ class MockNarrativePipeline:
     def __init__(self):
         self.pipeline_name = "mock_narrative_pipeline"
 
-    async def run(self, pipeline_input: PipelineInput) -> PipelineOutput:
+    async def run_async(self, pipeline_input: PipelineInput) -> PipelineOutput:
         """Return fixed mock PipelineOutput with NarrativeAnalysis."""
         analyzed_items: List[MultiDimensionAnalysis] = []
 
