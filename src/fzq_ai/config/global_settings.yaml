@@ -1,0 +1,5 @@
+budget:
+  daily_cap_usd: 3          # 每日预算上限（美元）
+  weekly_cap_usd: 10        # 每周预算上限（美元）
+  alert_threshold: 0.8      # 达到 80% 时提醒
+  auto_downgrade: true      # 是否自动降级模型（OpenAI → Qwen/GLM/DeepSeek）
