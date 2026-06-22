@@ -1,3 +1,5 @@
+# fzq_ai/pipelines/scenario_pipeline.py
+
 import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
@@ -5,34 +7,34 @@ from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.domain.models import ServiceResult
 
 
-BASE_SCENARIO_TEMPLATE = PromptTemplate("""
-You are a scenario analysis expert. Define the most likely base case scenario
-for the following topic over the next 30–90 days, including key drivers and
-expected trajectory.
+BASE_CASE_TEMPLATE = PromptTemplate("""
+You are a scenario analysis expert. Provide the most likely base case scenario
+for the next 30–90 days, including:
+- Key drivers
+- Expected trajectory
+- Strategic implications
 
 Topic: $query
 """)
 
 ALTERNATIVE_SCENARIOS_TEMPLATE = PromptTemplate("""
-List 2–3 plausible alternative scenarios (e.g., upside / downside) for the
-following topic over the next 30–90 days. For each scenario, give:
-- A short name
-- A brief description
-- Rough probability (low/medium/high)
+List 2–3 plausible alternative scenarios (e.g., upside / downside) for the next 30–90 days.
+For each scenario, include:
+- Scenario name
+- Short description
+- Probability (low/medium/high)
 
 Topic: $query
 """)
 
 KEY_DRIVERS_TEMPLATE = PromptTemplate("""
-Identify 5 key drivers or triggers that would shift the scenario trajectory
-for the following topic (policy moves, market shocks, geopolitical events, etc.).
+Identify 5 key drivers or triggers that could shift the scenario trajectory.
 
 Topic: $query
 """)
 
-SCENARIO_IMPLICATIONS_TEMPLATE = PromptTemplate("""
-Summarize the main implications of the base case scenario for the next 30–90 days
-(e.g., risk, opportunity, operational impact).
+IMPLICATIONS_TEMPLATE = PromptTemplate("""
+Summarize the main implications of the base case scenario for the next 30–90 days.
 
 Topic: $query
 """)
@@ -44,14 +46,16 @@ class ScenarioPipeline(BasePipeline):
     def __init__(self):
         self.llm = LLMRouter()
 
-    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         tasks = [
-            self.llm.route("scenario_base", BASE_SCENARIO_TEMPLATE.render(query=query)),
+            self.llm.route("scenario_base_case", BASE_CASE_TEMPLATE.render(query=query)),
             self.llm.route("scenario_alternatives", ALTERNATIVE_SCENARIOS_TEMPLATE.render(query=query)),
             self.llm.route("scenario_drivers", KEY_DRIVERS_TEMPLATE.render(query=query)),
-            self.llm.route("scenario_implications", SCENARIO_IMPLICATIONS_TEMPLATE.render(query=query)),
+            self.llm.route("scenario_implications", IMPLICATIONS_TEMPLATE.render(query=query)),
         ]
+
         base_case, alternatives, drivers, implications = await asyncio.gather(*tasks)
+
         return ServiceResult.ok({
             "base_case": base_case,
             "alternatives": alternatives,

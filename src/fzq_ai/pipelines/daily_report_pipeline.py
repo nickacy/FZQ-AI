@@ -1,3 +1,5 @@
+# fzq_ai/pipelines/daily_report_pipeline.py
+
 import asyncio
 from datetime import datetime
 
@@ -52,7 +54,7 @@ class DailyReportPipeline(BasePipeline):
     def __init__(self):
         self.llm = LLMRouter()
 
-    async def _run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
+    async def run_async(self, *args, query: str = "", **kwargs) -> ServiceResult:
         # 并发生成各个报告段落
         tasks = [
             self.llm.route("daily_exec_overview", EXEC_OVERVIEW_TEMPLATE.render(query=query)),
@@ -60,6 +62,7 @@ class DailyReportPipeline(BasePipeline):
             self.llm.route("daily_risk_alerts", RISK_ALERTS_TEMPLATE.render(query=query)),
             self.llm.route("daily_outlook", OUTLOOK_TEMPLATE.render(query=query)),
         ]
+
         exec_overview, top_stories, risk_alerts, outlook = await asyncio.gather(*tasks)
 
         report = {
