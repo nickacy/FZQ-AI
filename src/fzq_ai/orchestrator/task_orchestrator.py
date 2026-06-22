@@ -10,7 +10,7 @@ class TaskOrchestrator:
     """
     Pipeline Orchestrator（增强版）
     - 支持并发执行多个 Pipeline
-    - 保留旧行为（同步 run()）
+    - 保留旧行为（同步 run()），但内部已升级为 async 包装器
     """
 
     def __init__(self):
@@ -19,21 +19,13 @@ class TaskOrchestrator:
         self.sentiment = SentimentPipeline()
 
     # ---------------------------------------------------------
-    # 同步入口（保持旧行为）
+    # 同步入口（保持旧行为，但内部使用 async）
     # ---------------------------------------------------------
     def run(self, query: str):
         """
-        旧行为：串行执行（不破坏旧逻辑）
+        旧行为：同步调用，但内部已升级为 async 包装器
         """
-        news = self.news.run(query)
-        risk = self.risk.run(query)
-        sentiment = self.sentiment.run(query)
-
-        return {
-            "news": news,
-            "risk": risk,
-            "sentiment": sentiment,
-        }
+        return asyncio.run(self.run_async(query))
 
     # ---------------------------------------------------------
     # 新增：异步并发执行（性能提升 3–10 倍）
@@ -44,9 +36,9 @@ class TaskOrchestrator:
         """
 
         tasks = [
-            self.news.run_async(query),
-            self.risk.run_async(query),
-            self.sentiment.run_async(query),
+            self.news.run_async(query=query),
+            self.risk.run_async(query=query),
+            self.sentiment.run_async(query=query),
         ]
 
         news, risk, sentiment = await asyncio.gather(*tasks)
