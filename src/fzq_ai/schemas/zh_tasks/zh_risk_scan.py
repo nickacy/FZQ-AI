@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 
 
@@ -10,7 +10,7 @@ class ZhRiskEvidenceItem(BaseModel):
     span: str = Field(..., max_length=60, description="原文片段，必须为直接引用")
     source: str = Field(..., description="来源渠道，如 news / social / report")
 
-    @validator("item_id", "span", "source")
+    @field_validator("item_id", "span", "source")
     def must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("证据链字段不能为空")

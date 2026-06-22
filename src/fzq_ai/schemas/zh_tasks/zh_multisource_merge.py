@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 
 
@@ -37,7 +37,8 @@ class ZhMultiSourcePerspectiveDiff(BaseModel):
         "措辞强度",
         "被引主体",
         "时间线侧重",
-        "数据口径"
+        "数据口径",
+        "其他"
     ] = Field(..., description="差异维度")
 
     source_a: str = Field(..., description="信源 A 标识")
@@ -50,7 +51,7 @@ class ZhMultiSourcePerspectiveDiff(BaseModel):
         description="支撑该差异的原文片段"
     )
 
-    @validator("source_a", "source_b", "diff", "evidence_span")
+    @field_validator("source_a", "source_b", "diff", "evidence_span")
     def must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("多源差异字段不能为空")
@@ -74,7 +75,7 @@ class ZhMultiSourceReliability(BaseModel):
         description="可能的偏向性提示（如立场、利益相关）"
     )
 
-    @validator("source", "reason")
+    @field_validator("source", "reason")
     def must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("信源可靠性字段不能为空")
@@ -89,7 +90,7 @@ class ZhMultiSourceEvidenceItem(BaseModel):
     span: str = Field(..., max_length=80, description="原文片段")
     source: str = Field(..., description="信源名称或标识")
 
-    @validator("item_id", "span", "source")
+    @field_validator("item_id", "span", "source")
     def evidence_not_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("证据映射字段不能为空")

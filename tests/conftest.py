@@ -1,5 +1,9 @@
-import sys
-import os
+# tests/conftest.py — pytest 路径配置
+# 确保 pytest 可以正确导入 src/fzq_ai 包
 
-# Add src/ to the path so fzq_ai package is importable
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+import sys
+from pathlib import Path
+
+src_dir = Path(__file__).resolve().parents[1] / "src"
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 
 
@@ -9,7 +9,7 @@ class ZhOpinionQuote(BaseModel):
     item_id: str = Field(..., description="引用来源的唯一标识")
     span: str = Field(..., max_length=80, description="原文片段，必须为直接引用")
 
-    @validator("item_id", "span")
+    @field_validator("item_id", "span")
     def must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("引用字段不能为空")
@@ -23,7 +23,7 @@ class ZhOpinionCluster(BaseModel):
     cluster_id: str = Field(..., description="阵营编号")
     label: str = Field(..., description="阵营标签")
 
-    stance: Literal["支持", "反对", "中性", "分裂"] = Field(
+    stance: Literal["支持", "反对", "中性", "复杂"] = Field(
         ..., description="阵营立场"
     )
     sentiment: Literal["正面", "负面", "中性", "混合"] = Field(
@@ -51,7 +51,7 @@ class ZhOpinionFrame(BaseModel):
     description: str = Field(..., description="框架描述")
     evidence_span: str = Field(..., max_length=80, description="原文片段")
 
-    @validator("frame", "description", "evidence_span")
+    @field_validator("frame", "description", "evidence_span")
     def must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("框架字段不能为空")
@@ -64,7 +64,7 @@ class ZhOpinionFrame(BaseModel):
 class ZhOpinionInfluencer(BaseModel):
     name: str = Field(..., description="主体名称")
     influence_score: float = Field(..., ge=0.0, le=1.0)
-    stance: Literal["支持", "反对", "中性", "分裂"]
+    stance: Literal["支持", "反对", "中性", "复杂"]
     representative_quotes: List[ZhOpinionQuote] = Field(default_factory=list)
 
 
@@ -88,7 +88,7 @@ class ZhOpinionLandscapeOutput(BaseModel):
     # 舆论阵营（聚类结果）
     clusters: List[ZhOpinionCluster] = Field(default_factory=list)
 
-    # 立场分布（支持/反对/中性/分裂）
+    # 立场分布（支持/反对/中性/复杂）
     stance_map: List[str] = Field(default_factory=list)
 
     # 情绪分布（正面/负面/中性/混合）
@@ -107,10 +107,10 @@ class ZhOpinionLandscapeOutput(BaseModel):
     representative_quotes: List[ZhOpinionQuote] = Field(default_factory=list)
 
     # 全局立场
-    overall_stance: Optional[Literal["支持", "反对", "中性", "分裂"]] = None
+    overall_stance: Optional[Literal["支持", "反对", "中性", "复杂"]] = None
 
     # 全局情绪
-    overall_sentiment: Optional[Literal["正面", "负面", "中性", "分化"]] = None
+    overall_sentiment: Optional[Literal["正面", "负面", "中性", "混合"]] = None
 
     # 全局置信度
     confidence: Optional[float] = Field(

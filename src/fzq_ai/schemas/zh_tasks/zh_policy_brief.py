@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Literal
 
 
@@ -10,7 +10,7 @@ class ZhPolicyBriefKeyPoint(BaseModel):
     category: Literal["目标", "执行", "适用对象", "配套措施", "约束", "其他"]
     evidence_span: str = Field(..., max_length=30)
 
-    @validator("evidence_span")
+    @field_validator("evidence_span")
     def evidence_must_not_be_empty(cls, v):
         if not v or v.strip() == "":
             raise ValueError("evidence_span 不能为空，必须为原文片段")
