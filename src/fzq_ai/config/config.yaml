@@ -40,3 +40,16 @@ task_overrides:
   # 长文本任务 → Kimi
   daily_exec_overview:
     primary: kimi
+
+  refinement:
+    enabled: true
+    tasks:
+      - risk_summary
+      - risk_forecast
+      - scenario_base_case
+      - scenario_alternatives
+      - scenario_implications
+      - daily_exec_overview
+      - daily_outlook
+      - zh_policy_brief
+      - zh_opinion_landscape
