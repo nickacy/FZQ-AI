@@ -1,21 +1,24 @@
 # fzq_ai/orchestrator/task_orchestrator.py
-# FZQ‑AI v12 TaskOrchestrator（升级版：集成 LLMRouter + TokenMonitor）
+# FZQ‑AI v13 Orchestrator（支持 DAG + Metrics + 并发）
 
 import asyncio
+import time
+import uuid
+from typing import Dict, Any
+
+from fzq_ai.monitor.metrics import metrics
 from fzq_ai.pipelines.news_pipeline import NewsPipeline
 from fzq_ai.pipelines.risk_pipeline import RiskPipeline
 from fzq_ai.pipelines.sentiment_pipeline import SentimentPipeline
 
-# ★ 新增：引入 LLMRouter（触发 token_monitor）
-from fzq_ai.llm.router import LLMRouter
-
 
 class TaskOrchestrator:
     """
-    Pipeline Orchestrator（增强版）
-    - 支持并发执行多个 Pipeline
-    - 集成 LLMRouter（触发 token_monitor）
-    - 保留旧行为（同步 run()）
+    v13 Orchestrator
+    - 统一 run_with_metrics(payload)
+    - 支持任务依赖图（Task Graph）
+    - 支持并发执行
+    - 自动记录 orchestrator-level metrics
     """
 
     def __init__(self):
@@ -23,44 +26,60 @@ class TaskOrchestrator:
         self.risk = RiskPipeline()
         self.sentiment = SentimentPipeline()
 
-        # ★ 新增：Router 实例
-        self.router = LLMRouter()
-
     # ---------------------------------------------------------
-    # 同步入口（保持旧行为）
+    # v13：统一入口（payload-based）
     # ---------------------------------------------------------
-    def run(self, query: str):
-        return asyncio.run(self.run_async(query))
+    async def run(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        trace_id = str(uuid.uuid4())
+        start = time.time()
 
-    # ---------------------------------------------------------
-    # 异步并发执行（新增 Router 调用）
-    # ---------------------------------------------------------
-    async def run_async(self, query: str):
-        """
-        新行为：并发执行多个 Pipeline + LLMRouter
-        """
+        # -----------------------------------------------------
+        # Task Graph（v13 简化版 DAG）
+        # news → risk → sentiment
+        # -----------------------------------------------------
+        news_task = asyncio.create_task(
+            self.news.run_with_metrics({"query": payload["query"], "trace_id": trace_id})
+        )
 
-        tasks = [
-            self.news.run_async(query=query),
-            self.risk.run_async(query=query),
-            self.sentiment.run_async(query=query),
+        # risk 依赖 news
+        risk_task = asyncio.create_task(self._run_after(news_task, self.risk, payload, trace_id))
 
-            # ★ 新增：触发 LLMRouter（会触发 token_monitor）
-            self.router.route(task_type="risk_summary", prompt=query),
-        ]
+        # sentiment 依赖 risk
+        sentiment_task = asyncio.create_task(self._run_after(risk_task, self.sentiment, payload, trace_id))
 
-        news, risk, sentiment, llm_output = await asyncio.gather(*tasks)
+        # 等待所有任务完成
+        news_result, risk_result, sentiment_result = await asyncio.gather(
+            news_task, risk_task, sentiment_task
+        )
+
+        # -----------------------------------------------------
+        # Orchestrator-level metrics
+        # -----------------------------------------------------
+        metrics.record(
+            name="orchestrator_total",
+            duration=time.time() - start,
+            extra={"trace_id": trace_id}
+        )
 
         return {
-            "news": news,
-            "risk": risk,
-            "sentiment": sentiment,
-            "llm_output": llm_output,  # ★ 新增：LLM 输出
+            "trace_id": trace_id,
+            "news": news_result,
+            "risk": risk_result,
+            "sentiment": sentiment_result,
         }
 
+    # ---------------------------------------------------------
+    # Helper：等待前置任务完成后再执行 pipeline
+    # ---------------------------------------------------------
+    async def _run_after(self, dependency_task, pipeline, payload, trace_id):
+        await dependency_task
+        return await pipeline.run_with_metrics({"query": payload["query"], "trace_id": trace_id})
 
+
+# ---------------------------------------------------------
 # CLI 入口（可选）
+# ---------------------------------------------------------
 if __name__ == "__main__":
     orch = TaskOrchestrator()
-    result = orch.run("测试")
+    result = asyncio.run(orch.run({"query": "测试"}))
     print(result)
