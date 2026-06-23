@@ -1,8 +1,20 @@
 # fzq_ai/config/global_settings.py
-# v13 Global Settings Loader
+# v13 Global Settings Loader (supports nested attribute access)
 
 import yaml
 from pathlib import Path
+
+
+class AttrDict(dict):
+    """Allow dict.key access as attribute."""
+    def __getattr__(self, item):
+        value = self.get(item)
+        if isinstance(value, dict):
+            return AttrDict(value)
+        return value
+
+    def __setattr__(self, key, value):
+        self[key] = value
 
 
 class Settings:
@@ -15,9 +27,12 @@ class Settings:
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
-        # 直接把 YAML 的 key 映射成属性
+        # Convert nested dicts to AttrDict
         for k, v in data.items():
-            setattr(self, k, v)
+            if isinstance(v, dict):
+                setattr(self, k, AttrDict(v))
+            else:
+                setattr(self, k, v)
 
 
 # 单例

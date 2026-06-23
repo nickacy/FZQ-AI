@@ -6,7 +6,7 @@ from typing import List
 
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.pipelines.news_fetcher import fetch_all_news
-from fzq_ai.pipelines.base_pipeline import BasePipeline
+from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.domain.models import ServiceResult, Article
 
 
