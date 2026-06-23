@@ -1,4 +1,7 @@
 # fzq_ai/pipelines/daily_report_pipeline.py
+# v13 DailyReportPipeline – 保留原业务逻辑 + 轻量对齐 v13
+
+from __future__ import annotations
 
 import asyncio
 from datetime import datetime
@@ -50,6 +53,8 @@ Topic: $query
 
 class DailyReportPipeline(BasePipeline):
     """Daily intelligence report pipeline built from multiple LLM sections."""
+
+    name = "daily_report"
 
     def __init__(self):
         self.llm = LLMRouter()

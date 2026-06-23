@@ -1,6 +1,10 @@
 # fzq_ai/pipelines/narrative_pipeline.py
+# v13 NarrativePipeline – 保留原业务逻辑 + 轻量对齐 v13
+
+from __future__ import annotations
 
 import asyncio
+
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
 from fzq_ai.pipelines.base import BasePipeline
@@ -35,6 +39,8 @@ Topic: $query
 class NarrativePipeline(BasePipeline):
     """Narrative analysis with concurrent sub-tasks."""
 
+    name = "narrative"
+
     def __init__(self):
         self.llm = LLMRouter()
 
@@ -45,7 +51,9 @@ class NarrativePipeline(BasePipeline):
             self.llm.route("narrative_storyline", STORYLINE_TEMPLATE.render(query=query)),
             self.llm.route("narrative_implications", IMPLICATIONS_TEMPLATE.render(query=query)),
         ]
+
         summary, key_points, storyline, implications = await asyncio.gather(*tasks)
+
         return ServiceResult.ok({
             "summary": summary,
             "key_points": key_points,

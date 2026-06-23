@@ -1,6 +1,10 @@
 # fzq_ai/pipelines/scenario_pipeline.py
+# v13 ScenarioPipeline – 保留原业务逻辑 + 轻量对齐 v13
+
+from __future__ import annotations
 
 import asyncio
+
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
 from fzq_ai.pipelines.base import BasePipeline
@@ -42,6 +46,8 @@ Topic: $query
 
 class ScenarioPipeline(BasePipeline):
     """Scenario analysis with concurrent sub-tasks."""
+
+    name = "scenario"
 
     def __init__(self):
         self.llm = LLMRouter()

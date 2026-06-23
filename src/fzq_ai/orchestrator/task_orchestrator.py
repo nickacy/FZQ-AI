@@ -1,82 +1,55 @@
 # src/fzq_ai/orchestrator/task_orchestrator.py
-# v13 Orchestrator – unified trace_id, metrics, pipeline execution
+# v13 Task Orchestrator – 统一调度入口
 
 from __future__ import annotations
 
-import uuid
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-from fzq_ai.monitor.metrics import metrics
-from fzq_ai.pipelines.news_pipeline import NewsPipeline
-from fzq_ai.pipelines.risk_pipeline import RiskPipeline
-from fzq_ai.pipelines.sentiment_pipeline import SentimentPipeline
+from fzq_ai.metrics.metrics import metrics
+from fzq_ai.monitor.token_monitor import token_monitor
+from fzq_ai.llm.router import Router
+from fzq_ai.pipelines.base import BasePipeline
 
 
 class TaskOrchestrator:
     """
-    v13 Orchestrator
-
-    - 为每个任务生成 trace_id
-    - 顺序执行多个 pipelines
-    - 调用 pipeline.run_with_metrics()
-    - 记录 orchestrator 级 metrics
+    v13 任务调度器
+    - 统一 trace_id
+    - 统一 pipeline 调度
+    - 统一 provider 调用
+    - 统一 metrics + token_monitor
     """
 
     def __init__(self):
-        self.news = NewsPipeline()
-        self.risk = RiskPipeline()
-        self.sentiment = SentimentPipeline()
+        self.router = Router()
 
-    async def run(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        payload 示例：
-        {
-            "query": "测试",
-            "user_id": "...",
-        }
-        """
-        trace_id = str(uuid.uuid4())
+    async def run(self, pipeline: BasePipeline, req: Dict[str, Any]) -> Dict[str, Any]:
+        trace_id = req.get("trace_id") or self._gen_trace_id()
+        req["trace_id"] = trace_id
+
         start = time.time()
 
-        context = {
-            "query": payload.get("query"),
-            "trace_id": trace_id,
-            "user_id": payload.get("user_id"),
-        }
+        # ---- Pipeline 前置处理 ----
+        preprocessed = await pipeline.preprocess(req)
 
-        results = {}
+        # ---- Router 调用 Provider ----
+        result = await self.router.run(preprocessed)
 
-        # ---------------- Pipeline 1: News ----------------
-        news_result = await self.news.run_with_metrics(context=context, trace_id=trace_id)
-        results["news"] = news_result
+        # ---- Pipeline 后置处理 ----
+        final_output = await pipeline.postprocess(result)
 
-        # ---------------- Pipeline 2: Risk ----------------
-        risk_result = await self.risk.run_with_metrics(context=context, trace_id=trace_id)
-        results["risk"] = risk_result
-
-        # ---------------- Pipeline 3: Sentiment ----------------
-        sentiment_result = await self.sentiment.run_with_metrics(context=context, trace_id=trace_id)
-        results["sentiment"] = sentiment_result
-
-        # ---------------- Orchestrator metrics ----------------
         duration_ms = (time.time() - start) * 1000
-        metrics.record(
-            name="orchestrator",
+
+        # ---- Orchestrator 级别 metrics ----
+        metrics.record_orchestrator_call(
+            pipeline=pipeline.name,
             duration_ms=duration_ms,
-            extra={
-                "trace_id": trace_id,
-                "pipelines": ["news", "risk", "sentiment"],
-            },
+            success=("error" not in final_output),
+            trace_id=trace_id,
         )
 
-        return {
-            "trace_id": trace_id,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "results": results,
-        }
+        return final_output
 
-
-# 单例
-orchestrator = TaskOrchestrator()
+    def _gen_trace_id(self) -> str:
+        return f"trace-{int(time.time() * 1000)}"

@@ -1,6 +1,10 @@
 # fzq_ai/pipelines/sentiment_pipeline.py
+# v13 SentimentPipeline – 保留原业务逻辑 + 轻量对齐 v13
+
+from __future__ import annotations
 
 import asyncio
+
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
 from fzq_ai.pipelines.base import BasePipeline
@@ -22,6 +26,8 @@ Topic: $query
 
 class SentimentPipeline(BasePipeline):
     """Sentiment analysis with concurrent sub-tasks."""
+
+    name = "sentiment"
 
     def __init__(self):
         self.llm = LLMRouter()
