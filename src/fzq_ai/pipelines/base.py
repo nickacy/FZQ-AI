@@ -1,53 +1,100 @@
 ﻿# src/fzq_ai/pipelines/base.py
-# v13 BasePipeline 鈥?鎵€鏈?Pipeline 鐨勭粺涓€鍩虹被
+# FZQ‑AI v13 BasePipeline — unified pipeline base class
 
 from __future__ import annotations
-from typing import Any, Dict
+import uuid
+import time
+from typing import Any, Dict, List
 
 
 class BasePipeline:
     """
-    v13 Pipeline 缁熶竴鎺ュ彛
-    - preprocess锛氳姹傞澶勭悊
-    - postprocess锛氱粨鏋滃悗澶勭悊
-    - name锛歱ipeline 鍚嶇О锛堢敤浜?metrics锛?
+    FZQ‑AI v13 unified pipeline interface.
+
+    Lifecycle:
+        1. validate_inputs()   → validate incoming kwargs
+        2. preprocess()        → build request payload / prompt
+        3. call_llm()          → invoke LLM (subclass override)
+        4. postprocess()       → clean & structure output
+        5. finalize()          → logging / cleanup
+
+    All pipelines (English + Chinese) inherit from this class.
     """
 
-    name: str = "base"
+    name: str = "base_pipeline"
 
+    # ----------------------------------------------------------------------
+    # Input validation
+    # ----------------------------------------------------------------------
+    def validate_inputs(self, kwargs: Dict[str, Any]) -> List[str]:
+        """
+        Validate input parameters.
+        Subclasses may override.
+        Return a list of error messages.
+        """
+        return []
+
+    # ----------------------------------------------------------------------
+    # Preprocess
+    # ----------------------------------------------------------------------
     async def preprocess(self, req: Dict[str, Any]) -> Dict[str, Any]:
         """
-        瀛愮被鍙噸鍐欙細
-        - 娣诲姞 task_type
-        - 娣诲姞 prompt 妯℃澘
-        - 娣诲姞涓婁笅鏂?
+        Subclasses may override.
+        Typical tasks:
+            - add task_type
+            - build prompt template
+            - enrich context
         """
         return req
 
+    # ----------------------------------------------------------------------
+    # LLM call (must be overridden)
+    # ----------------------------------------------------------------------
+    async def call_llm(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Subclasses MUST override or inject a router.
+        """
+        raise NotImplementedError(
+            f"{self.name}: call_llm() must be implemented by subclass"
+        )
+
+    # ----------------------------------------------------------------------
+    # Postprocess
+    # ----------------------------------------------------------------------
     async def postprocess(self, result: Dict[str, Any]) -> Dict[str, Any]:
         """
-        瀛愮被鍙噸鍐欙細
-        - 娓呮礂杈撳嚭
-        - 缁撴瀯鍖栫粨鏋?
-        - 閿欒澶勭悊
+        Subclasses may override.
+        Typical tasks:
+            - clean output
+            - convert to structured schema
+            - error normalization
         """
         return result
 
+    # ----------------------------------------------------------------------
+    # Finalize
+    # ----------------------------------------------------------------------
+    async def finalize(self, output: Dict[str, Any]) -> None:
+        """
+        Cleanup hook.
+        Subclasses may override.
+        """
+        pass
 
-    # 鈹€鈹€ v13 core methods 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-
+    # ----------------------------------------------------------------------
+    # Core execution (async)
+    # ----------------------------------------------------------------------
     async def run(self, **kwargs: Any) -> Dict[str, Any]:
         """
         Main pipeline execution flow.
 
-        Lifecycle:
-            1. validate_inputs()   鈫?input validation
-            2. preprocess(req)     鈫?build prompt & context
-            3. llm_call(prompt)    鈫?invoke LLM (subclass override)
-            4. postprocess(result) 鈫?clean & structure output
-            5. finalize(output)    鈫?cleanup / logging
+        Steps:
+            1. validate_inputs()
+            2. preprocess()
+            3. call_llm()
+            4. postprocess()
+            5. finalize()
         """
-        import time
         from fzq_ai.utils.logger import get_logger
 
         logger = get_logger(__name__)
@@ -69,7 +116,7 @@ class BasePipeline:
             # 2. Preprocess
             req = await self.preprocess(dict(kwargs))
 
-            # 3. LLM call (subclass provides)
+            # 3. LLM call
             result = await self.call_llm(req)
 
             # 4. Postprocess
@@ -78,34 +125,46 @@ class BasePipeline:
             # 5. Finalize
             await self.finalize(output)
 
+            # Metadata
             output["trace_id"] = trace_id
             output["duration_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
             output.setdefault("status", "success")
 
-            logger.info("pipeline_done", name=self.name, trace_id=trace_id,
-                        duration_ms=output["duration_ms"])
+            logger.info(
+                "pipeline_done",
+                name=self.name,
+                trace_id=trace_id,
+                duration_ms=output["duration_ms"],
+            )
+
             return output
 
         except Exception as e:
-            logger.error("pipeline_failed", name=self.name, trace_id=trace_id, error=str(e))
+            logger.error(
+                "pipeline_failed",
+                name=self.name,
+                trace_id=trace_id,
+                error=str(e),
+            )
             return {
                 "status": "error",
                 "errors": [str(e)],
                 "trace_id": trace_id,
             }
 
+    # ----------------------------------------------------------------------
+    # Metrics wrapper
+    # ----------------------------------------------------------------------
     async def run_with_metrics(self, **kwargs: Any) -> Dict[str, Any]:
         """
-        Run the pipeline and collect performance metrics.
+        Wrap run() and collect performance metrics.
 
-        Wraps run() to capture:
-          - token usage (prompt_tokens, completion_tokens)
-          - timing (preprocess_ms, llm_ms, postprocess_ms, total_ms)
-          - status & trace_id
-
-        Metrics are logged and optionally written to JSONL.
+        Captures:
+            - total_duration_ms
+            - token usage (if provided by subclass)
+            - status
+            - trace_id
         """
-        import time
         from fzq_ai.utils.logger import get_logger
 
         logger = get_logger(__name__)
@@ -133,28 +192,11 @@ class BasePipeline:
         # Log metrics
         logger.info("pipeline_metrics", **metrics)
 
-        # Optionally write to JSONL
+        # Optional JSONL writer
         try:
             from fzq_ai.metrics.metrics_writer import write_metrics_jsonl
             write_metrics_jsonl(metrics)
-        except (ImportError, Exception):
-            pass  # metrics writer not available 鈥?skip
+        except Exception:
+            pass
 
         return output
-
-    # 鈹€鈹€ Override hooks 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-
-    def validate_inputs(self, kwargs: Dict[str, Any]) -> list:
-        """Validate input parameters. Return list of error strings."""
-        return []
-
-    async def call_llm(self, req: Dict[str, Any]) -> Dict[str, Any]:
-        """LLM call hook 鈥?subclasses must override or inject a router."""
-        raise NotImplementedError(
-            f"{self.name}: call_llm() must be overridden or a router injected"
-        )
-
-    async def finalize(self, output: Dict[str, Any]) -> None:
-        """Cleanup hook. Called after postprocess."""
-        pass
-
