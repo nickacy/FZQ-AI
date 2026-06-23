@@ -6,7 +6,7 @@ from __future__ import annotations
 import time
 from typing import Any, Dict
 
-from fzq_ai.monitor.metrics import metrics
+from fzq_ai.metrics.metrics import metrics
 from fzq_ai.monitor.token_monitor import token_monitor
 
 
