@@ -14,7 +14,7 @@ import asyncio
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 # --- 修复路径：确保 fzq_ai 可被正确 import ---
@@ -107,7 +107,7 @@ def main():
 
     # --- 保存文件 ---
     if args.save:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         path = args.save.replace("{timestamp}", timestamp)
         saved_path = save_report(data, path)
         print(f"\n💾 日报已保存到：{saved_path}")

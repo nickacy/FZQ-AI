@@ -4,7 +4,7 @@ fzq_ai/ui/components/timeline.py — v2.6 Professional Timeline
 
 from __future__ import annotations
 from typing import Any, List
-from datetime import datetime
+from datetime import datetime, timezone
 import streamlit as st
 from fzq_ai.ui.theme import COLORS, region_tag, section_header
 
@@ -33,7 +33,7 @@ def render_timeline(articles: List[Any]) -> None:
                 t = datetime.fromisoformat(t)
             except Exception:
                 t = None
-        sorted_articles.append((t or datetime.now(), a))
+        sorted_articles.append((t or datetime.now(timezone.utc), a))
 
     sorted_articles.sort(key=lambda x: x[0], reverse=True)
 

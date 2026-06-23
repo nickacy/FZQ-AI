@@ -2,11 +2,13 @@
 FZQ‑AI v10 全局配置中心（终极版）
 
 职责：
-1. 加载 .env（敏感信息）
-2. 加载 config.yaml / config.json（声明性配置）
-3. 提供 API Keys / RSS / 日志级别 / 版本号
-4. 提供统一 get_config() 接口
-5. 与新版 settings.py（模型优先级 + 任务覆盖）并存，不冲突
+1. 加载 config.yaml / config.json（声明性配置）
+2. 提供 API Keys / RSS / 日志级别 / 版本号
+3. 提供统一 get_config() 接口
+4. 与新版 # settings.py  # [v13: reference removed]（模型优先级 + 任务覆盖）并存，不冲突
+
+注意：.env 加载已统一移至应用入口（main.py / app.py），
+      本模块不再调用 load_dotenv()，避免重复加载和不可预测的覆盖。
 """
 
 from __future__ import annotations
@@ -14,34 +16,19 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
+import yaml
 
 # ------------------------------------------------------------
-# 1. 加载 .env（敏感信息）
-# ------------------------------------------------------------
-try:
-    from dotenv import load_dotenv
-    _DOTENV_LOADED = False
-
-    def _ensure_dotenv() -> None:
-        global _DOTENV_LOADED
-        if not _DOTENV_LOADED:
-            load_dotenv(override=True)
-            _DOTENV_LOADED = True
-except ImportError:
-    def _ensure_dotenv() -> None:
-        pass
-
-
-# ------------------------------------------------------------
-# 2. 配置文件路径
+# 1. 配置文件路径
 # ------------------------------------------------------------
 _CONFIG_DIR = Path(__file__).parent
 _PROJECT_ROOT = _CONFIG_DIR.parent.parent
 
 
 # ------------------------------------------------------------
-# 3. 加载 config.yaml / config.json
+# 2. 加载 config.yaml / config.json
 # ------------------------------------------------------------
 def _load_config_yaml() -> Dict[str, Any]:
     config: Dict[str, Any] = {}
@@ -50,7 +37,7 @@ def _load_config_yaml() -> Dict[str, Any]:
     if yaml_path.exists():
         try:
             with open(yaml_path, "r", encoding="utf-8") as f:
-                config.update(json.load(f))
+                config.update(yaml.safe_load(f))
         except Exception:
             pass
 
@@ -66,7 +53,7 @@ def _load_config_yaml() -> Dict[str, Any]:
 
 
 # ------------------------------------------------------------
-# 4. 检查缺失 API Keys
+# 3. 检查缺失 API Keys
 # ------------------------------------------------------------
 def _check_missing_keys() -> list[str]:
     missing: list[str] = []
@@ -84,11 +71,8 @@ def _check_missing_keys() -> list[str]:
 
 
 # ------------------------------------------------------------
-# 5. 初始化（加载 .env）
+# 4. API Keys（从已加载的环境变量读取）
 # ------------------------------------------------------------
-_ensure_dotenv()
-
-# API Keys
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
@@ -108,7 +92,7 @@ BUILD_TIME = "2026-06-15"
 
 
 # ------------------------------------------------------------
-# 6. get_config()：统一配置入口
+# 5. get_config()：统一配置入口
 # ------------------------------------------------------------
 def get_config() -> Dict[str, Any]:
     config: Dict[str, Any] = _load_config_yaml()
@@ -132,6 +116,7 @@ def get_config() -> Dict[str, Any]:
     missing = _check_missing_keys()
     if missing:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"缺少以下 API Key: {', '.join(missing)}")
         config["missing_keys"] = missing
@@ -140,7 +125,7 @@ def get_config() -> Dict[str, Any]:
 
 
 # ------------------------------------------------------------
-# 7. 默认 RSS 源
+# 6. 默认 RSS 源
 # ------------------------------------------------------------
 def _get_default_rss_sources() -> list[Dict[str, Any]]:
     return [

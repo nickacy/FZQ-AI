@@ -13,7 +13,7 @@ from urllib.parse import quote
 import aiohttp
 import xml.etree.ElementTree as ET
 
-from fzq_ai.schemas.real import (
+from fzq_ai.schemas import (
     LanguageCode, NewsSource, RawNewsItem, RegionCode,
     ModelProvider, LLMRequest, LLMResponse,
 )

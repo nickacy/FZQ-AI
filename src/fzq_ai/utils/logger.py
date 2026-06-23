@@ -15,7 +15,7 @@ import logging
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
@@ -59,7 +59,7 @@ def setup_logging(
         log_dir = str(project_root / "logs")
     os.makedirs(log_dir, exist_ok=True)
 
-    today: str = datetime.now().strftime("%Y%m%d")
+    today: str = datetime.now(timezone.utc).strftime("%Y%m%d")
     log_file: str = os.path.join(log_dir, f"fzq_ai_{today}.log")
 
     file_handler: logging.FileHandler = logging.FileHandler(

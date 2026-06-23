@@ -3,7 +3,7 @@ FZQ-AI Utils — 翻译客户端（真实版）
 支持多语言翻译，可接入 DeepL、Google Translate、Azure Translator 等
 """
 from typing import Optional
-from fzq_ai.schemas.real import LanguageCode
+from fzq_ai.schemas import LanguageCode
 
 
 class TranslationClient:

@@ -1,8 +1,13 @@
-import os
-from dotenv import load_dotenv
+"""
+Legacy config module — 统一入口已迁移至 fzq_ai.config (config/__init__.py)
 
-load_dotenv()
+本文件保留向后兼容，避免旧代码 `from fzq_ai.config import ...` 失败。
+.env 加载已统一移至应用入口（main.py / app.py），避免重复加载。
+"""
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
-DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
+from fzq_ai.config import (  # noqa: F401
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_BASE_URL,
+    DEEPSEEK_MODEL,
+    get_config,
+)

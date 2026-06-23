@@ -1,4 +1,4 @@
-from .schemas.real import (
+from .schemas import (
     LanguageCode,
     RegionCode,
     NewsSource,

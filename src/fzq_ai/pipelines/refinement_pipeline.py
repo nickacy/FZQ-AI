@@ -3,7 +3,8 @@
 
 import asyncio
 from typing import Dict, List
-from fzq_ai.llm.router import LLMRouter
+
+from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.llm.cache_redis import redis_llm_cache
 from fzq_ai.llm.cache import llm_cache
 
@@ -43,7 +44,11 @@ class MultiModelRefinementPipeline:
             "prompt": prompt,
             "provider": model,
         }
-        return await provider.run(req)
+        result = await provider.run(req)
+        # v13 Provider 返回 dict，这里取 output 作为文本内容
+        if isinstance(result, dict):
+            return result.get("output", "")
+        return str(result)
 
     # ------------------------------------------------------------
     # 多模型并行生成候选版本
@@ -55,7 +60,7 @@ class MultiModelRefinementPipeline:
         ]
         results_raw = await asyncio.gather(*tasks, return_exceptions=True)
 
-        results = {}
+        results: Dict[str, str] = {}
         for model_name, content in zip(self.models, results_raw):
             if isinstance(content, Exception):
                 results[model_name] = f"[ERROR from {model_name}] {content}"
@@ -82,7 +87,7 @@ class MultiModelRefinementPipeline:
     # 计算模型评分 + 权重 + 综合得分
     # ------------------------------------------------------------
     def _compute_model_scores(self, candidates: Dict[str, str]) -> Dict[str, Dict[str, float]]:
-        result = {}
+        result: Dict[str, Dict[str, float]] = {}
         for model, content in candidates.items():
             base_score = self._score_candidate(model, content)
             weight = self.model_weights.get(model, 1.0)

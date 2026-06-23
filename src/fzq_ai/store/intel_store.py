@@ -1,7 +1,7 @@
 # fzq_ai/store/intel_store.py — v2.7 Data Layer
 from __future__ import annotations
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import json, logging, sqlite3
@@ -55,7 +55,7 @@ class IntelStore:
         provider_snapshot: Dict[str, Any],
         created_at: Optional[datetime] = None,
     ) -> None:
-        created_at = created_at or datetime.utcnow()
+        created_at = created_at or datetime.now(timezone.utc)
         try:
             bj = json.dumps(asdict(bundle), ensure_ascii=False, default=str)
             ps = json.dumps(provider_snapshot, ensure_ascii=False)

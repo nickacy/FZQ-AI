@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import List, Dict
 from textwrap import dedent
+import warnings
 
 from fzq_ai.intel.models import Article, Narrative
 from fzq_ai.llm.llm_router import LLMRouter
@@ -42,10 +43,18 @@ class NarrativeEngine:
             missing_perspectives=parsed["missing"],
         )
 
-    # 兼容旧同步接口（news_intel_service 目前是同步风格）
+    # 兼容旧同步接口（已废弃，将在 v5.0 移除）
     def generate(self, articles: List[Article], event_id: str) -> Narrative:
+        """
+        ⚠️ 已废弃：请直接使用 `await generate_async()` 异步版本。
+        在已运行的事件循环中调用 asyncio.run() 会引发 RuntimeError。
+        """
+        warnings.warn(
+            "generate() is deprecated. Use `await generate_async()` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         import asyncio
-
         return asyncio.run(self.generate_async(articles, event_id))
 
     # ---------------------------------------------------------

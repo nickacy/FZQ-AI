@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import yaml
 import asyncio
 
@@ -102,7 +102,7 @@ class MultiSourceFetcher:
                     source_name=src.name,
                     region=src.region,
                     language=src.language,
-                    fetched_at=datetime.utcnow(),
+                    fetched_at=datetime.now(timezone.utc),
                     title_original=title,
                     content_original=summary,
                 )

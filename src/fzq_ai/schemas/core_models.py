@@ -1,4 +1,4 @@
-"""FZQ-AI Schemas — Test Adapter Layer"""
+"""FZQ-AI Schemas — Real System"""
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Literal, Union
 from enum import Enum
@@ -42,6 +42,7 @@ class RawNewsItem(BaseModel):
     published_at: datetime
     fetched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     language: LanguageCode
+    detected_language: Optional[LanguageCode] = None  # v10: 自动检测的源语言
     region: RegionCode
     url: Optional[str] = None
     author: Optional[str] = None
@@ -50,6 +51,8 @@ class RawNewsItem(BaseModel):
     translated_title: Optional[str] = None
     translated_content: Optional[str] = None
     translation_confidence: float = 0.0
+    relevance_score: float = 0.0  # v10: 与 topic 的相关性评分 (0-1)
+    
 
 class TranslatedNewsItem(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
@@ -57,18 +60,18 @@ class TranslatedNewsItem(BaseModel):
     translated_title: str
     translated_content: str
     target_language: LanguageCode = LanguageCode.EN
-    translation_provider: str = "mock"
+    translation_provider: str = ""
     translation_confidence: float = 1.0
-    translation_latency_ms: Optional[int] = 1
+    translation_latency_ms: Optional[int] = None
 
 class NarrativeAnalysis(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
     news_id: str
-    primary_narrative: str = "Mock narrative"
+    primary_narrative: str = ""
     secondary_narratives: List[str] = Field(default_factory=list)
     narrative_strength: float = 0.5
-    key_actors: List[str] = Field(default_factory=lambda: ["Actor A"])
-    key_themes: List[str] = Field(default_factory=lambda: ["Theme A"])
+    key_actors: List[str] = Field(default_factory=list)
+    key_themes: List[str] = Field(default_factory=list)
     timeline_indicators: List[str] = Field(default_factory=list)
     related_events: List[str] = Field(default_factory=list)
     confidence: float = 1.0
@@ -78,8 +81,8 @@ class NarrativeAnalysis(BaseModel):
 
 class RiskFactor(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    risk_type: str = "mock_risk"
-    description: str = "Mock risk factor"
+    risk_type: str = ""
+    description: str = ""
     level: RiskLevel = RiskLevel.LOW
     probability: float = 0.1
     impact_score: float = 0.1
@@ -93,7 +96,7 @@ class RiskAnalysis(BaseModel):
     news_id: str
     overall_risk_level: RiskLevel = RiskLevel.LOW
     composite_risk_score: float = 0.1
-    risk_factors: List[RiskFactor] = Field(default_factory=lambda: [RiskFactor()])
+    risk_factors: List[RiskFactor] = Field(default_factory=list)
     systemic_risk_indicators: List[str] = Field(default_factory=list)
     confidence: float = 1.0
     model_used: ModelProvider = ModelProvider.OPENAI
@@ -116,9 +119,10 @@ class SentimentAnalysis(BaseModel):
 
 class ScenarioProjection(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    scenario_name: str = "Mock Scenario"
-    description: str = "Mock scenario description"
+    scenario_name: str = ""
+    description: str = ""
     probability: float = 0.5
+    confidence: float = 0.5  # v10: 情景投影的置信度
     key_triggers: List[str] = Field(default_factory=list)
     expected_outcomes: List[str] = Field(default_factory=list)
     time_horizon: str = "short_term"
@@ -138,10 +142,10 @@ class ScenarioAnalysis(BaseModel):
 class MultiDimensionAnalysis(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
     news_id: str
-    narrative: NarrativeAnalysis = Field(default_factory=lambda: NarrativeAnalysis(news_id="mock"))
-    risk: RiskAnalysis = Field(default_factory=lambda: RiskAnalysis(news_id="mock"))
-    sentiment: SentimentAnalysis = Field(default_factory=lambda: SentimentAnalysis(news_id="mock"))
-    scenario: ScenarioAnalysis = Field(default_factory=lambda: ScenarioAnalysis(news_id="mock"))
+    narrative: NarrativeAnalysis = Field(default_factory=lambda: NarrativeAnalysis(news_id=""))
+    risk: RiskAnalysis = Field(default_factory=lambda: RiskAnalysis(news_id=""))
+    sentiment: SentimentAnalysis = Field(default_factory=lambda: SentimentAnalysis(news_id=""))
+    scenario: ScenarioAnalysis = Field(default_factory=lambda: ScenarioAnalysis(news_id=""))
     cross_dimension_insights: List[str] = Field(default_factory=list)
     aggregated_priority_score: float = 0.5
     recommended_actions: List[str] = Field(default_factory=list)
@@ -149,9 +153,9 @@ class MultiDimensionAnalysis(BaseModel):
 
 class DailyReportSection(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    section_title: str = "Mock Section"
+    section_title: str = ""
     section_type: Literal["overview", "highlight", "regional", "risk_alert", "sentiment_trend", "scenario_watch", "market_impact"] = "overview"
-    content: str = "Mock content"
+    content: str = ""
     data_points: List[Dict[str, Any]] = Field(default_factory=list)
     priority: int = 5
     related_news_ids: List[str] = Field(default_factory=list)
@@ -163,14 +167,14 @@ class DailyReport(BaseModel):
     generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     language: LanguageCode = LanguageCode.EN
     region_focus: Optional[RegionCode] = None
-    sections: List[DailyReportSection] = Field(default_factory=lambda: [DailyReportSection()])
+    sections: List[DailyReportSection] = Field(default_factory=list)
     top_stories: List[RawNewsItem] = Field(default_factory=list)
     risk_alerts: List[RiskAnalysis] = Field(default_factory=list)
     sentiment_summary: Optional[str] = None
     scenario_highlights: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
     model_used: ModelProvider = ModelProvider.OPENAI
-    generation_latency_ms: Optional[int] = 1
+    generation_latency_ms: Optional[int] = None
 
 class LLMRequest(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
@@ -187,11 +191,11 @@ class LLMRequest(BaseModel):
 
 class LLMResponse(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    content: str = "Mock LLM response"
+    content: str = ""
     provider: ModelProvider = ModelProvider.OPENAI
-    model: str = "mock-model"
+    model: str = ""
     usage: Dict[str, int] = Field(default_factory=dict)
-    latency_ms: int = 1
+    latency_ms: int = 0
     finish_reason: Optional[str] = "stop"
     raw_response: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
@@ -200,8 +204,8 @@ class FallbackRecord(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
     original_provider: ModelProvider = ModelProvider.OPENAI
     fallback_provider: ModelProvider = ModelProvider.OPENAI
-    reason: str = "mock"
-    latency_ms: int = 1
+    reason: str = ""
+    latency_ms: int = 0
     success: bool = True
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -261,7 +265,7 @@ class ProviderConfig(BaseModel):
     provider: ModelProvider
     api_key: Optional[str] = None
     base_url: Optional[str] = None
-    default_model: str = "mock-model"
+    default_model: str = ""
     backup_models: List[str] = Field(default_factory=list)
     timeout_seconds: int = 30
     max_retries: int = 3
@@ -273,12 +277,12 @@ class ProviderConfig(BaseModel):
 
 class RouterConfig(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())
-    default_provider: ModelProvider = ModelProvider.OPENAI
+    default_provider: ModelProvider = ModelProvider.DEEPSEEK
     fallback_chain: List[ModelProvider] = Field(
         default_factory=lambda: [
-            ModelProvider.OPENAI,
             ModelProvider.DEEPSEEK,
             ModelProvider.GEMINI,
+            ModelProvider.OPENAI,
         ]
     )
     providers: List[ProviderConfig] = Field(default_factory=list)

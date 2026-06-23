@@ -5,7 +5,7 @@
 # Never: create facts, add opinions, format, enforce schema
 
 import copy, json, re, hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -40,7 +40,7 @@ class DeepSeekStructOptimizer:
         draft = copy.deepcopy(raw_draft)
         report = {"reordered": [], "logic_fixes": [], "deduplicated": [],
                    "hierarchy_fixes": [], "warnings": [], "v93_groups": []}
-        t0 = datetime.utcnow()
+        t0 = datetime.now(timezone.utc)
         try:
             if mode == "v9.3":
                 draft = self._v93_transform(draft, report)

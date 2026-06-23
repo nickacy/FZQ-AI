@@ -63,10 +63,15 @@ class AutonomyAgent:
         # Try LLM call, fall back to rules if no LLM available
         try:
             from fzq_ai.llm.llm_router import LLMRouter
-            import asyncio
             router = LLMRouter()
+            # ⚠️ 注意：此方法在异步环境中会崩溃（RuntimeError）。
+            # 调用方应在异步上下文中直接 await router.run(prompt) 或使用 asyncio.run() 在外部管理。
             raw = asyncio.run(router.run(prompt))
             return raw
+        except RuntimeError as e:
+            if "cannot be called from a running event loop" in str(e):
+                logger.warning("asyncio.run() failed in running event loop, falling back to rule-based")
+            return self._rule_based_think(trends_summary)
         except Exception:
             return self._rule_based_think(trends_summary)
 

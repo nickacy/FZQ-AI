@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
@@ -71,8 +71,8 @@ class DailyReportPipeline(BasePipeline):
         exec_overview, top_stories, risk_alerts, outlook = await asyncio.gather(*tasks)
 
         report = {
-            "report_id": f"daily-report-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
-            "generated_at": datetime.utcnow().isoformat(),
+            "report_id": f"daily-report-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "topic": query,
             "sections": {
                 "executive_overview": exec_overview,

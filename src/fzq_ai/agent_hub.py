@@ -37,6 +37,7 @@ class AgentHub:
     def run_narrative(self, items: List[str]) -> Dict[str, Any]:
         """叙事分析：将字符串列表转为文章列表后分析"""
 
+        articles = [
             Article(title_original=item, content_original=item) for item in items
         ]
         # NarrativePipeline.run 是 async，这里用同步包装
@@ -73,3 +74,5 @@ class AgentHub:
                 "narrative_pipeline",
                 "risk_pipeline",
                 "daily_report_pipeline",
+            ]
+        }

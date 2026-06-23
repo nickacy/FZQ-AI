@@ -65,108 +65,243 @@ flowchart TD
     LLM --> DS[DeepSeek API]
     LLM --> OA[OpenAI API]
     LLM --> GM[Gemini API]
-📸 Screenshots | 系统截图
-（你已提供 2 张截图，README 中将这样展示）
-
-1. 系统首页 Dashboard
-FZQ‑AI Intelligence Dashboard 主界面
-
-（你稍后上传图片，我会帮你插入 Markdown 图片链接）
-
-2. 新闻情报分析模块
-输入主题 → 自动分析 → 结构化输出
-
-（你稍后上传图片，我会帮你插入 Markdown 图片链接）
 
 🚀 Installation | 安装
 1. 克隆仓库
 bash
 git clone https://github.com/yourname/FZQ-AI.git
 cd FZQ-AI
-2. 安装依赖（Python 3.11）
+2. 安装依赖（Python 3.10+）
 bash
 pip install -r requirements.txt
+# 或安装开发依赖
+pip install -e ".[dev]"
 3. 配置环境变量 .env
+复制 .env.example 为 .env，并填入你的 API Keys：
+
 Code
-DEEPSEEK_API_KEY=
-OPENAI_API_KEY=
-GEMINI_API_KEY=
-DEFAULT_MODEL=deepseek
-NEWSAPI_KEY=
+DEEPSEEK_API_KEY=your_key_here
+OPENAI_API_KEY=your_key_here
+GEMINI_API_KEY=your_key_here
+NEWSAPI_KEY=your_key_here
+
+# CORS 白名单（仅允许这些来源跨域访问）
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8501
+
+# 运行环境：development / production / staging
+# production 下错误信息不会暴露给客户端
+ENV=development
 ▶️ Run UI | 启动界面
 bash
 streamlit run ui_app.py
 ▶️ Run API Server | 启动 API 服务
 bash
-uvicorn api_server:app --reload --port 8000
-📦 Project Structure | 项目结构（超详细版）
+uvicorn app:app --reload --port 8000
+# 访问文档：http://localhost:8000/docs
+# 健康检查：http://localhost:8000/health
+# 版本信息：http://localhost:8000/version
+📦 Project Structure | 项目结构
 Code
 FZQ-AI/
 │
-├── api_server.py                # FastAPI 后端服务入口
-├── main.py                      # 启动器（调用 Streamlit）
-├── ui_app.py                    # Streamlit UI 主界面
+├── app.py                        # FastAPI 后端服务入口（v4.0.0，使用 lifespan）
+├── main.py                       # 启动器（调用 Streamlit UI）
+├── ui_app.py                     # Streamlit UI 主界面
 │
-├── requirements.txt             # Python 依赖
-├── README.md                    # 项目说明文档（双语）
-├── LICENSE                      # MIT License
-├── .gitignore                   # 忽略文件
+├── requirements.txt              # Python 依赖
+├── setup.py                      # 包安装配置
+├── pyproject.toml                # 统一工具配置（Black/Ruff/mypy/pytest）
+├── README.md                     # 项目说明文档（双语）
+├── LICENSE                       # MIT License
+├── .gitignore                    # 忽略文件
+├── .env.example                  # 环境变量模板
 │
-├── tests/
-│   └── test_news_pipeline.py    # 新闻 Pipeline 单元测试
+├── tests/                        # 测试目录
+│   ├── test_api.py               # API 测试
+│   ├── test_news_pipeline.py     # 新闻 Pipeline 测试
+│   ├── test_narrative.py         # 叙事分析测试
+│   ├── test_risk.py              # 风险扫描测试
+│   ├── test_daily_report.py      # 日报测试
+│   ├── test_llm_router.py        # LLM 路由测试
+│   ├── test_schemas.py           # Schema 测试
+│   └── test_adapter/             # 测试适配器（mock 依赖）
 │
-├── fzq_ai/
-│   ├── pipelines/
-│   │   ├── news_pipeline.py         # 新闻情报分析
-│   │   ├── narrative_pipeline.py    # 叙事分析
-│   │   ├── risk_pipeline.py         # 风险扫描
-│   │   └── daily_report_pipeline.py # 每日报告
+├── src/fzq_ai/                   # 主代码包
+│   ├── api/                      # API 端点
+│   │   ├── __init__.py
+│   │   ├── zh_endpoints.py       # 中文情报 API
+│   │   └── metrics_endpoints.py  # 系统指标 API
 │   │
-│   ├── orchestrator/
-│   │   └── task_orchestrator.py     # 自然语言任务编排器
+│   ├── agents/                   # 智能体系统
+│   │   ├── base.py
+│   │   ├── registry.py
+│   │   ├── orchestrator.py
+│   │   ├── news_center_agent.py
+│   │   ├── autonomy_agent.py
+│   │   ├── alert_agent.py
+│   │   ├── report_agent.py
+│   │   ├── watchlist_agent.py
+│   │   └── tasks/
+│   │       └── policy_brief_agent.py
 │   │
-│   ├── llm/
-│   │   ├── llm_router.py            # 多模型路由器
-│   │   ├── deepseek_client.py
-│   │   ├── openai_client.py
-│   │   └── gemini_client.py
+│   ├── cli/                      # 命令行工具
+│   │   └── agent.py
 │   │
-│   ├── tools/
-│   │   └── utils.py                 # 工具函数
+│   ├── config/                   # 配置管理
+│   │   ├── __init__.py           # 统一配置入口（加载 config.yaml）
+│   │   ├── global_settings.py    # 全局设置（支持嵌套属性访问）
+│   │   └── settings.yaml
 │   │
-│   ├── logging/
-│   │   └── logger.py                # 日志系统
+│   ├── core/                     # 核心组件
+│   │   ├── __init__.py
+│   │   ├── config.py             # 全局配置模型
+│   │   ├── llm_executor.py       # 统一 LLM 执行器
+│   │   └── prompts.py            # Prompt 模板系统
 │   │
-│   └── metrics/
-│       └── metrics.py               # Pipeline 性能指标
+│   ├── dashboard/                # Dashboard 组件
+│   │   ├── dashboard.py
+│   │   └── components/
+│   │
+│   ├── domain/                   # 领域模型
+│   │   └── models.py
+│   │
+│   ├── intel/                    # 情报引擎
+│   │   ├── news_intel_engine.py
+│   │   ├── news_intel_service.py
+│   │   ├── narrative_engine.py
+│   │   ├── event_clustering.py
+│   │   ├── translation_manager.py
+│   │   ├── denoising_and_scoring.py
+│   │   └── schemas.py
+│   │
+│   ├── llm/                      # LLM 层
+│   │   ├── llm_router.py         # 多模型路由（fallback + 熔断）
+│   │   ├── router.py             # 底层模型路由
+│   │   ├── model_selector.py
+│   │   ├── cache_redis.py
+│   │   ├── providers/            # 各 Provider 实现
+│   │   │   ├── deepseek_provider.py
+│   │   │   ├── openai_provider.py
+│   │   │   ├── gemini_provider.py
+│   │   │   ├── qwen_provider.py
+│   │   │   └── kimi_provider.py
+│   │   └── test_adapter/         # 测试适配器（mock）
+│   │       ├── __init__.py
+│   │       └── llm_router.py
+│   │
+│   ├── logging/                  # 日志系统
+│   │   └── logger.py
+│   │
+│   ├── metrics/                  # 性能指标
+│   │   └── metrics_store.py
+│   │
+│   ├── orchestrator/             # 任务编排器
+│   │   ├── task_orchestrator.py  # 主编排器
+│   │   ├── daily_report_orchestrator.py
+│   │   └── test_adapter/
+│   │       ├── __init__.py
+│   │       └── task_orchestrator.py
+│   │
+│   ├── pipelines/                # Pipeline 层
+│   │   ├── news_pipeline.py
+│   │   ├── narrative_pipeline.py
+│   │   ├── risk_pipeline.py
+│   │   ├── sentiment_pipeline.py
+│   │   ├── scenario_pipeline.py
+│   │   ├── daily_report_pipeline.py
+│   │   ├── registry.py
+│   │   ├── protocol.py
+│   │   ├── base.py
+│   │   └── test_adapter/         # 测试适配器（mock）
+│   │       ├── __init__.py
+│   │       ├── news_pipeline.py
+│   │       ├── narrative_pipeline.py
+│   │       ├── risk_pipeline.py
+│   │       ├── sentiment_pipeline.py
+│   │       ├── scenario_pipeline.py
+│   │       └── daily_report_pipeline.py
+│   │
+│   ├── prompts/                  # Prompt 模板
+│   │   └── news_intel_prompt.py
+│   │
+│   ├── quality/                  # 质量优化
+│   │   ├── deepseek_struct_opt.py
+│   │   ├── minimax.py
+│   │   └── schemas.py
+│   │
+│   ├── schemas/                  # 数据模型
+│   │   ├── __init__.py           # 统一导出所有 Schema
+│   │   ├── core_models.py        # 核心数据模型（v13）
+│   │   ├── base.py
+│   │   ├── pipeline_output.py
+│   │   └── validator.py
+│   │
+│   ├── store/                    # 数据存储
+│   │   ├── intel_store.py
+│   │   └── event_extractor.py
+│   │
+│   ├── tools/                    # 工具集
+│   │   ├── news_fetcher.py
+│   │   ├── translator.py
+│   │   ├── generic_llm_tool.py
+│   │   ├── weather_tool.py
+│   │   ├── attractions_tool.py
+│   │   ├── metro_checker.py
+│   │   ├── route_planner.py
+│   │   └── embedding.py
+│   │
+│   ├── ui/                       # UI 模块
+│   │   └── __init__.py
+│   │
+│   └── utils/                    # 工具函数
+│       ├── helpers.py
+│       ├── json_formatter.py
+│       ├── key_health.py
+│       └── translation.py
+│
+└── .github/workflows/            # CI/CD
+    └── python.yml
 📡 API Endpoints | API 接口
-/news/analyze
+GET /health
+健康检查
+
+GET /version
+版本信息
+
+POST /news/analyze
 新闻情报分析
 
-/risk/scan
+POST /narrative
+叙事分析
+
+POST /risk
 风险扫描
 
-/daily/generate
+POST /daily/generate
 日报生成
 
-/task/run
+POST /task/run
 任务编排（自然语言 → 自动执行）
 
 🧭 Roadmap | 路线图
-✔ 已完成
-多模型路由器
+✔️ 已完成
+多模型路由器（DeepSeek / OpenAI / Gemini fallback）
 
-Streamlit UI
+Streamlit UI 主界面
 
-FastAPI 后端
+FastAPI 后端（v4.0.0，lifespan + CORS 白名单）
 
 Pipelines（新闻 / 舆情 / 风险 / 日报）
 
-任务编排器
+任务编排器（Task Orchestrator）
 
-GitHub 仓库清理
+LLM 熔断器 + 负载均衡
 
-依赖管理（Python 3.11）
+配置管理统一（config.yaml + 环境变量）
+
+Schema 验证（Minimax）
+
+异步架构（async/await）
 
 🔜 即将加入
 新闻抓取（NewsAPI）
@@ -179,6 +314,20 @@ Orchestrator 可视化
 
 多模型并行推理
 
+Redis 缓存集成
+
+🛠️ Development | 开发
+代码质量
+使用 pre-commit hooks 自动格式化与检查：
+
+bash
+pre-commit install
+pre-commit run --all-files
+测试
+bash
+python -m pytest tests/ -v --tb=short
+# 带覆盖率
+python -m pytest tests/ --cov=src --cov-report=term-missing
 🤝 Contributing | 贡献
 欢迎提交 PR、Issue 或建议。
 你可以：

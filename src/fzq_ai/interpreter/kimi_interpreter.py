@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from fzq_ai.schemas.real import LLMRequest, ModelProvider
+from fzq_ai.schemas import LLMRequest, ModelProvider
 
 logger = logging.getLogger(__name__)
 

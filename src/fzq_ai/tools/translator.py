@@ -9,7 +9,7 @@ import hashlib
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-from fzq_ai.schemas.real import (
+from fzq_ai.schemas import (
     LanguageCode, ModelProvider, LLMRequest,
 )
 from fzq_ai.core.prompts import PromptTemplates
@@ -205,7 +205,7 @@ class Translator:
         - 保留错误隔离
         - 保留翻译质量评分
         """
-        from fzq_ai.schemas.real import TranslatedNewsItem
+        from fzq_ai.schemas import TranslatedNewsItem
         results: List[TranslatedNewsItem] = []
 
         for i in range(0, len(items), batch_size):
@@ -319,7 +319,7 @@ class Translator:
         return results
 
     def _simple_translate_item(self, item: Any, target_language: LanguageCode) -> Any:
-        from fzq_ai.schemas.real import TranslatedNewsItem
+        from fzq_ai.schemas import TranslatedNewsItem
         return TranslatedNewsItem(
             original=item,
             translated_title=item.title,

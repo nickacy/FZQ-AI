@@ -12,8 +12,14 @@ It exposes:
 - 系统指标 Metrics API
 """
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 # -------------------------------
@@ -56,6 +62,25 @@ app = FastAPI(
 
 
 # -------------------------------
+# CORS 配置（安全：从环境变量读取，而非允许所有来源）
+# -------------------------------
+_allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8501"
+).split(",")
+# 去除空白并过滤空字符串
+allow_origins = [origin.strip() for origin in _allowed_origins if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allow_origins,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "X-Trace-Id"],
+    allow_credentials=True,
+)
+
+
+# -------------------------------
 # 挂载各模块路由
 # -------------------------------
 # 中文情报相关 API
@@ -63,6 +88,25 @@ app.include_router(zh_router)
 
 # 系统 Metrics 相关 API
 app.include_router(metrics_router)
+
+
+# -------------------------------
+# 全局端点（从 api_server.py 迁移）
+# -------------------------------
+@app.get("/health")
+async def health():
+    """健康检查端点。"""
+    return {"status": "ok", "service": "FZQ-AI Intelligence API"}
+
+
+@app.get("/version")
+async def version():
+    """版本信息端点。"""
+    return {
+        "version": "4.0.0",
+        "build_time": "2026-06-15",
+        "service": "FZQ-AI Intelligence API",
+    }
 
 
 # -------------------------------

@@ -1,6 +1,6 @@
 # src/fzq_ai/agents/tasks/policy_brief_agent.py
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
-from fzq_ai.core.llm_router import LLMRouter
+from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.quality.deepseek_struct_opt import DeepSeekStructOptimizer
 from fzq_ai.quality.minimax import validate_and_fix
 from fzq_ai.utils.json_formatter import format_final

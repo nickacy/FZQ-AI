@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
 
 
@@ -55,7 +55,7 @@ class Article:
     propaganda_tags: List[str] = field(default_factory=list)
 
     # ---- 时间字段 ----
-    fetched_at: datetime = field(default_factory=datetime.utcnow)
+    fetched_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     # ---- 风险字段 ----
     risk_level: Optional[int] = None
@@ -97,4 +97,4 @@ class IntelBundle:
     narrative_summary: Dict[str, Any] = field(default_factory=dict)
     sentiment_summary: Dict[str, Any] = field(default_factory=dict)
 
-    fetched_at: datetime = field(default_factory=datetime.utcnow)
+    fetched_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
