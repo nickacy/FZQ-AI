@@ -1,86 +1,37 @@
-# fzq_ai/llm/model_selector.py
-# FZQ‑AI v13 ModelSelector（智能模型选择器）
+from __future__ import annotations
 
-import time
-from typing import List, Dict, Optional
+from typing import List, Dict
 
-from fzq_ai.monitor.metrics import metrics
-from fzq_ai.config.global_settings import settings
+from fzq_ai.llm.provider_capabilities import PROVIDER_CAPABILITIES
+from fzq_ai.metrics.metrics import metrics
 
 
-class ModelSelectorV3:
+class ModelSelector:
     """
-    v13 智能模型选择器（基于 metrics 的自适应选择）
-    - 自动降级（成本高 → 换便宜模型）
-    - 自动升级（性能差 → 换更快模型）
-    - 基于最近 N 次调用的稳定性、错误率、耗时
+    v13 Model Selector
+    - 根据任务类型过滤 provider
+    - 根据 metrics 排序 provider（成功率优先）
+    - 根据用户优先级排序 provider
     """
 
-    def __init__(self):
-        self.priority = settings.model_priority.fallback
-        self.primary = settings.model_priority.default_primary
+    def __init__(self, priority_order: List[str]):
+        self.priority_order = priority_order
 
-    # ---------------------------------------------------------
-    # 主入口：选择最优模型
-    # ---------------------------------------------------------
-    def select(self, task_type: str) -> str:
-        candidates = [self.primary] + self.priority
+    def filter_by_capability(self, task_type: str) -> List[str]:
+        return [
+            p for p in self.priority_order
+            if task_type in PROVIDER_CAPABILITIES[p]["supports"]
+        ]
 
-        scored = []
-        for model in candidates:
-            score = self._score_model(model)
-            scored.append((model, score))
+    def sort_by_metrics(self, providers: List[str]) -> List[str]:
+        stats = metrics.get_provider_stats()
 
-        # 分数越高越好
-        scored.sort(key=lambda x: x[1], reverse=True)
+        def score(p):
+            s = stats.get(p, {})
+            return s.get("success_rate", 1.0)
 
-        best_model = scored[0][0]
-        return best_model
+        return sorted(providers, key=score, reverse=True)
 
-    # ---------------------------------------------------------
-    # 计算模型得分（核心智能逻辑）
-    # ---------------------------------------------------------
-    def _score_model(self, model: str) -> float:
-        """
-        综合评分：
-        - 成本（越低越好）
-        - 耗时（越低越好）
-        - 错误率（越低越好）
-        - 最近调用次数（越多越稳定）
-        """
-
-        stats = metrics.get_provider_stats(model)
-
-        if not stats:
-            # 没有数据 → 使用默认优先级
-            return 0.5
-
-        cost_weight = 0.3
-        latency_weight = 0.3
-        error_weight = 0.3
-        usage_weight = 0.1
-
-        # 成本（越低越好）
-        cost_score = 1 / (stats["avg_cost"] + 1e-6)
-
-        # 耗时（越低越好）
-        latency_score = 1 / (stats["avg_latency_ms"] + 1e-6)
-
-        # 错误率（越低越好）
-        error_score = 1 - stats["error_rate"]
-
-        # 使用次数（越多越稳定）
-        usage_score = stats["count"] / (stats["count"] + 10)
-
-        final_score = (
-            cost_score * cost_weight +
-            latency_score * latency_weight +
-            error_score * error_weight +
-            usage_score * usage_weight
-        )
-
-        return final_score
-
-
-# 单例
-model_selector = ModelSelectorV3()
+    def select(self, task_type: str) -> List[str]:
+        candidates = self.filter_by_capability(task_type)
+        return self.sort_by_metrics(candidates)
