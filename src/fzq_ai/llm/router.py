@@ -4,7 +4,6 @@
 from typing import Any, List
 
 from fzq_ai.llm.providers import ProviderRegistry
-from fzq_ai.llm.task_registry import TaskRegistry
 from fzq_ai.llm.model_selector import model_selector
 from fzq_ai.llm.cache import llm_cache
 from fzq_ai.llm.cache_redis import redis_llm_cache
@@ -16,7 +15,6 @@ from fzq_ai.config.global_settings import settings
 class LLMRouter:
 
     def __init__(self) -> None:
-        self.task_registry = TaskRegistry()
         self.provider_registry = ProviderRegistry()
 
     # ------------------------------------------------------------
