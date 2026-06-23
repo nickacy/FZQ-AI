@@ -1,11 +1,11 @@
-"""
+﻿"""
 fzq_ai.utils.logger
 
-统一日志配置入口 (v2.5)：
-- setup_logging() 在应用入口调用一次
-- 各模块使用 logging.getLogger(__name__)
-- 支持控制台 + 文件输出
-- 提供 @log_time 装饰器记录函数耗时
+缁熶竴鏃ュ織閰嶇疆鍏ュ彛 (v2.5)锛?
+- setup_logging() 鍦ㄥ簲鐢ㄥ叆鍙ｈ皟鐢ㄤ竴娆?
+- 鍚勬ā鍧椾娇鐢?logging.getLogger(__name__)
+- 鏀寔鎺у埗鍙?+ 鏂囦欢杈撳嚭
+- 鎻愪緵 @log_time 瑁呴グ鍣ㄨ褰曞嚱鏁拌€楁椂
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from fzq_ai.config.settings import settings
+from fzq_ai.config.global_settings import settings
 
 
 def setup_logging(
@@ -27,17 +27,17 @@ def setup_logging(
     log_dir: Optional[str] = None,
 ) -> None:
     """
-    初始化全局日志配置。
+    鍒濆鍖栧叏灞€鏃ュ織閰嶇疆銆?
 
     Args:
-        level: 日志等级（None 时使用 settings.log_level）
-        log_dir: 日志文件目录（None 时使用项目根目录下的 logs/）
+        level: 鏃ュ織绛夌骇锛圢one 鏃朵娇鐢?settings.log_level锛?
+        log_dir: 鏃ュ織鏂囦欢鐩綍锛圢one 鏃朵娇鐢ㄩ」鐩牴鐩綍涓嬬殑 logs/锛?
     """
     if level is None:
         level_name: str = settings.log_level.upper()
         level = getattr(logging, level_name, logging.INFO)
 
-    # 格式
+    # 鏍煎紡
     format_str: str = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
     formatter: logging.Formatter = logging.Formatter(
         fmt=format_str,
@@ -48,12 +48,12 @@ def setup_logging(
     root.setLevel(level)
     root.handlers.clear()
 
-    # 控制台 handler
+    # 鎺у埗鍙?handler
     console: logging.StreamHandler = logging.StreamHandler(sys.stdout)
     console.setFormatter(formatter)
     root.addHandler(console)
 
-    # 文件 handler
+    # 鏂囦欢 handler
     if log_dir is None:
         project_root: Path = Path(__file__).parent.parent
         log_dir = str(project_root / "logs")
@@ -68,7 +68,7 @@ def setup_logging(
     file_handler.setFormatter(formatter)
     root.addHandler(file_handler)
 
-    # 降低第三方库日志噪音
+    # 闄嶄綆绗笁鏂瑰簱鏃ュ織鍣煶
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("openai").setLevel(logging.WARNING)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -77,22 +77,22 @@ def setup_logging(
 
 def get_logger(name: str) -> logging.Logger:
     """
-    获取模块日志器。
+    鑾峰彇妯″潡鏃ュ織鍣ㄣ€?
 
     Args:
-        name: 通常传入 __name__
+        name: 閫氬父浼犲叆 __name__
 
     Returns:
-        logging.Logger 实例
+        logging.Logger 瀹炰緥
     """
     return logging.getLogger(name)
 
 
 def log_time(func: Callable[..., Any]) -> Callable[..., Any]:
     """
-    装饰器：记录被装饰函数的执行耗时。
+    瑁呴グ鍣細璁板綍琚楗板嚱鏁扮殑鎵ц鑰楁椂銆?
 
-    用于关键函数（Pipeline、Orchestrator、LLM 调用）的耗时统计。
+    鐢ㄤ簬鍏抽敭鍑芥暟锛圥ipeline銆丱rchestrator銆丩LM 璋冪敤锛夌殑鑰楁椂缁熻銆?
 
     Usage:
         @log_time
@@ -107,12 +107,12 @@ def log_time(func: Callable[..., Any]) -> Callable[..., Any]:
         try:
             result = func(*args, **kwargs)
             elapsed: float = time.time() - start
-            logger.info(f"{func.__qualname__} 完成, 耗时 {elapsed:.3f}s")
+            logger.info(f"{func.__qualname__} 瀹屾垚, 鑰楁椂 {elapsed:.3f}s")
             return result
         except Exception as e:
             elapsed = time.time() - start
             logger.error(
-                f"{func.__qualname__} 失败, 耗时 {elapsed:.3f}s, 错误: {e}"
+                f"{func.__qualname__} 澶辫触, 鑰楁椂 {elapsed:.3f}s, 閿欒: {e}"
             )
             raise
 
@@ -123,12 +123,12 @@ def log_time(func: Callable[..., Any]) -> Callable[..., Any]:
         try:
             result = await func(*args, **kwargs)
             elapsed = time.time() - start
-            logger.info(f"{func.__qualname__} 完成, 耗时 {elapsed:.3f}s")
+            logger.info(f"{func.__qualname__} 瀹屾垚, 鑰楁椂 {elapsed:.3f}s")
             return result
         except Exception as e:
             elapsed = time.time() - start
             logger.error(
-                f"{func.__qualname__} 失败, 耗时 {elapsed:.3f}s, 错误: {e}"
+                f"{func.__qualname__} 澶辫触, 鑰楁椂 {elapsed:.3f}s, 閿欒: {e}"
             )
             raise
 
@@ -138,5 +138,6 @@ def log_time(func: Callable[..., Any]) -> Callable[..., Any]:
     return wrapper
 
 
-# 模块导入时自动初始化日志
+# 妯″潡瀵煎叆鏃惰嚜鍔ㄥ垵濮嬪寲鏃ュ織
 setup_logging()
+

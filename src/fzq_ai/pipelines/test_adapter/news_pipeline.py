@@ -1,10 +1,11 @@
-"""
-FZQ-AI Pipelines – Test Adapter News Pipeline
-Mock NewsPipeline. Same interface as real NewsPipeline. Async run_async() → PipelineOutput.
+﻿"""
+FZQ-AI Pipelines 鈥?Test Adapter News Pipeline
+Mock NewsPipeline. Same interface as real NewsPipeline. Async run_async() 鈫?PipelineOutput.
 No real fetching. No translation. Returns fixed mock data with up to 3 dummy
 MultiDimensionAnalysis items.
 """
 from typing import List
+from datetime import timezone
 from datetime import datetime
 
 from fzq_ai.schemas.test_adapter import (
@@ -64,7 +65,7 @@ class MockNewsPipeline:
             total_latency_ms=1.0,
             fallback_count=0,
             translation_count=0,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
         return PipelineOutput(
@@ -73,3 +74,4 @@ class MockNewsPipeline:
             failed_items=[],
             metrics=metrics,
         )
+
