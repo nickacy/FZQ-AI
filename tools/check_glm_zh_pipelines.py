@@ -1,11 +1,15 @@
 # tools/check_glm_zh_pipelines.py
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+
 import asyncio
 import traceback
 
-from fzq_ai.pipelines.zh_multisource_merge import ZhMultiSourceMergePipeline
-from fzq_ai.pipelines.zh_opinion_landscape import ZhOpinionLandscapePipeline
-from fzq_ai.pipelines.zh_policy_brief import ZhPolicyBriefPipeline
-from fzq_ai.pipelines.zh_risk_scan import ZhRiskScanPipeline
+
+from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline
+from fzq_ai.pipelines.zh_opinion_landscape_pipeline import ZhOpinionLandscapePipeline
+from fzq_ai.pipelines.zh_policy_pipeline import ZhPolicyBriefPipeline
+from fzq_ai.pipelines.zh_risk_scan_pipeline import ZhRiskScanPipeline
 
 
 async def check_zh_multisource_merge():
