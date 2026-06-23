@@ -22,7 +22,7 @@ from fzq_ai.utils.prompt_loader import load_prompt_template
 
 
 @PipelineRegistry.register("zh_opinion_landscape@v1", set_default=True)
-class ZhOpinionLandscapePipeline(BasePipeline[ZhOpinionLandscapeOutput]):
+class ZhOpinionLandscapePipeline(BasePipeline):
     """
     Pipeline: zh_opinion_landscape
     中文舆论版图 Pipeline（v1）

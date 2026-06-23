@@ -21,7 +21,8 @@ from fzq_ai.utils.prompt_loader import load_prompt_template
 
 
 @PipelineRegistry.register("zh_multisource_merge@v1", set_default=True)
-class ZhMultiSourceMergePipeline(BasePipeline[ZhMultiSourceMergeOutput]):
+class ZhMultiSourceMergePipeline(BasePipeline):
+
     """
     Pipeline: zh_multisource_merge
     中文多源新闻合并 Pipeline（v1）

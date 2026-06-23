@@ -17,7 +17,7 @@ from fzq_ai.utils.prompt_loader import load_prompt_template
 
 
 @PipelineRegistry.register("zh_policy_brief@v1", set_default=True)
-class ZhPolicyBriefPipeline(BasePipeline[ZhPolicyBriefOutput]):
+class ZhPolicyBriefPipeline(BasePipeline):
     """
     Pipeline: zh_policy_brief
     中文政策解读 Pipeline（v1）

@@ -17,7 +17,7 @@ from fzq_ai.utils.prompt_loader import load_prompt_template
 
 
 @PipelineRegistry.register("zh_risk_scan@v1", set_default=True)
-class ZhRiskScanPipeline(BasePipeline[ZhRiskScanOutput]):
+class ZhRiskScanPipeline(BasePipeline):
     """
     Pipeline: zh_risk_scan
     中文风险扫描 Pipeline（v1）
