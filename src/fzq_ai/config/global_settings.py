@@ -32,6 +32,7 @@ class Settings:
         "llm_request_timeout": 60,
         "default_temperature": 0.7,
         "default_max_tokens": 2048,
+    "log_level": "INFO",
     }
 
     def __init__(self):
@@ -46,12 +47,31 @@ class Settings:
             )
             data = self._DEFAULTS
 
+        # Normalize model_priority (dict -> flat list)
+        mp = data.get("model_priority", [])
+        data["model_priority"] = self._normalize_model_priority(mp)
+
         # Convert nested dicts to AttrDict
         for k, v in data.items():
             if isinstance(v, dict):
                 setattr(self, k, AttrDict(v))
             else:
                 setattr(self, k, v)
+
+    def _normalize_model_priority(self, mp):
+        """Normalize model_priority from dict to flat list."""
+        if isinstance(mp, dict):
+            result = []
+            primary = mp.get("default_primary")
+            if primary:
+                result.append(primary)
+            fallback = mp.get("fallback", [])
+            if isinstance(fallback, list):
+                result.extend(fallback)
+            return result or ["deepseek", "openai", "gemini"]
+        if isinstance(mp, list):
+            return mp
+        return ["deepseek", "openai", "gemini"]
 
     def get_client(self, provider: str) -> object:
         """Return client config for provider (placeholder)."""

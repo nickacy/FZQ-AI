@@ -58,6 +58,9 @@ You must output and only output the following JSON structure:
       "confidence": "<0.0-1.0>"
     }
   ],
+  "overall_risk_level": "<高|中|低|观察>",
+  "entity_watchlist": ["<需监控的实体1>", "<实体2>"],
+  "suggested_actions": ["<全局行动建议1>", "<建议2>"],
   "summary": "<整体风险态势综述，200字以内>"
 }
 
@@ -115,6 +118,15 @@ You must output and only output the following JSON structure:
 8. Noise handling:  
    - Remove ads, duplicates, irrelevant content  
    - If <3 valid items remain → degrade
+
+5. 全局字段要求：
+   - overall_risk_level：必须从扫描结果中判定整体风险等级
+   - entity_watchlist：回填所有受监控实体
+   - suggested_actions：提供至少1条全局行动建议
+5. Global fields:
+   - overall_risk_level: must determine overall risk level from scan
+   - entity_watchlist: backfill all monitored entities
+   - suggested_actions: provide at least 1 global action suggestion
 
 【禁止事项 / Prohibited】
 - 禁止输出 Markdown 代码块  

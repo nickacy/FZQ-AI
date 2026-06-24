@@ -44,7 +44,7 @@ async def check_router_providers():
             "prompt": "Summarize: What role does GLM-5.2 play in this project? (test specific provider)",
             "provider": "glm",
         }
-        out = await router.call(**req)
+        out = await router.call(provider=req.get("provider", "deepseek"), prompt=req.get("prompt", ""), model=req.get("model", ""), api_key=req.get("api_key", ""))
         print("  [glm] OK, len(output) =", len(str(out)))
     except Exception:
         print("  [glm] ERROR:")
@@ -63,8 +63,7 @@ async def check_english_pipeline():
             print("  [pipeline] SKIP - no registered pipelines")
             return
         fam = families[0]
-        PipelineCls = PipelineRegistry.get(fam)
-        pipeline = PipelineCls()
+        pipeline = PipelineRegistry.get(fam)  # get() returns instance
         print(f"  [{fam}] Pipeline class created: {type(pipeline).__name__}")
         print("  [pipeline] OK, pipeline instantiated successfully")
     except Exception:

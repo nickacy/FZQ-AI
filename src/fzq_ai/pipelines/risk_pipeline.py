@@ -38,7 +38,7 @@ class RiskPipeline(BasePipeline):
     # ---------------------------------------------------------
     async def postprocess(self, result: Dict[str, Any]) -> Dict[str, Any]:
         # result 鏄?orchestrator/router 鐨勫崟娆¤緭鍑?
-        # 浣?risk_pipeline 鏄瀛愪换鍔?鈫?鎴戜滑鍦?preprocess 鍚庤嚜宸辨墽琛屽苟鍙戜换鍔?
+        # 浣?risk_pipeline 鏄??瀛愪换鍔?鈫?鎴戜滑鍦?preprocess 鍚庤嚜宸辨墽琛屽苟鍙戜换鍔?
         return result
 
     # ---------------------------------------------------------

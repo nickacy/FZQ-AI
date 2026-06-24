@@ -83,7 +83,7 @@ class NewsPipeline(BasePipeline):
         }
 
     # ---------------------------------------------------------
-    # 淇濈暀浣犲師鏉ョ殑涓氬姟閫昏緫锛堟枃绔犲垪琛級
+    # 淇濈暀浣犲師鏉ョ殑涓氬姟閫昏緫锛堟枃绔犲垪琛?級
     # ---------------------------------------------------------
     def _build_article_list(self, articles: List[Article], max_items: int = 30) -> str:
         lines = ["## 馃摪 Original News List\n"]

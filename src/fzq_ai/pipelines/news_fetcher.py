@@ -1,5 +1,5 @@
 # fzq_ai/pipelines/news_fetcher.py
-# Clean UTFâ€? safe version
+# Clean UTFéˆ¥? safe version
 
 import asyncio
 from typing import List

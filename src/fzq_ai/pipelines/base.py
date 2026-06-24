@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import uuid
 import time
 from typing import Any, Dict, List, Optional, Generic, TypeVar
@@ -64,9 +64,28 @@ class BasePipeline(Generic[T]):
         trace_id = kwargs.pop("trace_id", str(uuid.uuid4()))
         t_start = time.perf_counter()
 
-        logger.info("pipeline_start", name=self.name, trace_id=trace_id)
+        logger.info(f"pipeline_start name={self.name} trace_id={trace_id}")
 
         try:
+            # 0. Delegate to run_async if the subclass defines it
+            if "run_async" in type(self).__dict__:
+                result = await self.run_async(**kwargs)
+                # Convert pydantic model or dataclass to dict
+                if hasattr(result, "model_dump"):
+                    output = result.model_dump()
+                elif hasattr(result, "__dataclass_fields__"):
+                    from dataclasses import asdict
+                    output = asdict(result)
+                elif isinstance(result, dict):
+                    output = result
+                else:
+                    output = {"status": "success", "data": result}
+                output["trace_id"] = trace_id
+                output["duration_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
+                output.setdefault("status", "success")
+                logger.info(f"pipeline_done name={self.name} trace_id={trace_id} duration_ms={output['duration_ms']}")
+                return output
+
             # 1. Validate
             errors = self.validate_inputs(kwargs)
             if errors:
@@ -93,22 +112,12 @@ class BasePipeline(Generic[T]):
             output["duration_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
             output.setdefault("status", "success")
 
-            logger.info(
-                "pipeline_done",
-                name=self.name,
-                trace_id=trace_id,
-                duration_ms=output["duration_ms"],
-            )
+            logger.info(f"pipeline_done name={self.name} trace_id={trace_id} duration_ms={output['duration_ms']}")
 
             return output
 
         except Exception as e:
-            logger.error(
-                "pipeline_failed",
-                name=self.name,
-                trace_id=trace_id,
-                error=str(e),
-            )
+            logger.error(f"pipeline_failed name={self.name} trace_id={trace_id} error={e}")
             return {
                 "status": "error",
                 "errors": [str(e)],
@@ -141,7 +150,7 @@ class BasePipeline(Generic[T]):
             ).isoformat(),
         }
 
-        logger.info("pipeline_metrics", **metrics)
+        logger.info(f"pipeline_metrics {metrics}")
 
         try:
             from fzq_ai.metrics.metrics_writer import write_metrics_jsonl

@@ -17,6 +17,10 @@ PROVIDER_CAPABILITIES = {
         "supports": ["chat", "coding", "analysis"],
         "max_tokens": 16000,
     },
+    "glm": {
+        "supports": ["chat", "analysis", "coding"],
+        "max_tokens": 32000,
+    },
     "gemini": {
         "supports": ["chat", "analysis"],
         "max_tokens": 16000,

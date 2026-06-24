@@ -43,40 +43,52 @@ You must output and only output the following JSON structure:
 
 {
   "task_type": "zh_opinion_landscape",
-  "topic": "<输入 topic>",
-  "camps": [
+  "topic": "<话题主题>",
+  "time_range": "<分析时间范围，如2024-01-01至2024-01-07>",
+  "clusters": [
     {
-      "camp_id": "<C-｛序号｝>",
-      "label": "<阵营标签，15字以内>",
-      "stance": "<支持|反对|中立|复杂>",
-      "share": "<0.0-1.0>",
-      "core_claim": "<核心主张，80字以内>",
+      "cluster_id": "<C-{序号}>",
+      "label": "<聚类标签，15字以内>",
+      "stance": "<支持|反对|中性|复杂>",
+      "sentiment": "<正面|负面|中性|混合>",
+      "size": "<该聚类中的条目数量>",
+      "key_arguments": ["<核心论点1>", "<论点2>"],
       "representative_quotes": [
-        "<引用原文片段1，标注[item_id]>",
-        "<引用原文片段2，标注[item_id]>"
+        {"item_id": "<条目ID>", "span": "<引用原文片段，80字以内>"}
       ]
     }
   ],
-  "frame_analysis": [
+  "stance_map": ["<立场1>", "<立场2>"],
+  "sentiment_map": ["<情感倾向1>", "<倾向2>"],
+  "key_frames": [
     {
       "frame": "<话语框架名称>",
-      "used_by": ["<阵营标签1>", "<阵营标签2>"],
-      "effect": "<框架效果描述>"
+      "description": "<框架描述，100字以内>",
+      "evidence_span": "<支持该框架的原文片段，80字以内>"
     }
   ],
-  "key_nodes": [
+  "influencers": [
     {
-      "author": "<作者标识>",
-      "platform": "<平台名称>",
-      "camp": "<所属阵营标签>",
-      "influence_score": "<0.0-1.0>"
+      "name": "<影响者名称>",
+      "influence_score": "<0.0-1.0>",
+      "stance": "<支持|反对|中性|复杂>",
+      "representative_quotes": [
+        {"item_id": "<条目ID>", "span": "<引用原文片段>"}
+      ]
     }
   ],
-  "heat": {
-    "volume": "<讨论总量或-1>",
-    "trend": "<上升|下降|平稳|震荡|数据不足>",
-    "peak_date": "<YYYY-MM-DD 或 null>"
-  }
+  "heat_trend": [
+    {
+      "date": "<YYYY-MM-DD>",
+      "volume": "<当日讨论量>"
+    }
+  ],
+  "representative_quotes": [
+    {"item_id": "<条目ID>", "span": "<全局代表性引用片段>"}
+  ],
+  "overall_stance": "<支持|反对|中性|复杂>",
+  "overall_sentiment": "<正面|负面|中性|混合>",
+  "confidence": "<0.0-1.0>"
 }
 
 【执行规则 / Execution Rules】

@@ -24,7 +24,13 @@ class ModelSelector:
         ]
 
     def sort_by_metrics(self, providers: List[str]) -> List[str]:
-        stats = metrics.get_provider_stats()
+        # get_provider_stats returns aggregated stats; default to empty dict
+        stats = {}
+        for p in providers:
+            try:
+                stats[p] = metrics.get_provider_stats(p)
+            except Exception:
+                stats[p] = {"count": 0, "avg_latency_ms": 0.0, "error_rate": 0.0}
 
         def score(p):
             s = stats.get(p, {})
