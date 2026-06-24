@@ -1,4 +1,5 @@
-from fzq_ai.pipelines.zh_multisource_merge import ZhMultiSourceMergePipeline
+from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline
+
 
 def test_merge_pipeline():
     pipeline = ZhMultiSourceMergePipeline()
