@@ -18,18 +18,6 @@ from fzq_ai.llm.providers.glm_provider import GLMProvider
 from fzq_ai.llm.providers.kimi_provider import KimiProvider
 from fzq_ai.llm.providers.qwen_provider import QwenProvider
 
-# --- Doubao & MiniMax (stubs - implement when needed) ---
-try:
-    from fzq_ai.llm.providers.doubao_provider import DoubaoProvider
-except ImportError:
-    DoubaoProvider = None  # type: ignore
-
-try:
-    from fzq_ai.llm.providers.minimax_client import MiniMaxClient
-except ImportError:
-    MiniMaxClient = None  # type: ignore
-
-
 __all__ = [
     # Registry
     "ProviderRegistry",
@@ -41,7 +29,4 @@ __all__ = [
     "GLMProvider",
     "KimiProvider",
     "QwenProvider",
-    # Optional
-    "DoubaoProvider",
-    "MiniMaxClient",
 ]

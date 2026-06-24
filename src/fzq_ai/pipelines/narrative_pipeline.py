@@ -1,5 +1,5 @@
-# fzq_ai/pipelines/narrative_pipeline.py
-# v13 NarrativePipeline – 保留原业务逻辑 + 轻量对齐 v13
+﻿# fzq_ai/pipelines/narrative_pipeline.py
+# v13 NarrativePipeline 鈥?淇濈暀鍘熶笟鍔￠€昏緫 + 杞婚噺瀵归綈 v13
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import asyncio
 from fzq_ai.llm.llm_router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
 from fzq_ai.pipelines.base import BasePipeline
+from fzq_ai.pipelines.registry import PipelineRegistry
 from fzq_ai.domain.models import ServiceResult
 
 
@@ -36,6 +37,7 @@ Topic: $query
 """)
 
 
+@PipelineRegistry.register("narrative@v1", set_default=True)
 class NarrativePipeline(BasePipeline):
     """Narrative analysis with concurrent sub-tasks."""
 
@@ -60,3 +62,4 @@ class NarrativePipeline(BasePipeline):
             "storyline": storyline,
             "implications": implications,
         })
+
