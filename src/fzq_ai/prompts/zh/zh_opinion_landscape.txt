@@ -18,7 +18,7 @@
   - platform: 平台名称（字符串）
   - author: 作者标识（字符串，可能为空）
   - timestamp: 时间戳（字符串，ISO 8601格式）
-  - engagement_metrics: 互动指标（可选，如{"likes": 100, "shares": 20}）
+  - engagement_metrics: 互动指标（可选，如｛"likes": 100, "shares": 20｝）
 
 【输出格式】
 必须输出且仅输出一个 JSON 对象，结构如下：
