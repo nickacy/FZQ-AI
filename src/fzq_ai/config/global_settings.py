@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import yaml
 from pathlib import Path
-from fzq_ai.llm.model_client import ModelClient
 
 
 class AttrDict(dict):
@@ -25,8 +24,8 @@ class Settings:
     v13 Global Settings Loader (supports nested attribute access).
 
     - Loads global_settings.yaml if present
-    - Falls back to defaults
-    - Normalizes model_priority (dict → flat list)
+    - Merges with _DEFAULTS so all expected keys always exist
+    - Normalizes model_priority (dict -> flat list)
     - Provides get_client() / get_model() for Router
     """
 
@@ -45,28 +44,33 @@ class Settings:
 
         if config_path.exists():
             with open(config_path, "r", encoding="utf-8") as f:
-                data = yaml.safe_load(f)
+                yaml_data = yaml.safe_load(f) or {}
         else:
             import logging
             logging.getLogger(__name__).warning(
                 f"global_settings.yaml not found at {config_path}, using defaults"
             )
-            data = dict(self._DEFAULTS)
+            yaml_data = {}
 
-        # Normalize model_priority (dict → flat list)
+        # Merge: start with defaults, override with YAML
+        data = dict(self._DEFAULTS)
+        data.update(yaml_data)
+
+        # Normalize model_priority (dict -> flat list)
         mp = data.get("model_priority", [])
         data["model_priority"] = self._normalize_model_priority(mp)
 
-        # Convert nested dicts to AttrDict
+        # Ensure llm_models is always a dict
+        if not isinstance(data.get("llm_models"), dict):
+            data["llm_models"] = {}
+
+        # Set all as attributes
         for k, v in data.items():
             if isinstance(v, dict):
                 setattr(self, k, AttrDict(v))
             else:
                 setattr(self, k, v)
 
-    # ------------------------------------------------------------
-    # Priority normalization
-    # ------------------------------------------------------------
     def _normalize_model_priority(self, mp):
         """Normalize model_priority from dict to flat list."""
         if isinstance(mp, dict):
@@ -78,34 +82,22 @@ class Settings:
             if isinstance(fallback, list):
                 result.extend(fallback)
             return result or ["deepseek", "openai", "gemini"]
-
         if isinstance(mp, list):
             return mp
-
         return ["deepseek", "openai", "gemini"]
 
-    # ------------------------------------------------------------
-    # Router integration
-    # ------------------------------------------------------------
-    def get_client(self, provider: str) -> ModelClient:
-        """
-        Return a ModelClient instance for the provider.
-        Router depends on this.
-        """
+    def get_client(self, provider: str):
+        """Return a ModelClient instance for the provider."""
+        # Lazy import to avoid circular dependency
+        from fzq_ai.clients.model_client import ModelClient
         return ModelClient(provider)
 
     def get_model(self, provider: str) -> str:
-        """
-        Return model name for provider.
-        Priority:
-        1. llm_models in YAML
-        2. ModelClient default model
-        """
-        # User-defined model override
+        """Return model name for provider."""
         if hasattr(self, "llm_models") and provider in self.llm_models:
             return self.llm_models[provider]
-
-        # Fallback to ModelClient defaults
+        # Lazy import for defaults
+        from fzq_ai.clients.model_client import ModelClient
         return ModelClient._DEFAULT_MODELS.get(provider, provider)
 
 

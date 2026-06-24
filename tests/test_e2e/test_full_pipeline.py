@@ -1,20 +1,29 @@
-# tests/test_e2e/test_full_pipeline.py
+﻿# tests/test_e2e/test_full_pipeline.py
 
 import pytest
-from fzq_ai.llm.router_v2.router import RouterV2
 from fzq_ai.llm.orchestrator.orchestrator import MultiModelOrchestrator
 from tests.utils.mock_provider import MockProvider
 
+
+class MockStrategy:
+    """Mock strategy for testing."""
+    def primary(self, task):
+        return MockProvider()
+    def validator(self, task):
+        return MockProvider()
+    def repair(self, task):
+        return MockProvider()
+    def audit(self, task):
+        return MockProvider()
+
+
 @pytest.mark.asyncio
 async def test_full_pipeline():
-    router = RouterV2()
-    orchestrator = MultiModelOrchestrator(strategy=None)
-
-    orchestrator.strategy = lambda task: MockProvider()
+    orchestrator = MultiModelOrchestrator(strategy=MockStrategy())
 
     task = {
         "task_type": "zh_multisource_merge",
-        "input": "中国经济最新动态"
+        "input": "test input",
     }
 
     result = await orchestrator.run(task)
