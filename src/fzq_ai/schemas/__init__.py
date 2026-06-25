@@ -1,4 +1,5 @@
 from fzq_ai.schemas.base import PipelineOutputSchema
+from .pipeline_input import PipelineInput
 from fzq_ai.schemas.pipeline_output import (
     NewsPipelineOutput,
     NarrativePipelineOutput,
