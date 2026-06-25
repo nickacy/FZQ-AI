@@ -1,5 +1,5 @@
 import streamlit as st
-from fzq_ai.llm.orchestrator.orchestrator import TaskOrchestrator
+from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 from fzq_ai.schemas.pipeline_input import PipelineInput
 
 
@@ -13,7 +13,6 @@ st.title("🤖 FZQ-AI Web UI（调试控制台）")
 st.write("输入任何问题，FZQ-AI 将通过 Router → Pipeline → 自愈 → 恢复 → 输出完整回答。")
 
 
-# 输入框
 question = st.text_area(
     "请输入你的问题：",
     height=150,
