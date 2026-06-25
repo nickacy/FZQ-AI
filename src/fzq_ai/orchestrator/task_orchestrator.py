@@ -6,7 +6,7 @@ from __future__ import annotations
 import time
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fzq_ai.metrics.metrics import metrics
 from fzq_ai.monitor.token_monitor import token_monitor
@@ -26,7 +26,14 @@ class TaskOrchestrator:
     def __init__(self):
         self.router = Router()
 
-    async def run(self, pipeline: BasePipeline, req: Dict[str, Any]) -> Dict[str, Any]:
+    async def run(
+        self,
+        req: Dict[str, Any],
+        pipeline: Optional[BasePipeline] = None,
+    ) -> Dict[str, Any]:
+        """Run a request, auto-resolving pipeline from task_type if not given."""
+        if pipeline is None:
+            pipeline = self._resolve_pipeline(req)
         trace_id = req.get("trace_id") or self._gen_trace_id()
         req["trace_id"] = trace_id
 
@@ -55,7 +62,9 @@ class TaskOrchestrator:
 
 
     async def run_with_metrics(
-        self, pipeline: BasePipeline, req: Dict[str, Any]
+        self,
+        req: Dict[str, Any],
+        pipeline: Optional[BasePipeline] = None,
     ) -> Dict[str, Any]:
         """
         Run a pipeline with full metrics capture.
@@ -99,6 +108,44 @@ class TaskOrchestrator:
             pass  # token_monitor may not support record() yet
 
         return output
+
+    def _resolve_pipeline(self, req: Dict[str, Any]) -> BasePipeline:
+        """Resolve which pipeline to use from the request task_type."""
+        task_type = req.get("task_type", "").lower()
+
+        # Map task_type -> pipeline module
+        pipeline_map = {
+            "news": "fzq_ai.pipelines.news_pipeline",
+            "narrative": "fzq_ai.pipelines.narrative_pipeline",
+            "risk": "fzq_ai.pipelines.risk_pipeline",
+            "daily_report": "fzq_ai.pipelines.daily_report_pipeline",
+            "sentiment": "fzq_ai.pipelines.sentiment_pipeline",
+            "scenario": "fzq_ai.pipelines.scenario_pipeline",
+        }
+
+        mod_path = pipeline_map.get(task_type)
+        if mod_path:
+            import importlib
+            mod = importlib.import_module(mod_path)
+            for attr_name in dir(mod):
+                attr = getattr(mod, attr_name)
+                if isinstance(attr, type) and issubclass(attr, BasePipeline) and attr is not BasePipeline:
+                    return attr()
+
+        # Fallback: return a minimal pipeline that delegates to Router directly
+        logger = __import__("fzq_ai.utils.logger", fromlist=["get_logger"]).get_logger(__name__)
+        logger.warning("no pipeline matched task_type=%s, using router fallback", task_type)
+
+        class _FallbackPipeline(BasePipeline):
+            name = "fallback"
+            async def preprocess(self, r):
+                r.setdefault("prompt", r.get("query", str(r)))
+                r.setdefault("task_type", "default")
+                return r
+            async def postprocess(self, result):
+                return result
+
+        return _FallbackPipeline()
 
     def _gen_trace_id(self) -> str:
         """Generate a unique trace_id using uuid4 + timestamp prefix."""
