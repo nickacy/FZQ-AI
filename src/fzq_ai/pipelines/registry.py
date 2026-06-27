@@ -1,10 +1,10 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Type
 
 from fzq_ai.pipelines.base import BasePipeline
 
-# from fzq_ai.pipelines.zh_policy_pipeline import ZhPolicyBriefPipeline  # [V15: lazy import in register_defaults()]
+# from fzq_ai.pipelines.zh_policy_brief_pipeline import ZhPolicyBriefPipeline  # [V15: lazy import in register_defaults()]
 # from fzq_ai.pipelines.zh_risk_scan_pipeline import ZhRiskScanPipeline  # [V15: lazy import in register_defaults()]
 # from fzq_ai.pipelines.zh_opinion_landscape_pipeline import ZhOpinionLandscapePipeline  # [V15: lazy import in register_defaults()]
 # from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline  # [V15: lazy import in register_defaults()]
@@ -17,7 +17,7 @@ class PipelineRegistry:
     @classmethod
     def register_defaults(cls):
         # Lazy imports to avoid circular dependency with zh_*_pipeline modules
-        from fzq_ai.pipelines.zh_policy_pipeline import ZhPolicyBriefPipeline
+        from fzq_ai.pipelines.zh_policy_brief_pipeline import ZhPolicyBriefPipeline
         from fzq_ai.pipelines.zh_risk_scan_pipeline import ZhRiskScanPipeline
         from fzq_ai.pipelines.zh_opinion_landscape_pipeline import ZhOpinionLandscapePipeline
         from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline
@@ -108,4 +108,5 @@ def get_pipeline_info(name: str):
         "module": cls.__module__,
         "is_default": PipelineRegistry._DEFAULT == name,
     }
+
 
