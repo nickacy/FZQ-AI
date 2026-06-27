@@ -1,67 +1,82 @@
-# app/web_app.py
+# -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Layer · V15
-Bloomberg Terminal Theme + IntentEngine + TaskRouter + Pipelines
+FZQ-AI Entry Layer (V15-Final)
+FastAPI + Bloomberg Terminal Theme + IntentEngine + TaskRouter
 """
 
-from fastapi import FastAPI, HTTPException
+from __future__ import annotations
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from pathlib import Path
 
-# ---- 核心依赖（按你现有/规划的模块路径） ----
+# 核心模块
 from core.theme import inject_theme
 from core.intent_engine import IntentEngine
 from core.task_router import TaskRouter
 from core.pipelines import PipelineRegistry
 
 
-# ---------- FastAPI 应用初始化 ----------
+ROOT = Path(__file__).resolve().parent.parent
+TEMPLATE_DIR = ROOT / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+
 app = FastAPI(title="FZQ-AI Entry Layer V15")
 
-# CORS（方便你后面挂前端 / 移动端）
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 你可以后面收紧
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# ---------- 主题注入 ----------
-# Bloomberg Terminal Dark Theme / 统一 UI 风格
+# -------------------------
+# 注入主题
+# -------------------------
 inject_theme(app)
 
 
-# ---------- 核心组件初始化 ----------
+# -------------------------
+# 初始化核心组件
+# -------------------------
 intent_engine = IntentEngine()
 pipeline_registry = PipelineRegistry()
 task_router = TaskRouter(pipeline_registry=pipeline_registry)
 
 
-# ---------- 请求 / 响应模型 ----------
+# -------------------------
+# 请求模型
+# -------------------------
 class UserQuery(BaseModel):
     text: str
-    language: str = "zh"  # "zh" / "en"
+    language: str = "zh"
     session_id: str | None = None
 
 
-class EntryResponse(BaseModel):
-    intent: dict
-    route: dict
-    result: dict | str
+# -------------------------
+# 首页（带主题的 UI）
+# -------------------------
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "theme": app.state.theme,
+        },
+    )
 
 
-# ---------- 主入口端点 ----------
-@app.post("/entry", response_model=EntryResponse)
+# -------------------------
+# 智能入口 /entry
+# -------------------------
+@app.post("/entry")
 async def entry_point(query: UserQuery):
-    """
-    FZQ-AI 智能入口：
-    1) 意图识别
-    2) 任务路由
-    3) Pipeline 执行
-    4) 统一返回结构（含元数据）
-    """
 
     # 1) 意图识别
     try:
@@ -71,21 +86,20 @@ async def entry_point(query: UserQuery):
             session_id=query.session_id,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"IntentEngine error: {e}")
+        raise HTTPException(500, f"IntentEngine error: {e}")
 
-    # 低置信度时可以在这里做澄清（后续你可以扩展）
-    if hasattr(intent, "confidence") and intent.confidence < 0.4:
-        # 简单示例：返回澄清提示，而不是直接执行
-        return EntryResponse(
-            intent=intent.to_dict() if hasattr(intent, "to_dict") else dict(intent=intent),
-            route={},
-            result={
+    # 低置信度澄清
+    if intent.confidence < 0.4:
+        return {
+            "intent": intent.to_dict(),
+            "route": {},
+            "result": {
                 "type": "clarification",
                 "message": "当前意图置信度较低，请补充说明你的需求。",
             },
-        )
+        }
 
-    # 2) 路由决策
+    # 2) 路由
     try:
         route = task_router.route(
             intent=intent,
@@ -93,9 +107,9 @@ async def entry_point(query: UserQuery):
             session_id=query.session_id,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"TaskRouter error: {e}")
+        raise HTTPException(500, f"TaskRouter error: {e}")
 
-    # 3) 执行 pipeline
+    # 3) 执行 Pipeline
     try:
         pipeline = route.pipeline
         result = await pipeline.run(
@@ -104,17 +118,19 @@ async def entry_point(query: UserQuery):
             route=route,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Pipeline error: {e}")
+        raise HTTPException(500, f"Pipeline error: {e}")
 
-    # 4) 统一返回结构
-    return EntryResponse(
-        intent=intent.to_dict() if hasattr(intent, "to_dict") else dict(intent=intent),
-        route=route.to_dict() if hasattr(route, "to_dict") else dict(route=route),
-        result=result.to_dict() if hasattr(result, "to_dict") else result,
-    )
+    # 4) 返回结构化结果
+    return {
+        "intent": intent.to_dict(),
+        "route": route.to_dict(),
+        "result": result,
+    }
 
 
-# ---------- 健康检查 ----------
+# -------------------------
+# 健康检查
+# -------------------------
 @app.get("/health")
-def health_check():
+def health():
     return {"status": "ok", "entry_layer": "v15"}
