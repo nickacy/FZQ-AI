@@ -1,153 +1,78 @@
-# src/fzq_ai/orchestrator/task_orchestrator.py
-# v13 Task Orchestrator – 统一调度入口
+# -*- coding: utf-8 -*-
+"""
+FZQ-AI Task Orchestrator (V15-Final)
+任务编排器（V15 最终版）
+
+核心功能：
+- 调用 Intent Engine → TaskRouter → ModelRouter → AgentHub → Pipelines
+- 自愈链路（Self-Healing）
+- Recovery Trace（恢复链路）
+- Pipeline fallback
+- Model fallback
+- Agent fallback
+- 统一输出结构
+"""
 
 from __future__ import annotations
+from typing import Dict, Any
 
-import time
-import uuid
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional
-
-from fzq_ai.metrics.metrics import metrics
-from fzq_ai.monitor.token_monitor import token_monitor
-from fzq_ai.llm.router import Router
-from fzq_ai.pipelines.base import BasePipeline
+from fzq_ai.core.intent_engine import classify
+from fzq_ai.core.task_router import TaskRouter
 
 
 class TaskOrchestrator:
-    """
-    v13 任务调度器
-    - 统一 trace_id
-    - 统一 pipeline 调度
-    - 统一 provider 调用
-    - 统一 metrics + token_monitor
-    """
+    """V15-Final 任务编排器"""
 
     def __init__(self):
-        self.router = Router()
+        self.router = TaskRouter()
 
-    async def run(
-        self,
-        req: Dict[str, Any],
-        pipeline: Optional[BasePipeline] = None,
-    ) -> Dict[str, Any]:
-        """Run a request, auto-resolving pipeline from task_type if not given."""
-        if pipeline is None:
-            pipeline = self._resolve_pipeline(req)
-        trace_id = req.get("trace_id") or self._gen_trace_id()
-        req["trace_id"] = trace_id
-
-        start = time.time()
-
-        # ---- Pipeline 前置处理 ----
-        preprocessed = await pipeline.preprocess(req)
-
-        # ---- Router 调用 Provider ----
-        result = await self.router.run(preprocessed)
-
-        # ---- Pipeline 后置处理 ----
-        final_output = await pipeline.postprocess(result)
-
-        duration_ms = (time.time() - start) * 1000
-
-        # ---- Orchestrator 级别 metrics ----
-        metrics.record_orchestrator_call(
-            pipeline=pipeline.name,
-            duration_ms=duration_ms,
-            success=("error" not in final_output),
-            trace_id=trace_id,
-        )
-
-        return final_output
-
-
-    async def run_with_metrics(
-        self,
-        req: Dict[str, Any],
-        pipeline: Optional[BasePipeline] = None,
-    ) -> Dict[str, Any]:
+    # ------------------------------------------------------------
+    # 主入口
+    # ------------------------------------------------------------
+    def run(self, text: str) -> Dict[str, Any]:
         """
-        Run a pipeline with full metrics capture.
-
-        Wraps run() to additionally:
-          - Record token consumption via token_monitor
-          - Store trace_id in output
-          - Timestamp with timezone.utc
-          - Write metrics to JSONL when available
+        输入自然语言 → 自动执行完整任务链
         """
-        import time as _time
-
-        trace_id = req.get("trace_id") or self._gen_trace_id()
-        req["trace_id"] = trace_id
-
-        t0 = _time.perf_counter()
-
-        # Run the pipeline
-        output = await self.run(pipeline, req)
-
-        duration_ms = round((_time.perf_counter() - t0) * 1000, 2)
-
-        # Enrich output with metrics metadata
-        output.setdefault("trace_id", trace_id)
-        output.setdefault("duration_ms", duration_ms)
-        output.setdefault(
-            "timestamp_utc", datetime.now(timezone.utc).isoformat()
-        )
-
-        # Record token consumption if available
+        recovery_trace = []
         try:
-            token_monitor.record(
-                pipeline=pipeline.name,
-                trace_id=trace_id,
-                prompt_tokens=output.get("prompt_tokens", 0),
-                completion_tokens=output.get("completion_tokens", 0),
-                total_tokens=output.get("total_tokens", 0),
-                timestamp=datetime.now(timezone.utc).isoformat(),
+            # 1. 意图识别
+            intent = classify(text)
+            recovery_trace.append({"stage": "intent", "intent": intent.model_dump()})
+
+            # 2. 路由任务
+            result = self.router.route(intent, text)
+            recovery_trace.append(
+                {
+                    "stage": "task_router",
+                    "pipeline": result.pipeline_used,
+                    "agent": result.agent_used,
+                    "model": result.model_used,
+                }
             )
-        except Exception:
-            pass  # token_monitor may not support record() yet
 
-        return output
+            # 3. 输出结构化结果
+            return {
+                "success": result.success,
+                "task_type": result.task_type,
+                "pipeline": result.pipeline_used,
+                "agent": result.agent_used,
+                "model": result.model_used,
+                "fallback_used": result.fallback_used,
+                "output": result.output,
+                "error": result.error,
+                "recovery_trace": recovery_trace,
+            }
 
-    def _resolve_pipeline(self, req: Dict[str, Any]) -> BasePipeline:
-        """Resolve which pipeline to use from the request task_type."""
-        task_type = req.get("task_type", "").lower()
-
-        # Map task_type -> pipeline module
-        pipeline_map = {
-            "news": "fzq_ai.pipelines.news_pipeline",
-            "narrative": "fzq_ai.pipelines.narrative_pipeline",
-            "risk": "fzq_ai.pipelines.risk_pipeline",
-            "daily_report": "fzq_ai.pipelines.daily_report_pipeline",
-            "sentiment": "fzq_ai.pipelines.sentiment_pipeline",
-            "scenario": "fzq_ai.pipelines.scenario_pipeline",
-        }
-
-        mod_path = pipeline_map.get(task_type)
-        if mod_path:
-            import importlib
-            mod = importlib.import_module(mod_path)
-            for attr_name in dir(mod):
-                attr = getattr(mod, attr_name)
-                if isinstance(attr, type) and issubclass(attr, BasePipeline) and attr is not BasePipeline:
-                    return attr()
-
-        # Fallback: return a minimal pipeline that delegates to Router directly
-        logger = __import__("fzq_ai.utils.logger", fromlist=["get_logger"]).get_logger(__name__)
-        logger.warning("no pipeline matched task_type=%s, using router fallback", task_type)
-
-        class _FallbackPipeline(BasePipeline):
-            name = "fallback"
-            async def preprocess(self, r):
-                r.setdefault("prompt", r.get("query", str(r)))
-                r.setdefault("task_type", "default")
-                return r
-            async def postprocess(self, result):
-                return result
-
-        return _FallbackPipeline()
-
-    def _gen_trace_id(self) -> str:
-        """Generate a unique trace_id using uuid4 + timestamp prefix."""
-        ts = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-        return f"{ts}-{uuid.uuid4().hex[:12]}"
+        except Exception as e:
+            recovery_trace.append({"stage": "exception", "error": str(e)})
+            return {
+                "success": False,
+                "task_type": None,
+                "pipeline": None,
+                "agent": None,
+                "model": None,
+                "fallback_used": None,
+                "output": None,
+                "error": str(e),
+                "recovery_trace": recovery_trace,
+            }
