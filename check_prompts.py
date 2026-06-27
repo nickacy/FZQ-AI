@@ -1,3 +1,6 @@
+﻿import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 from fzq_ai.utils.prompt_loader import load_prompt_template
 
 paths = [
@@ -8,5 +11,6 @@ paths = [
 ]
 
 for p in paths:
-    print("\n===== ", p, " =====")
-    print(load_prompt_template(p))
+    name = p.split("/")[-1]
+    text = load_prompt_template(p)
+    print(f"{name}: {len(text)} chars loaded OK")

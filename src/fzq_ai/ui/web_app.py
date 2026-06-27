@@ -1,64 +1,69 @@
-import streamlit as st
+﻿import streamlit as st
+import asyncio
 from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
 from fzq_ai.schemas.pipeline_input import PipelineInput
 
 
 st.set_page_config(
     page_title="FZQ-AI Web UI",
-    page_icon="🤖",
+    page_icon="\U0001f916",
     layout="centered"
 )
 
-st.title("🤖 FZQ-AI Web UI（调试控制台）")
-st.write("输入任何问题，FZQ-AI 将通过 Router → Pipeline → 自愈 → 恢复 → 输出完整回答。")
-
+st.title("\U0001f916 FZQ-AI Web UI")
+st.write("Enter any question. FZQ-AI will process it through Router + Pipeline + Self-Healing + Recovery.")
 
 question = st.text_area(
-    "请输入你的问题：",
+    "Question:",
     height=150,
-    placeholder="例如：2026年世界杯冠军可能是谁？中国哪一年可能举办世界杯？"
+    placeholder="e.g. Who might win the 2026 World Cup?"
 )
 
 task_type = st.selectbox(
-    "选择 Pipeline 类型：",
+    "Pipeline type:",
     ["daily_report", "narrative", "risk", "merge"]
 )
 
 target_language = st.selectbox(
-    "输出语言：",
+    "Output language:",
     ["zh", "en"]
 )
 
-run_button = st.button("🚀 运行 FZQ-AI")
+run_button = st.button("\U0001f680 Run FZQ-AI")
 
 
 if run_button and question.strip():
     orchestrator = TaskOrchestrator()
 
+    # PipelineInput is a Pydantic model; convert to dict for orchestrator
     req = PipelineInput(
         query=question,
         target_language=target_language,
         task_type=task_type,
     )
 
-    with st.spinner("FZQ-AI 正在思考中…"):
-        result = orchestrator.run(req)
+    with st.spinner("Processing..."):
+        result = asyncio.run(orchestrator.run(req.model_dump()))
 
-    st.subheader("📝 最终输出")
-    st.write(result.output)
+    st.subheader("Output")
+    output = result.get("output", str(result))
+    if isinstance(output, str):
+        st.write(output)
+    else:
+        st.json(output)
 
-    if hasattr(result, "model_used"):
-        st.subheader("🤖 使用的模型")
-        st.json(result.model_used)
+    if "model_used" in result:
+        st.subheader("Model Used")
+        st.json(result["model_used"])
 
-    if hasattr(result, "metadata"):
-        st.subheader("📦 元数据")
-        st.json(result.metadata)
+    if "metadata" in result:
+        st.subheader("Metadata")
+        st.json(result["metadata"])
 
-    if hasattr(result, "recovery_trace"):
-        st.subheader("🛠 恢复链路")
-        st.json(result.recovery_trace)
+    if "recovery_trace" in result:
+        st.subheader("Recovery Trace")
+        st.json(result["recovery_trace"])
 
-    if hasattr(result, "repair_log"):
-        st.subheader("🔧 自愈日志")
-        st.json(result.repair_log)
+    if "repair_log" in result:
+        st.subheader("Self-Healing Log")
+        st.json(result["repair_log"])
