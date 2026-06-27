@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from pathlib import Path
+import json
 
 # 核心模块
 from core.theme import inject_theme
@@ -67,7 +68,7 @@ async def index(request: Request):
         "index.html",
         {
             "request": request,
-            "theme": app.state.theme,
+            "theme_json": json.dumps(app.state.theme),  # ← 修复关键点
         },
     )
 

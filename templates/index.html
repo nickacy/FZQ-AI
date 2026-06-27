@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <title>FZQ-AI · Entry Layer V15</title>
+
+    <!-- 加载 Bloomberg Terminal 主题 -->
     <link rel="stylesheet" href="/static/theme.css" />
+
     <style>
         .container {
             max-width: 900px;
@@ -39,6 +42,12 @@
 </head>
 
 <body>
+    <!-- theme_json 是字符串，不是 dict -->
+    <script>
+        const theme = {{ theme_json | safe }};
+        console.log("Loaded theme:", theme);
+    </script>
+
     <div class="container">
         <h2 class="accent-green">FZQ-AI · Entry Layer V15</h2>
 
