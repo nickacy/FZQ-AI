@@ -1,22 +1,21 @@
-﻿"""FZQ-AI Agents module — role-based intelligence agents."""
+﻿# -*- coding: utf-8 -*-
+"""
+FZQ-AI Agents Package (V15-Final)
+智能体模块（V15 最终版）
 
-from fzq_ai.agents.base import BaseAgent
-from fzq_ai.agents.news_center_agent import NewsCenterAgent
+导出所有角色智能体，供 AgentHub / TaskRouter 使用。
+"""
 
+from .risk_scan_agent import RiskScanAgent
+from .policy_brief_agent import PolicyBriefAgent
+from .opinion_landscape_agent import OpinionLandscapeAgent
+from .multisource_merge_agent import MultiSourceMergeAgent
+from .news_center_agent import NewsCenterAgent  # 保留旧版兼容性
 
-# Lazy accessor for agent catalog (avoids circular import from registry -> orchestrator -> registry)
-def get_agent_catalog():
-    from fzq_ai.agents.registry import _AGENT_REGISTRY
-    return _AGENT_REGISTRY
-
-
-def get_agent(name: str):
-    from fzq_ai.agents.registry import get_agent as _get_agent
-    return _get_agent(name)
-
-
-# AGENT_CATALOG is a property-like accessor for backward compat
-# Call get_agent_catalog() to get the actual dict
-AGENT_CATALOG = property(lambda self: get_agent_catalog())
-
-__all__ = ["AGENT_CATALOG", "BaseAgent", "get_agent", "get_agent_catalog", "NewsCenterAgent"]
+__all__ = [
+    "RiskScanAgent",
+    "PolicyBriefAgent",
+    "OpinionLandscapeAgent",
+    "MultiSourceMergeAgent",
+    "NewsCenterAgent",
+]
