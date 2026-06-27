@@ -1,4 +1,4 @@
-﻿# fzq_ai/pipelines/news_pipeline.py
+# fzq_ai/pipelines/news_pipeline.py
 # v13 NewsPipeline 鈥?淇濈暀鍘熶笟鍔￠€昏緫 + 缁熶竴 v13 Pipeline 鎺ュ彛
 
 from __future__ import annotations
@@ -55,6 +55,23 @@ class NewsPipeline(BasePipeline):
         req["prompt"] = prompt
         req["task_type"] = "analysis"
         return req
+
+    # ---------------------------------------------------------
+    # v13 call_llm: 调用 LLM（通过 Router）
+    # ---------------------------------------------------------
+    async def call_llm(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        使用 v13 Router 调用 LLM。
+        req 中应包含 preprocess 构造好的 prompt 和 task_type。
+        """
+        prompt = req.get("prompt", "")
+        task_type = req.get("task_type", "analysis")
+        
+        result = await self.router.run({
+            "task_type": task_type,
+            "prompt": prompt,
+        })
+        return result
 
     # ---------------------------------------------------------
     # v13 postprocess锛氱粨鏋勫寲杈撳嚭

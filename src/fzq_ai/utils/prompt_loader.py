@@ -1,4 +1,4 @@
-﻿"""
+"""
 Prompt Loader
 """
 from pathlib import Path

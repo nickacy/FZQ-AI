@@ -1,4 +1,4 @@
-﻿# fzq_ai/llm/providers/__init__.py
+# fzq_ai/llm/providers/__init__.py
 """
 Unified provider exports for FZQ-AI v9.4
 This file exposes:

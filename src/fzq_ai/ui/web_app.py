@@ -13,6 +13,7 @@ from __future__ import annotations
 import streamlit as st
 
 from fzq_ai.ui.i18n import t
+from fzq_ai.ui.theme import inject_theme
 from fzq_ai.core.intent_engine import classify
 from fzq_ai.core.task_router import TaskRouter
 
@@ -37,6 +38,7 @@ def get_state():
 
 def main():
     st.set_page_config(page_title="FZQ-AI Intelligence Workbench", layout="wide")
+    inject_theme()  # 注入 Bloomberg Terminal 暗色主题
     state = get_state()
 
     # Language toggle

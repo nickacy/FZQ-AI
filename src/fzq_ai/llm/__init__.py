@@ -1,4 +1,4 @@
-﻿# fzq_ai/llm/__init__.py
+# fzq_ai/llm/__init__.py
 """LLM module: router, providers, model selector, caching."""
 
 from fzq_ai.llm.llm_router import LLMRouter

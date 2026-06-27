@@ -1,18 +1,19 @@
 """
-FZQ-AI Frontend Entry (Streamlit)
-FZQ-AI 前端入口（Streamlit）
-----------------------------------------------------
-This file defines the main Streamlit UI for FZQ-AI.
-It provides:
-- Home page
-- Chinese Intelligence Center
-- System Metrics Dashboard (placeholder for v8.6)
-
-本文件定义 FZQ-AI 的主 Streamlit 界面，提供：
-- 首页
-- 中文情报中心
-- 系统指标仪表盘（v8.6 占位）
+⚠️  DEPRECATED — 此文件已被 web_app.py (V15-Final) 取代。
+    保留原因：向后兼容。
+    请使用：python -m streamlit run src/fzq_ai/ui/web_app.py
+    
+FZQ-AI Frontend Entry (Streamlit V10 — DEPRECATED)
+FZQ-AI 前端入口（Streamlit V10 — 已废弃）
 """
+
+import warnings
+warnings.warn(
+    "ui_app.py (V10) is deprecated. Use web_app.py (V15-Final) instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 from fzq_ai.ui.views.metrics_dashboard import render_metrics_page
 
 import streamlit as st

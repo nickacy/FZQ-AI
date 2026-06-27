@@ -1,4 +1,4 @@
-﻿"""Minimax quality validation and repair utilities."""
+"""Minimax quality validation and repair utilities."""
 
 
 def validate_and_fix(data, schema=None):

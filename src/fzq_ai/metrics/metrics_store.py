@@ -1,4 +1,4 @@
-﻿"""
+"""
 MetricsStore - In-memory metrics aggregation for the API layer.
 """
 from __future__ import annotations

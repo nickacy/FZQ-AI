@@ -1,4 +1,4 @@
-﻿"""Agent for zh_risk_scan — wraps the pipeline for autonomous task execution."""
+"""Agent for zh_risk_scan — wraps the pipeline for autonomous task execution."""
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
 
 

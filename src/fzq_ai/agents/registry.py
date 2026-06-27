@@ -1,4 +1,4 @@
-﻿from typing import Dict
+from typing import Dict
 from fzq_ai.agents.base import BaseAgent
 from fzq_ai.agents.news_center_agent import NewsCenterAgent
 from fzq_ai.agents.tasks.policy_brief_agent import PolicyBriefAgent

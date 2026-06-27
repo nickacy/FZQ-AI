@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 FZQ-AI Global Settings (V15-Final)
 全局配置（V15 最终版）

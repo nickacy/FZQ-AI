@@ -1,4 +1,4 @@
-﻿"""
+"""
 ModelClient - Unified LLM client adapter.
 """
 from __future__ import annotations

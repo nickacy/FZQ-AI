@@ -1,4 +1,4 @@
-﻿# fzq_ai/llm/llm_router.py
+# fzq_ai/llm/llm_router.py
 # v13 Compatibility Layer for old pipelines
 
 from __future__ import annotations

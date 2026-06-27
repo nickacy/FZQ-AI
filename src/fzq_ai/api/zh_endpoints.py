@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 FZQ-AI Chinese Intelligence API (V15-Final)
 中文情报任务 API（V15 最终版）
@@ -69,7 +69,7 @@ def wrap_response(route_result):
 async def api_zh_policy_brief(payload: ZhIntelPayload):
     intent = classify(payload.text)
     intent.task_type = "zh_policy_brief"
-    result = task_router.route(intent, payload.text)
+    result = await task_router.route(intent, payload.text)
     return wrap_response(result)
 
 
@@ -77,7 +77,7 @@ async def api_zh_policy_brief(payload: ZhIntelPayload):
 async def api_zh_risk_scan(payload: ZhIntelPayload):
     intent = classify(payload.text)
     intent.task_type = "zh_risk_scan"
-    result = task_router.route(intent, payload.text)
+    result = await task_router.route(intent, payload.text)
     return wrap_response(result)
 
 
@@ -85,7 +85,7 @@ async def api_zh_risk_scan(payload: ZhIntelPayload):
 async def api_zh_opinion_landscape(payload: ZhIntelPayload):
     intent = classify(payload.text)
     intent.task_type = "zh_opinion_landscape"
-    result = task_router.route(intent, payload.text)
+    result = await task_router.route(intent, payload.text)
     return wrap_response(result)
 
 
@@ -93,5 +93,5 @@ async def api_zh_opinion_landscape(payload: ZhIntelPayload):
 async def api_zh_multisource_merge(payload: ZhIntelPayload):
     intent = classify(payload.text)
     intent.task_type = "zh_multisource_merge"
-    result = task_router.route(intent, payload.text)
+    result = await task_router.route(intent, payload.text)
     return wrap_response(result)

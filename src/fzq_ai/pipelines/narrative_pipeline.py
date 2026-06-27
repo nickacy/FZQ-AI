@@ -1,4 +1,4 @@
-﻿# fzq_ai/pipelines/narrative_pipeline.py
+# fzq_ai/pipelines/narrative_pipeline.py
 # v13 NarrativePipeline 鈥?淇濈暀鍘熶笟鍔￠€昏緫 + 杞婚噺瀵归綈 v13
 
 from __future__ import annotations

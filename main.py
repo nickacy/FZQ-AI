@@ -21,7 +21,7 @@ def run_api():
             sys.executable,
             "-m",
             "uvicorn",
-            "fzq_ai.api.app:app",
+            "app:app",  # 根目录 app.py（V4.0.0 FastAPI 入口）
             "--reload",
             "--port",
             "8000",

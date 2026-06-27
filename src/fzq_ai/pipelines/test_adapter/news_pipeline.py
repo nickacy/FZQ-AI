@@ -1,4 +1,4 @@
-﻿"""
+"""
 FZQ-AI Pipelines 鈥?Test Adapter News Pipeline
 Mock NewsPipeline. Same interface as real NewsPipeline. Async run_async() 鈫?PipelineOutput.
 No real fetching. No translation. Returns fixed mock data with up to 3 dummy

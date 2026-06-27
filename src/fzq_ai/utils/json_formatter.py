@@ -1,4 +1,4 @@
-﻿"""JSON formatting utilities."""
+"""JSON formatting utilities."""
 
 
 def format_final(data):

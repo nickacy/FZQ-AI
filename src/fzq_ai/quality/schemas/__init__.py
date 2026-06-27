@@ -1,4 +1,4 @@
-﻿"""Schema definitions for quality validation."""
+"""Schema definitions for quality validation."""
 
 
 def get_schema(task_type: str):

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 FZQ-AI Intent Engine (V15-Final)
 意图识别引擎（V15 最终融合版）
@@ -92,4 +92,72 @@ def _detect_language(text: str) -> str:
 
 # ============================================================
 # 4. 置信度计算 / Confidence Scoring
-# =================================================
+# ============================================================
+
+def _score_task(task_type: str, text: str, lang: str) -> tuple[float, list[str]]:
+
+    """
+    对单个任务类型进行评分，并返回匹配到的关键词列表
+    Score a single task_type and return matched keywords
+    """
+    patterns = _INTENT_PATTERNS.get(task_type, {})
+    keywords = patterns.get(lang, []) + patterns.get("en" if lang == "zh" else "zh", [])
+
+    matched: List[str] = []
+    score = 0.0
+
+    text_lower = text.lower()
+
+    for kw in keywords:
+        if kw in text or kw in text_lower:
+            matched.append(kw)
+            score += 1.0
+
+    # 简单归一化：最多 5 个关键词 → 置信度 1.0
+    confidence = min(1.0, score / 5.0)
+    return confidence, matched
+
+
+# ============================================================
+# 5. 主分类函数 / Main Classification Function
+# ============================================================
+
+def classify(text: str) -> IntentResult:
+    """
+    主入口：根据输入文本识别任务类型
+    Main entry: classify task_type from input text
+    """
+    lang = _detect_language(text)
+
+    best_task: Optional[str] = None
+    best_conf: float = 0.0
+    best_matched: List[str] = []
+
+    # 对所有任务类型进行评分
+    for task_type in _INTENT_PATTERNS.keys():
+        conf, matched = _score_task(task_type, text, lang)
+        if conf > best_conf:
+            best_conf = conf
+            best_task = task_type
+            best_matched = matched
+
+    # 低置信度 → 请求澄清
+    if best_task is None or best_conf < 0.3:
+        return IntentResult(
+            task_type="clarification_required",
+            confidence=best_conf,
+            language=lang,
+            keywords_matched=best_matched,
+            alternative=None,
+            reason="Low confidence intent; need user clarification.",
+        )
+
+    # 构造 IntentResult
+    return IntentResult(
+        task_type=best_task,
+        confidence=best_conf,
+        language=lang,
+        keywords_matched=best_matched,
+        alternative=None,
+        reason=None,
+    )

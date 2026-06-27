@@ -1,4 +1,4 @@
-﻿"""
+"""
 ZhOpinionLandscapePipeline
 """
 import json

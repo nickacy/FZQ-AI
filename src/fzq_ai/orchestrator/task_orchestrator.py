@@ -17,6 +17,7 @@ from __future__ import annotations
 from typing import Dict, Any
 
 from fzq_ai.core.intent_engine import classify
+from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.core.task_router import TaskRouter
 
 
@@ -29,7 +30,22 @@ class TaskOrchestrator:
     # ------------------------------------------------------------
     # 主入口
     # ------------------------------------------------------------
-    def run(self, text: str) -> Dict[str, Any]:
+    def run(
+        self,
+        req: Dict[str, Any] = None,
+        pipeline=None,
+        text: str = None,
+    ) -> Dict[str, Any]:
+        """Run a request. Accepts req dict or plain text. Auto-resolves pipeline."""
+        # Normalize input: if text is given, wrap it
+        if text and not req:
+            req = {"query": text, "task_type": "default"}
+        if req is None:
+            req = {}
+
+        # Auto-resolve pipeline if not provided
+        if pipeline is None:
+            pipeline = self._resolve_pipeline(req)
         """
         输入自然语言 → 自动执行完整任务链
         """

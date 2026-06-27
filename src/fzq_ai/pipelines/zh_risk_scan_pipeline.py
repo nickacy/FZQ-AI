@@ -1,4 +1,4 @@
-﻿"""
+"""
 ZhRiskScanPipeline
 """
 import json

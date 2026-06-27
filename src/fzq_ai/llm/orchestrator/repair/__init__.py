@@ -1,4 +1,4 @@
-﻿"""Orchestrator repair module."""
+"""Orchestrator repair module."""
 
 from fzq_ai.llm.orchestrator.repair.json_repairer import JsonRepairer
 from fzq_ai.llm.orchestrator.repair.schema_repairer import SchemaRepairer
