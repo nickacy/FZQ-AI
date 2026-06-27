@@ -1,37 +1,38 @@
-# fzq_ai/config/config.yaml
-# FZQ‑AI v10 全局配置（声明性）
+# ============================================================
+# FZQ‑AI Task-Level Model Overrides (V15-Final)
+# ============================================================
 
+# ------------------------------------------------------------
+# Global Model Priority
+# ------------------------------------------------------------
 model_priority:
-  # 全局模型优先级（从高到低）
-  # 你给的原则：DeepSeek > Qwen > GLM > Doubao > Kimi > OpenAI > Gemini
   order:
     - deepseek
     - qwen
     - glm
-    - doubao
-    - kimi
     - openai
     - gemini
 
+# ------------------------------------------------------------
+# Task-Level Overrides
+# ------------------------------------------------------------
 task_overrides:
-  # 任务级模型覆盖（可选）
-  # 例如：风险类任务强制 DeepSeek
-  risk_summary:
-    primary: deepseek
-  risk_factors:
-    primary: openai
-  risk_forecast:
+
+  # 风险类任务 → DeepSeek
+  zh_risk_scan:
     primary: deepseek
 
-  # 叙事类任务 → Qwen
-  narrative_summary:
+  # 政策类任务 → DeepSeek
+  zh_policy_brief:
+    primary: deepseek
+
+  # 舆论类任务 → Qwen
+  zh_opinion_landscape:
     primary: qwen
-  narrative_keypoints:
-    primary: qwen
-  narrative_storyline:
-    primary: qwen
-  narrative_implications:
-    primary: qwen
+
+  # 多源合并 → GLM
+  zh_multisource_merge:
+    primary: glm
 
   # 新闻类任务 → GLM
   news_intel:
@@ -41,15 +42,14 @@ task_overrides:
   daily_exec_overview:
     primary: kimi
 
-  refinement:
-    enabled: true
-    tasks:
-      - risk_summary
-      - risk_forecast
-      - scenario_base_case
-      - scenario_alternatives
-      - scenario_implications
-      - daily_exec_overview
-      - daily_outlook
-      - zh_policy_brief
-      - zh_opinion_landscape
+# ------------------------------------------------------------
+# Refinement Settings
+# ------------------------------------------------------------
+refinement:
+  enabled: true
+  tasks:
+    - zh_risk_scan
+    - zh_policy_brief
+    - zh_opinion_landscape
+    - zh_multisource_merge
+    - daily_exec_overview

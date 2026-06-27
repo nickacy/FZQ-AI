@@ -1,68 +1,97 @@
-﻿"""
-Chinese Intelligence API Endpoints
-中文情报任务 API 端点（中英文双语）
-----------------------------------------------------
-This module exposes REST APIs for the four zh-intel tasks.
-该模块为四大中文情报任务提供 REST API。
+﻿# -*- coding: utf-8 -*-
+"""
+FZQ-AI Chinese Intelligence API (V15-Final)
+中文情报任务 API（V15 最终版）
+
+本模块通过 TaskRouter 执行四大中文情报任务：
+- zh_policy_brief
+- zh_risk_scan
+- zh_opinion_landscape
+- zh_multisource_merge
+
+所有端点返回统一结构化响应格式。
 """
 
-from fastapi import APIRouter
-from fzq_ai.pipelines.registry import PipelineRegistry
+from __future__ import annotations
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from fzq_ai.core.intent_engine import classify
+from fzq_ai.core.task_router import TaskRouter
 
 router = APIRouter(prefix="/api/zh", tags=["Chinese Intelligence"])
+task_router = TaskRouter()
 
 
-# -------------------------------
-# 1. zh_policy_brief
-# -------------------------------
+# ============================================================
+# 1. 请求体 Schema
+# ============================================================
+
+class ZhIntelPayload(BaseModel):
+    text: str
+    extra: dict | None = None
+
+
+# ============================================================
+# 2. 统一响应包装
+# ============================================================
+
+def wrap_response(route_result):
+    """统一 API 响应格式"""
+    if not route_result.success:
+        return {
+            "success": False,
+            "task_type": route_result.task_type,
+            "pipeline": route_result.pipeline_used,
+            "agent": route_result.agent_used,
+            "model": route_result.model_used,
+            "fallback_used": route_result.fallback_used,
+            "error": route_result.error,
+            "output": None,
+        }
+
+    return {
+        "success": True,
+        "task_type": route_result.task_type,
+        "pipeline": route_result.pipeline_used,
+        "agent": route_result.agent_used,
+        "model": route_result.model_used,
+        "fallback_used": route_result.fallback_used,
+        "error": None,
+        "output": route_result.output,
+    }
+
+
+# ============================================================
+# 3. 四大中文情报任务端点
+# ============================================================
+
 @router.post("/policy_brief")
-async def api_zh_policy_brief(payload: dict):
-    """
-    Run zh_policy_brief pipeline.
-    执行 zh_policy_brief 中文政策解读任务。
-    """
-    pipeline = PipelineRegistry.get("zh_policy_brief")
-    result = await pipeline.run_async(**payload)
-    return result.model_dump()
+async def api_zh_policy_brief(payload: ZhIntelPayload):
+    intent = classify(payload.text)
+    intent.task_type = "zh_policy_brief"
+    result = task_router.route(intent, payload.text)
+    return wrap_response(result)
 
 
-# -------------------------------
-# 2. zh_risk_scan
-# -------------------------------
 @router.post("/risk_scan")
-async def api_zh_risk_scan(payload: dict):
-    """
-    Run zh_risk_scan pipeline.
-    执行 zh_risk_scan 中文风险扫描任务。
-    """
-    pipeline = PipelineRegistry.get("zh_risk_scan")
-    result = await pipeline.run_async(**payload)
-    return result.model_dump()
+async def api_zh_risk_scan(payload: ZhIntelPayload):
+    intent = classify(payload.text)
+    intent.task_type = "zh_risk_scan"
+    result = task_router.route(intent, payload.text)
+    return wrap_response(result)
 
 
-# -------------------------------
-# 3. zh_opinion_landscape
-# -------------------------------
 @router.post("/opinion_landscape")
-async def api_zh_opinion_landscape(payload: dict):
-    """
-    Run zh_opinion_landscape pipeline.
-    执行 zh_opinion_landscape 中文舆论版图任务。
-    """
-    pipeline = PipelineRegistry.get("zh_opinion_landscape")
-    result = await pipeline.run_async(**payload)
-    return result.model_dump()
+async def api_zh_opinion_landscape(payload: ZhIntelPayload):
+    intent = classify(payload.text)
+    intent.task_type = "zh_opinion_landscape"
+    result = task_router.route(intent, payload.text)
+    return wrap_response(result)
 
 
-# -------------------------------
-# 4. zh_multisource_merge
-# -------------------------------
 @router.post("/multisource_merge")
-async def api_zh_multisource_merge(payload: dict):
-    """
-    Run zh_multisource_merge pipeline.
-    执行 zh_multisource_merge 中文多源新闻合并任务。
-    """
-    pipeline = PipelineRegistry.get("zh_multisource_merge")
-    result = await pipeline.run_async(**payload)
-    return result.model_dump()
+async def api_zh_multisource_merge(payload: ZhIntelPayload):
+    intent = classify(payload.text)
+    intent.task_type = "zh_multisource_merge"
+    result = task_router.route(intent, payload.text)
+    return wrap_response(result)

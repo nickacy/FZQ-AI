@@ -1,6 +1,56 @@
 # ============================================================
-# FZQ‑AI Global Settings (v13)
+# FZQ‑AI Global Settings (V15-Final)
 # ============================================================
+
+# ------------------------------------------------------------
+# Provider Enable Flags
+# ------------------------------------------------------------
+providers:
+  deepseek:
+    enabled: true
+  qwen:
+    enabled: true
+  glm:
+    enabled: true
+  kimi:
+    enabled: true
+  openai:
+    enabled: true
+  gemini:
+    enabled: true
+
+# ------------------------------------------------------------
+# Model Priority (fallback chain)
+# ------------------------------------------------------------
+model_priority:
+  default_primary: "deepseek"
+  fallback:
+    - "qwen"
+    - "glm"
+    - "openai"
+    - "gemini"
+
+# ------------------------------------------------------------
+# Cost Matrix (USD per 1K tokens)
+# ------------------------------------------------------------
+cost_matrix:
+  deepseek: 0.002
+  qwen: 0.0008
+  glm: 0.001
+  kimi: 0.002
+  openai: 0.01
+  gemini: 0.01
+
+# ------------------------------------------------------------
+# Context Length
+# ------------------------------------------------------------
+context_length:
+  deepseek: 128000
+  qwen: 128000
+  glm: 32000
+  kimi: 200000
+  openai: 128000
+  gemini: 100000
 
 # ------------------------------------------------------------
 # Budget & Token Monitoring
@@ -13,24 +63,9 @@ budget:
 
 token_monitor:
   log_path: "fzqai_token_log.jsonl"
-  model_cost:
-    openai: 0.01
-    deepseek: 0.002
-    qwen: 0.0008
-    glm: 0.001
 
 # ------------------------------------------------------------
-# Model Priority (for model_selector)
-# ------------------------------------------------------------
-model_priority:
-  default_primary: "deepseek"
-  fallback:
-    - "qwen"
-    - "glm"
-    - "openai"
-
-# ------------------------------------------------------------
-# LLM Router Settings
+# Router Settings
 # ------------------------------------------------------------
 router:
   enable_cache: true
@@ -38,35 +73,7 @@ router:
   redis_ttl_seconds: 86400
 
 # ------------------------------------------------------------
-# Provider Settings
-# ------------------------------------------------------------
-providers:
-  openai:
-    enabled: true
-    max_tokens: 4096
-  deepseek:
-    enabled: true
-    max_tokens: 4096
-  qwen:
-    enabled: true
-    max_tokens: 4096
-  glm:
-    enabled: true
-    max_tokens: 4096
-
-# ------------------------------------------------------------
-# Pipeline Defaults
-# ------------------------------------------------------------
-pipelines:
-  news:
-    max_articles: 30
-  risk:
-    enable_forecast: true
-  sentiment:
-    mode: "standard"
-
-# ------------------------------------------------------------
-# Orchestrator Defaults
+# Orchestrator Settings
 # ------------------------------------------------------------
 orchestrator:
   enable_parallel: true
