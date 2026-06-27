@@ -1,0 +1,27 @@
+
+    body {
+        background-color: #0C0C0C;
+        color: #E6E6E6;
+        font-family: Consolas, Menlo, Monaco, 'Courier New', monospace;
+    }
+
+    .panel {
+        background-color: #111111;
+        border: 1px solid #2A2A2A;
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .panel-alt {
+        background-color: #161616;
+        border: 1px solid #2A2A2A;
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .accent-green { color: #00FF41; }
+    .accent-yellow { color: #F2E205; }
+    .accent-red { color: #FF4D4D; }
+    .accent-blue { color: #4DA6FF; }
+    .accent-orange { color: #FF9933; }
+    

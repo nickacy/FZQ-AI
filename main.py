@@ -1,64 +1,26 @@
 # -*- coding: utf-8 -*-
 """
 FZQ-AI Unified Entry (V15-Final)
-统一入口：API / Web UI
+统一入口：启动 FastAPI（web_app.py）
 """
 
 from __future__ import annotations
-import argparse
-import subprocess
-import sys
-from pathlib import Path
-
-
-ROOT = Path(__file__).resolve().parent
-
-
-def run_api():
-    """启动 FastAPI"""
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "uvicorn",
-            "app:app",  # 根目录 app.py（V4.0.0 FastAPI 入口）
-            "--reload",
-            "--port",
-            "8000",
-        ],
-        cwd=ROOT,
-        check=True,
-    )
-
-
-def run_web():
-    """启动 Streamlit Web UI"""
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "streamlit",
-            "run",
-            "src/fzq_ai/ui/web_app.py",
-        ],
-        cwd=ROOT,
-        check=True,
-    )
+import uvicorn
 
 
 def main():
-    parser = argparse.ArgumentParser(description="FZQ-AI Unified Entry")
-    parser.add_argument(
-        "mode",
-        choices=["api", "web"],
-        help="Run mode: api (FastAPI) or web (Streamlit)",
+    """
+    启动 V15 新入口端：
+    - app/web_app.py 中的 FastAPI 应用
+    - Bloomberg Terminal 主题
+    - IntentEngine + TaskRouter + Pipelines
+    """
+    uvicorn.run(
+        "app.web_app:app",   # ← 关键：指向新的入口端
+        host="0.0.0.0",
+        port=8000,
+        reload=True
     )
-    args = parser.parse_args()
-
-    if args.mode == "api":
-        run_api()
-    elif args.mode == "web":
-        run_web()
 
 
 if __name__ == "__main__":
