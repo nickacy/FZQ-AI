@@ -1,84 +1,112 @@
-﻿"""
-FZQ-AI Web UI (Debug Console)
-FZQ-AI 调试控制台（中英文双语）
-----------------------------------------------------
-Entry point for testing pipelines via Streamlit.
-通过 Streamlit 测试各 Pipeline 的调试入口。
+# -*- coding: utf-8 -*-
+"""
+FZQ-AI Web App (V15-Final)
+双语情报工作台前端入口（Streamlit）
+
+- 中文 / English 双语 UI
+- 四大中文情报任务入口
+- 统一错误边界
+- 状态恢复（SessionState）
 """
 
+from __future__ import annotations
 import streamlit as st
-import asyncio
-from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
-from fzq_ai.schemas.pipeline_input import PipelineInput
+
+from fzq_ai.ui.i18n import t
+from fzq_ai.core.intent_engine import classify
+from fzq_ai.core.task_router import TaskRouter
+
+router = TaskRouter()
 
 
-st.set_page_config(
-    page_title="FZQ-AI Web UI / 调试控制台",
-    page_icon="🤖",
-    layout="centered"
-)
+# ---------------- Session State ----------------
 
-st.title("🤖 FZQ-AI Web UI / 调试控制台")
-st.write(
-    "Enter any question. FZQ-AI processes it through Router → Pipeline → Self-Healing → Recovery.\n\n"
-    "输入任何问题，FZQ-AI 将通过 Router → Pipeline → 自愈 → 恢复 链路输出完整回答。"
-)
-
-question = st.text_area(
-    "Question / 问题：",
-    height=150,
-    placeholder="e.g. Who might win the 2026 World Cup? / 例如：2026年世界杯冠军可能是谁？"
-)
-
-task_type = st.selectbox(
-    "Pipeline type / Pipeline 类型：",
-    ["daily_report", "narrative", "risk", "merge",
-     "zh_multisource_merge", "zh_opinion_landscape", "zh_policy_brief", "zh_risk_scan"]
-)
-
-target_language = st.selectbox(
-    "Output language / 输出语言：",
-    ["zh", "en"]
-)
-
-run_button = st.button("🚀 Run FZQ-AI / 运行")
+def get_state():
+    if "fzq_state" not in st.session_state:
+        st.session_state["fzq_state"] = {
+            "language": "zh",
+            "last_task": None,
+            "last_input": "",
+            "last_result": None,
+            "error": None,
+        }
+    return st.session_state["fzq_state"]
 
 
-if run_button and question.strip():
-    orchestrator = TaskOrchestrator()
+# ---------------- Layout ----------------
 
-    req = PipelineInput(
-        query=question,
-        target_language=target_language,
-        task_type=task_type,
+def main():
+    st.set_page_config(page_title="FZQ-AI Intelligence Workbench", layout="wide")
+    state = get_state()
+
+    # Language toggle
+    col_lang, _ = st.columns([1, 3])
+    with col_lang:
+        lang = st.radio(
+            "Language / 语言",
+            options=["zh", "en"],
+            index=0 if state["language"] == "zh" else 1,
+            horizontal=True,
+        )
+        state["language"] = lang
+
+    st.title(t("app.title", lang))
+    st.caption(t("app.subtitle", lang))
+
+    # Task selector
+    task = st.selectbox(
+        t("app.task_selector", lang),
+        [
+            "zh_policy_brief",
+            "zh_risk_scan",
+            "zh_opinion_landscape",
+            "zh_multisource_merge",
+        ],
+        format_func=lambda x: t(f"task.{x}", lang),
+    )
+    state["last_task"] = task
+
+    # Input area
+    text = st.text_area(
+        t("app.input_label", lang),
+        value=state["last_input"],
+        height=200,
     )
 
-    with st.spinner("Processing... / 处理中..."):
+    if st.button(t("app.run_button", lang)):
+        state["last_input"] = text
         try:
-            result = asyncio.run(orchestrator.run(req.model_dump()))
+            intent = classify(text)
+            intent.task_type = task
+            result = router.route(intent, text)
+            state["last_result"] = result
+            state["error"] = None
         except Exception as e:
-            st.error(f"Error / 错误: {e}")
-            st.stop()
+            state["error"] = str(e)
+            state["last_result"] = None
 
-    st.subheader("📝 Output / 输出")
-    output = result.get("output", str(result))
-    if isinstance(output, str):
-        st.write(output)
-    else:
-        st.json(output)
+    # Error boundary
+    if state["error"]:
+        st.error(t("app.error_prefix", lang) + state["error"])
+        return
 
-    if "model_used" in result:
-        st.subheader("🤖 Model Used / 使用模型")
-        st.json(result["model_used"])
+    # Result display
+    if state["last_result"]:
+        rr = state["last_result"]
+        st.markdown("### " + t("app.result_title", lang))
+        st.json(
+            {
+                "success": rr.success,
+                "task_type": rr.task_type,
+                "pipeline": rr.pipeline_used,
+                "agent": rr.agent_used,
+                "model": rr.model_used,
+                "fallback_used": rr.fallback_used,
+                "output": rr.output,
+                "error": rr.error,
+            }
+        )
 
-    if "metadata" in result:
-        st.subheader("📦 Metadata / 元数据")
-        st.json(result["metadata"])
 
-    if "recovery_trace" in result:
-        st.subheader("🛠 Recovery Trace / 恢复链路")
-        st.json(result["recovery_trace"])
-
-    if "repair_log" in result:
-        st.subheader("🔧 Self-Healing Log / 自愈日志")
-        st.json(result["repair_log"])
+if __name__ == "__main__":
+    main()
