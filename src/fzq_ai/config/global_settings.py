@@ -1,4 +1,4 @@
-# fzq_ai/config/global_settings.py
+﻿# fzq_ai/config/global_settings.py
 # v13 Global Settings Loader (supports nested attribute access)
 
 from __future__ import annotations
@@ -103,3 +103,4 @@ class Settings:
 
 # Singleton
 settings = Settings()
+

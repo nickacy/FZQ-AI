@@ -1,22 +1,12 @@
-{
+﻿{
   "models": {
-    "deepseek": {
-      "model": "deepseek-chat"
-    },
-    "openai": {
-      "model": "gpt-4o-mini"
-    },
-    "gemini": {
-      "model": "gemini-1.5-flash"
-    }
+    "deepseek": { "model": "deepseek-chat" },
+    "openai": { "model": "gpt-4o-mini" },
+    "gemini": { "model": "gemini-1.5-flash" },
+    "qwen": { "model": "qwen-plus" },
+    "glm": { "model": "glm-4-flash" },
+    "kimi": { "model": "moonshot-v1-8k" }
   },
-
-  "news": {
-    "max_items": 50
-  },
-
-  "daily_report": {
-    "include_risk": true,
-    "include_narrative": true
-  }
+  "news": { "max_items": 50 },
+  "daily_report": { "include_risk": true, "include_narrative": true }
 }
