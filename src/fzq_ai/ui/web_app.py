@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 """
 FZQ-AI Web App (V15-Final)
-双语情报工作台前端入口（Streamlit）
+Bilingual Intelligence Workbench (Streamlit)
 
-- 中文 / English 双语 UI
-- 四大中文情报任务入口
-- 统一错误边界
-- 状态恢复（SessionState）
+- Chinese / English bilingual UI
+- 4 ZH intelligence task entry points
+- Unified error boundary
+- State recovery (SessionState)
+- Async execution via asyncio.run()
 """
 
 from __future__ import annotations
+import asyncio
 import streamlit as st
 
 from fzq_ai.ui.i18n import t
 from fzq_ai.ui.theme import inject_theme
-from fzq_ai.core.intent_engine import classify
-from fzq_ai.core.task_router import TaskRouter
+from fzq_ai.entry.entry_service import EntryService
 
-router = TaskRouter()
+service = EntryService()
 
 
-# ---------------- Session State ----------------
+# ── Session State ──────────────────────────────────────────────
 
 def get_state():
     if "fzq_state" not in st.session_state:
@@ -34,11 +35,20 @@ def get_state():
     return st.session_state["fzq_state"]
 
 
-# ---------------- Layout ----------------
+def _run_async(text: str, task_type: str):
+    """Sync wrapper: run the async entry service via asyncio.run()."""
+    return asyncio.run(service.handle(text, task_type))
+
+
+# ── Layout ─────────────────────────────────────────────────────
 
 def main():
-    st.set_page_config(page_title="FZQ-AI Intelligence Workbench", layout="wide")
-    inject_theme()  # 注入 Bloomberg Terminal 暗色主题
+    st.set_page_config(
+        page_title="FZQ-AI Intelligence Workbench",
+        page_icon=":robot:",
+        layout="wide",
+    )
+    inject_theme()
     state = get_state()
 
     # Language toggle
@@ -52,6 +62,7 @@ def main():
         )
         state["language"] = lang
 
+    # Header
     st.title(t("app.title", lang))
     st.caption(t("app.subtitle", lang))
 
@@ -75,12 +86,11 @@ def main():
         height=200,
     )
 
+    # Run button - async execution via EntryService
     if st.button(t("app.run_button", lang)):
         state["last_input"] = text
         try:
-            intent = classify(text)
-            intent.task_type = task
-            result = router.route(intent, text)
+            result = _run_async(text, task)
             state["last_result"] = result
             state["error"] = None
         except Exception as e:
@@ -98,14 +108,14 @@ def main():
         st.markdown("### " + t("app.result_title", lang))
         st.json(
             {
-                "success": rr.success,
-                "task_type": rr.task_type,
-                "pipeline": rr.pipeline_used,
-                "agent": rr.agent_used,
-                "model": rr.model_used,
-                "fallback_used": rr.fallback_used,
-                "output": rr.output,
-                "error": rr.error,
+                "success": getattr(rr, "success", None),
+                "task_type": getattr(rr, "task_type", None),
+                "pipeline": getattr(rr, "pipeline_used", None),
+                "agent": getattr(rr, "agent_used", None),
+                "model": getattr(rr, "model_used", None),
+                "fallback_used": getattr(rr, "fallback_used", None),
+                "output": getattr(rr, "output", None),
+                "error": getattr(rr, "error", None),
             }
         )
 
