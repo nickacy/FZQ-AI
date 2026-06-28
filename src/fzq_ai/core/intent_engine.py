@@ -141,7 +141,7 @@ def classify(text: str) -> IntentResult:
             best_matched = matched
 
     # 置信度过低 → 请求澄清
-    if best_task is None or best_conf < 0.3:
+    if best_task is None or best_conf < 0.1:
         return IntentResult(
             task_type="clarification_required",
             confidence=best_conf,

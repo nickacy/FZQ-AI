@@ -44,13 +44,13 @@ class EntryService:
             }
 
         # 2. 路由
-        route_result = self.task_router.route(intent.task_type)
+        route_result = self.task_router.route(intent)
 
-        if not route_result or not route_result.pipeline_name:
+        if not route_result or not route_result.pipeline:
             return {
                 "status": "error",
                 "type": "routing_error",
-                "message": f"未找到可用 Pipeline（task_type={intent.task_type}）",
+                "message": f"No pipeline available (task_type={intent.task_type})",
                 "intent": intent.__dict__,
             }
 
@@ -76,6 +76,6 @@ class EntryService:
             "status": "success",
             "type": intent.task_type,
             "intent": intent.__dict__,
-            "route": route_result.__dict__,
+            "route": route_result.to_dict(),
             "data": result,
         }
