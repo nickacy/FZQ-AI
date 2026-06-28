@@ -37,3 +37,67 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ============================================================
+# 2. 请求模型 / Request Model
+# ============================================================
+
+class UserQuery(BaseModel):
+    text: str = Field(..., max_length=5000)
+    language: str = Field("zh", max_length=10)
+    session_id: str | None = None
+
+
+# ============================================================
+# 3. 核心组件初始化 / Core Components
+# ============================================================
+
+pipeline_registry = AdaptedPipelineRegistry()
+task_router = TaskRouter(pipeline_registry=pipeline_registry)
+entry_service = EntryService(task_router=task_router, pipeline_registry=pipeline_registry)
+
+
+# ============================================================
+# 4. 全局异常处理 / Global Exception Handler
+# ============================================================
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "internal_error",
+            "message": str(exc),
+        },
+    )
+
+
+# ============================================================
+# 5. 入口端点 / Entry Endpoint
+# ============================================================
+
+@app.post("/entry")
+async def entry_endpoint(query: UserQuery):
+    """
+    Unified entry point:
+    - Intent recognition: IntentEngine.classify()
+    - Task routing: TaskRouter.route()
+    - Pipeline execution: pipeline.run()
+    - Structured output: EntryService.handle()
+    """
+    result = await entry_service.handle(
+        text=query.text,
+        language=query.language,
+        session_id=query.session_id,
+    )
+    return {"result": result}
+
+
+# ============================================================
+# 6. Health Check
+# ============================================================
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "version": "0.1.0"}
