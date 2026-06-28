@@ -448,24 +448,54 @@
     }
 
     function renderDashboard(data) {
-        const result = data.result || {};
+    // 真实结构：{ result: { status, type, data } }
+    const raw = data.result || {};
+    const type = raw.type || raw.task_type || "";
+    const payload = raw.data || raw;
 
-        if (result.type === "risk_scan") {
-            renderRiskRadar(result.risks);
-        }
+    // ===== 风险雷达图 =====
+    if (type === "zh_risk_scan") {
+        const factors = payload.risk_factors || [];
 
-        if (result.type === "opinion_landscape") {
-            renderSentimentTrend(result.clusters);
-        }
+        const labels = factors.map(f => f.name || "风险项");
+        const values = factors.map(f => f.score || 0);
 
-        if (result.type === "policy_brief") {
-            renderPolicyCard(result.summary);
-        }
-
-        if (result.type === "multi_source_graph") {
-            renderGraph(result.graph);
-        }
+        renderRiskRadar(values);
+        document.getElementById("risk-content").innerText = labels.join(" / ");
     }
+
+    // ===== 舆情趋势图 =====
+    if (type === "zh_opinion_landscape") {
+        const clusters = payload.clusters || [];
+
+        const values = clusters.map(c => c.sentiment || 0);
+        renderSentimentTrend(values);
+
+        document.getElementById("sentiment-content").innerText =
+            `共 ${clusters.length} 条舆情数据`;
+    }
+
+    // ===== 政策摘要卡片 =====
+    if (type === "zh_policy_brief") {
+        renderPolicyCard(payload);
+    }
+
+    // ===== 多源合并图 =====
+    if (type === "zh_multisource_merge") {
+        const graph = payload.graph || { nodes: [], links: [] };
+        renderGraph(graph);
+
+        document.getElementById("graph-content").innerText =
+            `Nodes: ${graph.nodes.length}, Links: ${graph.links.length}`;
+    }
+
+    // ===== 澄清请求 =====
+    if (type === "clarification_required") {
+        document.getElementById("policy-content").innerText =
+            payload.message || "无法识别意图，请补充说明。";
+    }
+}
+
 
     function startStreaming() {
         const text = document.getElementById("input").value;

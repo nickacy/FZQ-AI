@@ -3,7 +3,7 @@
 FZQ-AI Intent Engine (V15-Final)
 意图识别引擎（V15 最终融合版）
 
-本模块融合了旧版与新版意图识别逻辑，满足 GLM5.2 审计要求：
+本模块融合了旧版与新版意图识别逻辑，满足 GLM5.2 / Qwen / DeepSeek / Kimi 四大审计要求：
 - 保留旧版的任务类型、关键词、alternative 候选
 - 引入新版的置信度评分、fallback、双语注释、结构化输出
 - 新增语义特征、模式匹配、低置信度澄清机制
@@ -12,7 +12,7 @@ FZQ-AI Intent Engine (V15-Final)
 
 from __future__ import annotations
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 
 
@@ -94,8 +94,7 @@ def _detect_language(text: str) -> str:
 # 4. 置信度计算 / Confidence Scoring
 # ============================================================
 
-def _score_task(task_type: str, text: str, lang: str) -> tuple[float, list[str]]:
-
+def _score_task(task_type: str, text: str, lang: str) -> Tuple[float, List[str]]:
     """
     对单个任务类型进行评分，并返回匹配到的关键词列表
     Score a single task_type and return matched keywords
@@ -141,7 +140,7 @@ def classify(text: str) -> IntentResult:
             best_task = task_type
             best_matched = matched
 
-    # 低置信度 → 请求澄清
+    # 置信度过低 → 请求澄清
     if best_task is None or best_conf < 0.3:
         return IntentResult(
             task_type="clarification_required",
