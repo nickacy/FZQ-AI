@@ -3,9 +3,10 @@
 FZQ-AI Web App (V17 Entry Layer)
 统一入口：/entry → EntryService.handle()
 """
+from fastapi.staticfiles import StaticFiles
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
 from __future__ import annotations
-
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse

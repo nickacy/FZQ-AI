@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>FZQ‑AI Intelligence Dashboard (V17)</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>FZQ‑AI Intelligence Dashboard (V17)</h1>
+
+    <div class="input-box">
+        <textarea id="userInput" placeholder="请输入任务，例如：帮我做一个风险扫描"></textarea>
+        <button onclick="sendQuery()">提交</button>
+    </div>
+
+    <div id="resultArea"></div>
+
+    <div id="chartsArea">
+        <canvas id="radarChart"></canvas>
+        <canvas id="trendChart"></canvas>
+    </div>
+
+    <div id="graphArea"></div>
+
+</div>
+
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/graph.js"></script>
+
+</body>
+</html>
