@@ -1,5 +1,5 @@
 # src/fzq_ai/llm/providers/deepseek_provider.py
-# v13 DeepSeek Provider – unified output, metrics, token_monitor
+# V20 DeepSeek Provider — unified constructor, unified API client, unified output
 
 from __future__ import annotations
 
@@ -8,12 +8,13 @@ from typing import Any, Dict
 
 from fzq_ai.metrics.metrics import metrics
 from fzq_ai.monitor.token_monitor import token_monitor
+from fzq_ai.llm.clients.deepseek_api import DeepSeekAPI   # 你需要创建这个真实 API 客户端类
 
 
 class DeepSeekProvider:
-    def __init__(self, client, model: str):
-        self.client = client
+    def __init__(self, model: str):
         self.model = model
+        self.client = DeepSeekAPI(model)   # 真实 DeepSeek API 客户端
 
     async def run(self, req: Dict[str, Any]) -> Dict[str, Any]:
         start = time.time()
@@ -28,8 +29,6 @@ class DeepSeekProvider:
             prompt_tokens = response["usage"]["prompt_tokens"]
             completion_tokens = response["usage"]["completion_tokens"]
             total_tokens = prompt_tokens + completion_tokens
-
-            success = True
 
         except Exception as e:
             duration_ms = (time.time() - start) * 1000

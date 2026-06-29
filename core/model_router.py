@@ -1,33 +1,38 @@
 # -*- coding: utf-8 -*-
 """
 FZQ-AI Model Router (V20)
-统一多模型调度：GLM / Qwen / DeepSeek / MiniMax
+多模型智能调度（基于真实 providers 路径）
 """
 
 from __future__ import annotations
-from typing import Any, Dict
+from typing import Any
 
-from fzq_ai.models.glm_client import GLMClient
-from fzq_ai.models.qwen_client import QwenClient
-from fzq_ai.models.deepseek_client import DeepSeekClient
-from fzq_ai.models.minimax_client import MiniMaxClient
+# 真实存在的模型客户端路径（来自你的项目结构）
+from fzq_ai.llm.providers.glm_provider import GLMProvider
+from fzq_ai.llm.providers.qwen_provider import QwenProvider
+from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
+from fzq_ai.llm.providers.openai_provider import OpenAIProvider
+from fzq_ai.llm.providers.gemini_provider import GeminiProvider
+from fzq_ai.llm.providers.kimi_provider import KimiProvider
 
 
 class ModelRouter:
     """
     V20 多模型智能调度：
     - 按任务类型选择最佳模型
-    - 按模型状态 fallback
     - 按语言选择模型
-    - 按复杂度选择模型
+    - 按场景选择模型
+    - 按能力 fallback
     """
 
     def __init__(self):
         self.models = {
-            "glm": GLMClient(),
-            "qwen": QwenClient(),
-            "deepseek": DeepSeekClient(),
-            "minimax": MiniMaxClient(),
+            "glm": GLMProvider(),
+            "qwen": QwenProvider(),
+            "deepseek": DeepSeekProvider(),
+            "openai": OpenAIProvider(),
+            "gemini": GeminiProvider(),
+            "kimi": KimiProvider(),
         }
 
     def select(self, task_type: str, language: str = "zh") -> Any:
@@ -35,19 +40,19 @@ class ModelRouter:
         主调度逻辑（可扩展）
         """
 
-        # 舆情分析 → DeepSeek（更强的中文理解）
+        # 舆情分析 → DeepSeek（中文理解强）
         if task_type == "zh_opinion_landscape":
             return self.models["deepseek"]
 
-        # 风险扫描 → GLM（更强的结构化输出）
+        # 风险扫描 → GLM（结构化输出强）
         if task_type == "zh_risk_scan":
             return self.models["glm"]
 
-        # 政策简报 → Qwen（更强的中文生成）
+        # 政策简报 → Qwen（中文生成强）
         if task_type == "zh_policy_brief":
             return self.models["qwen"]
 
-        # 多源融合 → DeepSeek（更强的长文本处理）
+        # 多源融合 → DeepSeek（长文本处理强）
         if task_type == "zh_multisource_merge":
             return self.models["deepseek"]
 

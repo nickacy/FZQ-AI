@@ -1,23 +1,26 @@
 """
-Fabricates the missing model_client.py that global_settings.py depends on.
-Minimal v13 bridge module.
+Unified ModelClient for V20 multi-model routing.
+Delegates actual work to provider.run()
 """
+
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Dict
 
 
 class ModelClient:
-    """Minimal v13 ModelClient — delegates real work to Router."""
+    """
+    V20 ModelClient — unified interface for all providers.
+    Providers must implement async run(req: Dict[str, Any]).
+    """
 
-    _DEFAULT_MODELS = {
-        "deepseek": "deepseek-chat",
-        "openai": "gpt-4o",
-        "gemini": "gemini-2.0-flash",
-        "glm": "glm-4-flash",
-        "kimi": "moonshot-v1-32k",
-        "qwen": "qwen-max",
-    }
-
-    def __init__(self, provider: str):
+    def __init__(self, provider):
+        """
+        provider: instance of DeepSeekProvider / GLMProvider / QwenProvider / etc.
+        """
         self.provider = provider
-        self.model = self._DEFAULT_MODELS.get(provider, provider)
+
+    async def chat(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Unified chat interface — delegates to provider.run().
+        """
+        return await self.provider.run(req)
