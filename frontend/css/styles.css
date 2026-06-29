@@ -1,55 +1,284 @@
+/* ============================================================
+ * FZQ‑AI Intelligence Dashboard (V19)
+ * Bloomberg Terminal Dark Theme + Navigation + Status Bar
+ * ============================================================ */
+
+/* 全局暗色主题 */
 body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
+    background-color: #0d0f12;
+    color: #e0e0e0;
+    font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-.container {
-    width: 90%;
-    margin: auto;
-    padding-top: 20px;
+/* ============================================================
+ * 顶部导航栏（Bloomberg 风格）
+ * ============================================================ */
+
+.top-nav {
+    width: 100%;
+    height: 50px;
+    background-color: #111317;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
 }
 
+.nav-left .brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4caf50;
+}
+
+.nav-left .brand-sub {
+    font-size: 12px;
+    color: #888;
+    margin-left: 8px;
+}
+
+.nav-center {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-btn {
+    background-color: #1a1d21;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background-color: #2a2d31;
+}
+
+.nav-right button {
+    margin-left: 10px;
+    background-color: #1a1d21;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.nav-right button:hover {
+    background-color: #2a2d31;
+}
+
+/* ============================================================
+ * 状态栏（模型、管线、trace_id）
+ * ============================================================ */
+
+.status-bar {
+    width: 100%;
+    height: 32px;
+    background-color: #0f1114;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    gap: 30px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.status-bar span {
+    color: #4caf50;
+}
+
+/* ============================================================
+ * 页面容器
+ * ============================================================ */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+/* 标题 */
 h1 {
-    text-align: center;
+    color: #4caf50;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+h3 {
+    color: #888;
     margin-bottom: 20px;
 }
 
+/* ============================================================
+ * 输入框区域
+ * ============================================================ */
+
 .input-box {
-    display: flex;
-    gap: 10px;
     margin-bottom: 20px;
 }
 
 textarea {
-    width: 80%;
-    height: 80px;
-    padding: 10px;
-    font-size: 16px;
+    width: 100%;
+    height: 120px;
+    background-color: #1a1d21;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 6px;
+    resize: vertical;
 }
 
 button {
-    width: 120px;
-    font-size: 18px;
-    background: #0078ff;
-    color: white;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #4caf50;
     border: none;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 6px;
     cursor: pointer;
 }
 
-#resultArea {
-    margin-top: 20px;
-    padding: 15px;
-    background: white;
-    border-radius: 8px;
+button:hover {
+    background-color: #45a049;
 }
+
+/* ============================================================
+ * JSON 输出区域
+ * ============================================================ */
+
+#resultArea {
+    background-color: #1a1d21;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+}
+
+/* ============================================================
+ * 图表区域
+ * ============================================================ */
 
 #chartsArea {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
+canvas {
+    background-color: #1a1d21;
+    border: 1px solid #333;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+ * Bloomberg 风格卡片组件
+ * ============================================================ */
+
+.policy-card,
+.risk-block {
+    background-color: #1a1d21;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.policy-card h3,
+.risk-block h3 {
+    color: #4caf50;
+    margin-bottom: 10px;
+}
+
+.policy-card ul,
+.risk-block ul {
+    padding-left: 20px;
+}
+
+.policy-card li,
+.risk-block li {
+    margin-bottom: 6px;
+}
+
+/* ============================================================
+ * 时间线组件
+ * ============================================================ */
+
+#timelineArea {
+    background-color: #1a1d21;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+#timelineArea h3 {
+    color: #4caf50;
+    margin-bottom: 10px;
+}
+
+#timelineArea ul {
+    padding-left: 20px;
+}
+
+#timelineArea li {
+    margin-bottom: 6px;
+}
+
+/* ============================================================
+ * 多源合并组件
+ * ============================================================ */
+
+#sourceListArea,
+#mergeSummaryArea {
+    background-color: #1a1d21;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+#sourceListArea h3,
+#mergeSummaryArea h3 {
+    color: #4caf50;
+    margin-bottom: 10px;
+}
+
+/* ============================================================
+ * D3 图谱区域
+ * ============================================================ */
+
 #graphArea {
-    margin-top: 40px;
-    height: 500px;
+    background-color: #1a1d21;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+ * 滚动条（Bloomberg 风格）
+ * ============================================================ */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1d21;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #444;
 }

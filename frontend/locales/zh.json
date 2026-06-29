@@ -1,0 +1,42 @@
+{
+    "app.title": "FZQ‑AI 情报仪表盘",
+    "app.subtitle": "跨文明个人情报官系统",
+
+    "input.placeholder": "请输入任务，例如：帮我做一个风险扫描",
+    "button.submit": "提交",
+    "button.zh": "中文",
+    "button.en": "English",
+
+    "result.title": "分析结果",
+    "result.raw_json": "原始 JSON 输出",
+
+    "risk.title": "风险扫描摘要",
+    "risk.overall": "总体风险等级",
+    "risk.key_points": "关键风险点",
+
+    "sentiment.title": "舆情趋势",
+    "sentiment.timeline": "时间序列",
+
+    "narrative.title": "叙事图谱",
+
+    "policy.title": "政策简报",
+    "policy.summary": "摘要",
+    "policy.key_points": "关键点",
+
+    "timeline.title": "政策时间线",
+
+    "merge.sources": "信息源列表",
+    "merge.summary": "合并摘要",
+
+    "error.non_json": "后端返回了非 JSON 响应，请检查服务器日志。",
+    "error.offline": "系统处于离线模式，已返回最近一次成功结果。",
+
+    "nav.home": "首页",
+    "nav.dashboard": "仪表盘",
+    "nav.settings": "设置",
+    "nav.language": "语言",
+
+    "status.model": "模型",
+    "status.pipeline": "管线",
+    "status.trace_id": "追踪 ID"
+}
