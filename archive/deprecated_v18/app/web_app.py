@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 FZQ-AI Web App (V18 Entry Layer + Resilience + UI Layout)
 统一入口：/entry → EntryService.handle()
@@ -393,5 +393,5 @@ async def entry_endpoint(query: UserQuery):
 async def health():
     return {
         "status": "ok",
-        "version": "0.2.0",
+        "version": "15.0.0",
     }

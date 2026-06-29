@@ -20,7 +20,7 @@ class SentimentLabel(str, Enum):
     VERY_POSITIVE = "very_positive"; POSITIVE = "positive"; NEUTRAL = "neutral"; NEGATIVE = "negative"; VERY_NEGATIVE = "very_negative"
 
 class ModelProvider(str, Enum):
-    OPENAI = "openai"; DEEPSEEK = "deepseek"; GEMINI = "gemini"; AZURE = "azure"; ANTHROPIC = "anthropic"
+    OPENAI = "openai"; DEEPSEEK = "deepseek"; GEMINI = "gemini"; GLM = "glm"; KIMI = "kimi"; QWEN = "qwen"; AZURE = "azure"; ANTHROPIC = "anthropic"
 
 class NewsSource(BaseModel):
     model_config = ConfigDict(frozen=False, protected_namespaces=())

@@ -65,7 +65,7 @@ class EntryService:
             }
 
         # 4. 执行真实 Pipeline（统一参数）
-        result = await pipeline.run(
+        result = pipeline.run(
             input_text=text,
             task_type=intent.task_type,
             language=intent.language,

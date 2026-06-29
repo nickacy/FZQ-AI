@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Unified Entry (V15-Final)
-统一入口：启动 FastAPI（web_app.py）
+FZQ-AI Unified Entry (V15.0.0)
+统一入口：启动 FastAPI（src.fzq_ai.api.app）
 """
 
 from __future__ import annotations
@@ -10,16 +10,16 @@ import uvicorn
 
 def main():
     """
-    启动 V15 新入口端：
-    - app/web_app.py 中的 FastAPI 应用
-    - Bloomberg Terminal 主题
-    - IntentEngine + TaskRouter + Pipelines
+    启动 FZQ-AI API 服务：
+    - src/fzq_ai/api/app.py 中的 FastAPI 应用
+    - 包含中文情报端点 /api/zh/*
+    - 健康检查 /health
     """
     uvicorn.run(
-        "app.web_app:app",   # ← 关键：指向新的入口端
+        "src.fzq_ai.api.app:app",
         host="0.0.0.0",
         port=8000,
-        reload=True
+        reload=True,
     )
 
 

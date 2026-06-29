@@ -11,7 +11,7 @@ class GLMProvider:
         self.model = os.getenv("GLM_MODEL", "glm-4-flash")
         self.url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
-    async def run(self, req: LLMRequestSchema) -> str:
+    async def run(self, req: LLMRequestSchema) -> Dict[str, Any]:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
@@ -26,6 +26,16 @@ class GLMProvider:
             async with session.post(self.url, json=payload, headers=headers) as resp:
                 data = await resp.json()
                 try:
-                    return data["choices"][0]["message"]["content"]
+                    content = data["choices"][0]["message"]["content"]
                 except Exception:
-                    return str(data)
+                    content = str(data)
+                return {
+                    "content": content,
+                    "provider": "glm",
+                    "model": self.model,
+                    "usage": data.get("usage", {}),
+                    "latency_ms": 0,
+                    "finish_reason": data.get("choices", [{}])[0].get("finish_reason", "stop"),
+                    "raw_response": data,
+                    "error": None,
+                }
