@@ -1,52 +1,49 @@
+# src/fzq_ai/entry/entry_service.py
+# -*- coding: utf-8 -*-
 """
-V15 Entry Service — Unified Entry Protocol.
-
-Order: intent recognition -> task routing -> pipeline execution.
-
-Usage:
-    service = EntryService()
-    result = await service.handle(text="...", task_type="zh_policy_brief")
+FZQ-AI Entry Service (V20)
+统一入口层：HTTP / CLI / UI 都调用这里
 """
 
 from __future__ import annotations
-from typing import Any, Optional
+from typing import Dict, Any
 
-from fzq_ai.core.intent_engine import classify
-from fzq_ai.core.task_router import TaskRouter, RouteResult
+from fzq_ai.intel.pipeline_registry import PipelineRegistry
 
 
 class EntryService:
-    """V15 unified entry: intent -> route -> execute."""
+    """
+    V20 统一入口服务：
+    - 接收上层请求（UI / API）
+    - 根据 task_type 选择 Pipeline
+    - 调用 Pipeline.run()
+    - 返回统一结果结构
+    """
 
     def __init__(self):
-        self._intent_engine = classify
-        self._task_router = TaskRouter()
+        self.registry = PipelineRegistry()
 
-    async def handle(
-        self, text: str, task_type: Optional[str] = None
-    ) -> RouteResult:
+    async def handle(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Handle a user input:
-          1. Classify intent
-          2. Route to appropriate pipeline
-          3. Return RouteResult
-
-        Args:
-            text: User input text (Chinese or English)
-            task_type: Explicit task type override (optional)
-                       One of: zh_policy_brief, zh_risk_scan,
-                               zh_opinion_landscape, zh_multisource_merge
-
-        Returns:
-            RouteResult with output, model info, and metadata
+        payload 示例：
+        {
+            "task_type": "zh_opinion_landscape",
+            "input": "...",
+            "trace_id": "...",
+        }
         """
-        # 1. Intent recognition
-        intent = self._intent_engine(text)
+        task_type = payload["task_type"]
+        pipeline = self.registry.get_pipeline(task_type)
 
-        # 2. Apply explicit task_type override
-        if task_type:
-            intent.task_type = task_type
+        req = {
+            "input": payload["input"],
+            "trace_id": payload.get("trace_id"),
+        }
 
-        # 3. Route to pipeline (async)
-        result = await self._task_router.route(intent, text)
-        return result
+        result = await pipeline.run(req)
+
+        return {
+            "task_type": task_type,
+            "trace_id": payload.get("trace_id"),
+            "data": result,
+        }
