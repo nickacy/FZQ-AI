@@ -168,3 +168,9 @@ fail_under = 30
 [tool.bandit]
 exclude_dirs = ["tests", "__pycache__"]
 skips = ["B101"]  # skip assert_used warnings in non-test code
+
+# ============================================================
+# Pyright / VS Code Python Analysis
+# ============================================================
+[tool.pyright]
+extraPaths = ["./src"]

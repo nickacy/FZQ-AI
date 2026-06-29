@@ -1,3 +1,4 @@
+from typing import Any, Dict
 import aiohttp
 import os
 from fzq_ai.schemas.llm import LLMRequestSchema
