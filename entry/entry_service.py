@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Service (V17)
-统一入口层：intent → route → execute
+FZQ-AI Entry Service (V19)
+统一入口层：intent → route → pipeline.run(input_text, task_type, language)
 """
 
 from __future__ import annotations
@@ -13,11 +13,11 @@ from core.task_router import TaskRouter
 
 class EntryService:
     """
-    V17 统一入口层服务
-    - 负责意图识别
-    - 负责任务路由
-    - 负责 Pipeline 执行
-    - 负责结构化输出
+    V19 统一入口层服务
+    - 意图识别
+    - 任务路由
+    - Pipeline 执行（真实 zh_* pipelines）
+    - 结构化输出
     """
 
     def __init__(self, task_router: TaskRouter, pipeline_registry):
@@ -54,7 +54,7 @@ class EntryService:
                 "intent": intent.__dict__,
             }
 
-        # 3. 获取 Pipeline
+        # 3. 获取真实 Pipeline
         pipeline = self.pipeline_registry.resolve_pipeline(intent.task_type)
         if not pipeline:
             return {
@@ -64,11 +64,11 @@ class EntryService:
                 "intent": intent.__dict__,
             }
 
-        # 4. 执行 Pipeline
+        # 4. 执行真实 Pipeline（统一参数）
         result = await pipeline.run(
             input_text=text,
-            intent=intent,
-            route=route_result,
+            task_type=intent.task_type,
+            language=intent.language,
         )
 
         # 5. 统一结构化输出

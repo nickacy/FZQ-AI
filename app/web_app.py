@@ -112,9 +112,12 @@ class UserQuery(BaseModel):
 # 3. 核心组件初始化 / Core Components
 # ============================================================
 
-pipeline_registry = AdaptedPipelineRegistry()
+from core.pipelines import PipelineRegistry
+
+pipeline_registry = PipelineRegistry()
 task_router = TaskRouter(pipeline_registry=pipeline_registry)
 entry_service = EntryService(task_router=task_router, pipeline_registry=pipeline_registry)
+
 
 
 # ============================================================
