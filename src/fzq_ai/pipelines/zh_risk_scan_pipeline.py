@@ -1,54 +1,34 @@
-"""
-ZhRiskScanPipeline
-"""
-import json
-from typing import Any, Dict, List
+# src/fzq_ai/intel/pipelines/zh_risk_scan_pipeline.py
 
-from fzq_ai.pipelines.base import BasePipeline
-from fzq_ai.pipelines.registry import PipelineRegistry
-from fzq_ai.schemas.zh_tasks.zh_risk_scan import ZhRiskScanOutput
-from fzq_ai.clients.model_client import ModelClient
-from fzq_ai.utils.prompt_loader import load_prompt_template
+from __future__ import annotations
+from typing import Any, Dict
+
+from fzq_ai.core.model_router import ModelRouter
 
 
-@PipelineRegistry.register("zh_risk_scan@v1", set_default=True)
-class ZhRiskScanPipeline(BasePipeline[ZhRiskScanOutput]):
-    """Pipeline: zh_risk_scan - Chinese risk signal scanning."""
-
+class ZhRiskScanPipeline:
     def __init__(self):
-        super().__init__()
-        self.model = ModelClient("glm-5.2")
-        self.system_prompt = load_prompt_template("fzq_ai/prompts/zh/system_zh_intel.txt")
-        self.task_prompt = load_prompt_template("fzq_ai/prompts/zh/zh_risk_scan.txt")
+        self.router = ModelRouter()
 
-    async def run_async(self, **kwargs) -> ZhRiskScanOutput:
-        items: List[Dict[str, Any]] = kwargs.get("items", [])
-        input_payload: Dict[str, Any] = {
-            "scan_window": kwargs.get("scan_window"),
-            "scope": kwargs.get("scope", []),
-            "n": len(items),
-            "items_json": json.dumps(items, ensure_ascii=False, indent=2),
-            "entity_watchlist": kwargs.get("entity_watchlist", []),
+    async def run(self, req: Dict[str, Any]) -> Dict[str, Any]:
+        provider = self.router.select("zh_risk_scan")
+
+        model_req = {
+            "task_type": "zh_risk_scan",
+            "trace_id": req.get("trace_id"),
+            "messages": [
+                {"role": "system", "content": "你是一个专业风险扫描专家。"},
+                {"role": "user", "content": req["input"]},
+            ],
         }
 
-        # Build prompt: system prompt + task prompt + input data as JSON
-        prompt = (
-            self.system_prompt
-            + "\n\n---\n\n"
-            + self.task_prompt
-            + "\n\n---\n\n[INPUT DATA]\n"
-            + json.dumps(input_payload, ensure_ascii=False, indent=2)
-        )
+        result = await provider.run(model_req)
 
-        raw = await self.model.chat_async(prompt)
-
-        try:
-            parsed = json.loads(raw)
-        except Exception:
-            parsed = {
-                "task_type": "zh_risk_scan",
-                "status": "parse_error",
-                "raw": raw,
-            }
-
-        return ZhRiskScanOutput(**parsed)
+        return {
+            "task": "zh_risk_scan",
+            "input": req["input"],
+            "output": result["output"],
+            "model": result["model"],
+            "provider": result["provider"],
+            "tokens": result["total_tokens"],
+        }

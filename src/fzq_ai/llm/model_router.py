@@ -1,13 +1,13 @@
+# src/fzq_ai/llm/model_router.py
 # -*- coding: utf-8 -*-
 """
 FZQ-AI Model Router (V20)
-多模型智能调度（基于真实 providers 路径）
+多模型智能调度（统一 Provider 构造函数）
 """
 
 from __future__ import annotations
 from typing import Any
 
-# 真实存在的模型客户端路径（来自你的项目结构）
 from fzq_ai.llm.providers.glm_provider import GLMProvider
 from fzq_ai.llm.providers.qwen_provider import QwenProvider
 from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
@@ -26,16 +26,13 @@ class ModelRouter:
     """
 
     def __init__(self):
-        # Provider defaults: GLM/Kimi/Qwen are zero-arg;
-        # DeepSeek needs model; OpenAI/Gemini need client + model.
-        # Use None for lazy client init (providers fall back to env vars).
         self.models = {
-            "glm": GLMProvider(),
-            "qwen": QwenProvider(),
-            "deepseek": DeepSeekProvider(model="deepseek-chat"),
-            "openai": OpenAIProvider(client=None, model="gpt-4o"),
-            "gemini": GeminiProvider(client=None, model="gemini-2.0-flash"),
-            "kimi": KimiProvider(),
+            "glm": GLMProvider("glm-4-flash"),
+            "qwen": QwenProvider("qwen-max"),
+            "deepseek": DeepSeekProvider("deepseek-chat"),
+            "openai": OpenAIProvider("gpt-4o"),
+            "gemini": GeminiProvider("gemini-2.0-flash"),
+            "kimi": KimiProvider("moonshot-v1-32k"),
         }
 
     def select(self, task_type: str, language: str = "zh") -> Any:
@@ -43,21 +40,16 @@ class ModelRouter:
         主调度逻辑（可扩展）
         """
 
-        # 舆情分析 → DeepSeek（中文理解强）
         if task_type == "zh_opinion_landscape":
             return self.models["deepseek"]
 
-        # 风险扫描 → GLM（结构化输出强）
         if task_type == "zh_risk_scan":
             return self.models["glm"]
 
-        # 政策简报 → Qwen（中文生成强）
         if task_type == "zh_policy_brief":
             return self.models["qwen"]
 
-        # 多源融合 → DeepSeek（长文本处理强）
         if task_type == "zh_multisource_merge":
             return self.models["deepseek"]
 
-        # 默认模型
         return self.models["qwen"]
