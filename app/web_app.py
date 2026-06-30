@@ -7,6 +7,16 @@ Unified entry point for /entry, /multi, /autonomy.
 from __future__ import annotations
 
 from typing import Any, Dict
+from pydantic import BaseModel, Field
+
+# ------------------------------------------------------------
+# Pydantic 请求体验证模型（GLM Phase 6 必须项）
+# ------------------------------------------------------------
+class TaskPayload(BaseModel):
+    task: str = Field(..., min_length=1, description="任务名称")
+    ctx: Dict[str, Any] = Field(default_factory=dict)
+    options: Dict[str, Any] = Field(default_factory=dict)
+
 
 import pathlib
 from fastapi import FastAPI, Request
@@ -66,45 +76,30 @@ def wrap(result: RouteResult) -> Dict[str, Any]:
 
 
 # ------------------------------------------------------------
-# /entry — 单智能体统一入口
+# /entry — 单智能体统一入口（已升级为 V23-Final）
 # ------------------------------------------------------------
 @app.post("/entry")
-async def entry_endpoint(request: Request):
-    payload = await request.json()
-    task = payload.get("task")
-    ctx = payload.get("ctx", {})
-    options = payload.get("options", {})
-
-    result = await entry_service.handle(task, ctx, options)
+async def entry_endpoint(payload: TaskPayload):
+    result = await entry_service.handle(payload.task, payload.ctx, payload.options)
     return wrap(result)
 
 
 # ------------------------------------------------------------
-# /multi — 多智能体协作入口
+# /multi — 多智能体协作入口（已升级为 V23-Final）
 # ------------------------------------------------------------
 @app.post("/multi")
-async def multi_endpoint(request: Request):
-    payload = await request.json()
-    task = payload.get("task", "multi_agent")
-    ctx = payload.get("ctx", {})
-    options = payload.get("options", {})
-
-    ctx["multi_agent"] = True
-    result = await entry_service.handle(task, ctx, options)
+async def multi_endpoint(payload: TaskPayload):
+    payload.ctx["multi_agent"] = True
+    result = await entry_service.handle(payload.task, payload.ctx, payload.options)
     return wrap(result)
 
 
 # ------------------------------------------------------------
-# /autonomy — 自治智能体入口
+# /autonomy — 自治智能体入口（已升级为 V23-Final）
 # ------------------------------------------------------------
 @app.post("/autonomy")
-async def autonomy_endpoint(request: Request):
-    payload = await request.json()
-    task = "autonomy_v23"
-    ctx = payload.get("ctx", {})
-    options = payload.get("options", {})
-
-    result = await entry_service.handle(task, ctx, options)
+async def autonomy_endpoint(payload: TaskPayload):
+    result = await entry_service.handle("autonomy_v23", payload.ctx, payload.options)
     return wrap(result)
 
 
