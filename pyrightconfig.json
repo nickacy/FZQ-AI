@@ -1,0 +1,11 @@
+{
+  "include": ["src"],
+  "executionEnvironments": [
+    {
+      "root": "src",
+      "pythonPath": "src"
+    }
+  ],
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false
+}
