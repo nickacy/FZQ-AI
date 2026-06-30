@@ -112,7 +112,7 @@ class HealingEngine:
     # ------------------------------------------------------------
     # Step 6: 总入口
     # ------------------------------------------------------------
-    def heal(self, result: Any, required_fields: List[str] = None) -> Dict[str, Any]:
+    def heal(self, result: Any, required_fields: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         自愈入口：格式修复 → 字段补全 → 清理 → 重构
         Healing entry point.

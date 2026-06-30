@@ -5,7 +5,7 @@
 # Version: V21.0.0
 
 from __future__ import annotations
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 
 from fzq_ai.agents.base import AgentContext, AgentResult
@@ -110,7 +110,7 @@ class TaskDecomposer:
     # ------------------------------------------------------------
     # Step 2: 执行子任务
     # ------------------------------------------------------------
-    def execute_subtasks(self, subtasks: List[SubTask]) -> Dict[str, Any]:
+    def execute_subtasks(self, subtasks: List[SubTask]) -> tuple[Dict[str, Any], List[str]]:
         merged: Dict[str, Any] = {}
         trace: List[str] = []
 
@@ -136,7 +136,7 @@ class TaskDecomposer:
         trace.append(f"[Decomposer] Subtasks count: {len(subtasks)}")
 
         # Step 2: 执行子任务
-        merged, subtrace = self.execute_subtasks(subtasks)
+        merged, subtrace = self.execute_subtasks(subtasks)  # type: ignore
         trace.extend(subtrace)
 
         return DecompositionResult(

@@ -8,6 +8,7 @@ Uses LLM for reasoning about what to monitor next.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+import asyncio
 import json, logging, time
 
 from fzq_ai.store.intel_store import IntelStore
@@ -66,7 +67,7 @@ class AutonomyAgent:
             router = LLMRouter()
             # ⚠️ 注意：此方法在异步环境中会崩溃（RuntimeError）。
             # 调用方应在异步上下文中直接 await router.run(prompt) 或使用 asyncio.run() 在外部管理。
-            raw = asyncio.run(router.run(prompt))
+            raw = asyncio.run(router.achat(messages=[{"role": "user", "content": prompt}]))
             return raw
         except RuntimeError as e:
             if "cannot be called from a running event loop" in str(e):

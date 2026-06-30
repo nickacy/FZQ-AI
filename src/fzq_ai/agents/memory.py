@@ -52,7 +52,7 @@ class MemoryEngine:
     # ------------------------------------------------------------
     # Step 1: 写入短期记忆
     # ------------------------------------------------------------
-    def write_session(self, key: str, value: Any, tags: List[str] = None):
+    def write_session(self, key: str, value: Any, tags: Optional[List[str]] = None):
         self.session_memory[key] = MemoryItem(
             key=key,
             value=value,
@@ -70,7 +70,7 @@ class MemoryEngine:
     # ------------------------------------------------------------
     # Step 3: 写入长期记忆
     # ------------------------------------------------------------
-    def write_long_term(self, key: str, value: Any, tags: List[str] = None):
+    def write_long_term(self, key: str, value: Any, tags: Optional[List[str]] = None):
         self.long_term_memory[key] = MemoryItem(
             key=key,
             value=value,
