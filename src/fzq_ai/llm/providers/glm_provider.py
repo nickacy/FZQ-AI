@@ -7,9 +7,9 @@ from fzq_ai.schemas.llm import LLMRequestSchema
 class GLMProvider:
     """Zhipu GLM 5.2 Provider"""
 
-    def __init__(self):
+    def __init__(self, model: str = None):
         self.api_key = os.getenv("GLM_API_KEY", "")
-        self.model = os.getenv("GLM_MODEL", "glm-4-flash")
+        self.model = model or os.getenv("GLM_MODEL", "glm-4-flash")
         self.url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
     async def run(self, req: Union[LLMRequestSchema, Dict[str, Any]]) -> Dict[str, Any]:

@@ -2,7 +2,7 @@ from __future__ import annotations
 from fzq_ai.pipelines.base import BasePipeline
 from typing import Any, Dict
 
-from fzq_ai.core.model_router import ModelRouter
+from fzq_ai.llm.model_router import ModelRouter
 
 
 class ZhOpinionLandscapePipeline(BasePipeline):

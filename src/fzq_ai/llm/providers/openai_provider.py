@@ -19,9 +19,9 @@ class OpenAIProvider:
     - 完整异常处理
     """
 
-    def __init__(self, client, model: str):
+    def __init__(self, model: str = None, client=None):
         self.client = client
-        self.model = model
+        self.model = model or "gpt-4o"
 
     async def run(self, req: Dict[str, Any]) -> Dict[str, Any]:
         start = time.time()

@@ -309,7 +309,7 @@ Agent 实现 / Agents:              10+
 | P2‑2 | 无 Dockerfile | 根目录 | 无法容器化部署 | 创建 `Dockerfile` + `docker-compose.yml` |
 | P2‑3 | 无移动端入口 | 根目录 | 无 iOS/Android App | 调研 React Native / Flutter 方案，或先准备 PWA |
 | P2‑4 | 无离线能力 | 全局 | 无网络时无法使用 | 设计本地缓存策略 + 轻量模型 fallback |
-| P2‑5 | 版本号混乱 | 全局 | 同一代码中同时出现 v2.5, v4.0, v9, v10, v13, v14, v15 | 统一版本号：当前为 V15，所有文件引用统一版本号 |
+| P2‑5 | 版本号混乱 | 全局 | 同一代码中同时出现 v2.5, v4.0, V19, v10, v13, v14, v15 | 统一版本号：当前为 V15，所有文件引用统一版本号 |
 | P2‑6 | 无 API 使用手册（非自动生成） | 根目录 | 开发者/用户不了解 API 用法 | 创建 `API_GUIDE.md` 或 `API_REFERENCE.md` |
 | P2‑7 | `news_pipeline.py` 编码问题（中文乱码） | `news_pipeline.py` | 注释和字符串乱码，影响可读性 | 检查文件编码，重新保存为 UTF-8 |
 

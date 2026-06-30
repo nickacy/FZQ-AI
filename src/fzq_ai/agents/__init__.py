@@ -3,14 +3,14 @@
 FZQ-AI Agents Package (V19-Final)
 智能体模块（V19 最终版）
 
-导出所有角色智能体，供 AgentHub / TaskRouter 使用。
+从 agents/tasks/ 导出所有角色智能体，供 AgentHub / TaskRouter 使用。
 """
 
-from .risk_scan_agent import RiskScanAgent
-from .policy_brief_agent import PolicyBriefAgent
-from .opinion_landscape_agent import OpinionLandscapeAgent
-from .multisource_merge_agent import MultiSourceMergeAgent
-from .news_center_agent import NewsCenterAgent  # 保留旧版兼容性
+from .tasks.risk_scan_agent import RiskScanAgent
+from .tasks.policy_brief_agent import PolicyBriefAgent
+from .tasks.opinion_landscape_agent import OpinionLandscapeAgent
+from .tasks.multisource_merge_agent import MultiSourceMergeAgent
+from .news_center_agent import NewsCenterAgent
 
 __all__ = [
     "RiskScanAgent",

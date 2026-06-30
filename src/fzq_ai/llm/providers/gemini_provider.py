@@ -19,9 +19,9 @@ class GeminiProvider:
     - 完整异常处理
     """
 
-    def __init__(self, client, model: str):
+    def __init__(self, model: str = None, client=None):
         self.client = client
-        self.model = model
+        self.model = model or "gemini-2.0-flash"
 
     async def run(self, req: Dict[str, Any]) -> Dict[str, Any]:
         start = time.time()

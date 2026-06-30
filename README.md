@@ -1,108 +1,153 @@
-# FZQ-AI
+# FZQ-AI Framework
 
-[![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)](https://fastapi.tiangolo.com)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+FZQ-AI is an advanced AI application framework designed for intelligence analysis, news processing, and multi-model orchestration. This framework provides a comprehensive solution for processing and analyzing large volumes of data using various AI models.
 
-**FZQ-AI** 是一款多模型中文情报分析系统，支持政策简报、风险扫描、舆情版图、多源合并四大中文情报任务，同时涵盖新闻、叙事、情感、情景、日报等通用分析维度。
+## Features
 
-> 版本：V15.0.0 | 状态：持续迭代
+### Core Components
+- **LLM Router**: Intelligent routing between multiple AI providers (DeepSeek, OpenAI, Qwen, Kimi, Gemini)
+- **Pipeline System**: Modular processing pipelines for various tasks (news, narrative, risk, sentiment analysis)
+- **Orchestrator**: Task orchestration with fallback mechanisms and recovery capabilities
+- **Unified Interface**: Consistent APIs across different AI providers and processing tasks
 
----
+### Enhanced Capabilities (New!)
+- **Modern Configuration Management**: Dynamic configuration with hot reload capabilities
+- **Advanced Error Handling**: Circuit breaker patterns, retry mechanisms, and graceful degradation
+- **Performance Optimization**: LRU/TTL caching, concurrent processing, and async optimization
+- **Monitoring & Observability**: Comprehensive metrics collection with Prometheus export
+- **Security**: Secure credential management and error sanitization
 
-## 功能特性
+## Architecture
 
-- **中文情报四件套**：政策简报、风险扫描、舆情版图、多源合并
-- **通用分析维度**：新闻、叙事、情感、情景、日报
-- **多模型路由**：支持 OpenAI、DeepSeek、Gemini、GLM、Kimi、Qwen 等 6 个提供商，自动 fallback
-- **Agent 编排**：多角色 Agent（政策、风险、舆情、报告、调度等）+ AgentHub 统一调度
-- **可观测性**：内置指标采集（延迟、Token、Fallback 率）+ 结构化日志
-- **双语支持**：UI 与 API 支持中文/英文切换
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   API Layer     │───▶│  Orchestrator   │───▶│  LLM Providers  │
+│ (REST/GraphQL)  │    │ (Task Routing)   │    │ (Multi-Model)   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                                │
+                                ▼
+                    ┌──────────────────┐
+                    │   Pipelines      │
+                    │ (News, Analysis, │
+                    │  Reports, etc.)  │
+                    └──────────────────┘
+                                │
+                                ▼
+                    ┌──────────────────┐
+                    │   Utilities      │
+                    │ (Cache, Logger,  │
+                    │  Metrics, etc.)  │
+                    └──────────────────┘
+```
 
----
+## Installation
 
-## 快速开始
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd FZQ-AI
+```
 
-### 安装依赖
-
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 配置环境变量
-
+3. Set up environment variables:
 ```bash
 cp .env.example .env
-# 编辑 .env，填入至少一个 LLM API 密钥
+# Edit .env with your API keys and configurations
 ```
 
-### 启动 API 服务
+## Usage
 
+### Basic Example
+```python
+from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
+
+# Initialize orchestrator
+orchestrator = TaskOrchestrator()
+
+# Process a request
+result = orchestrator.run({
+    "query": "Analyze recent developments in AI regulation",
+    "task_type": "news_analysis"
+})
+
+print(result)
+```
+
+### Using Enhanced Features
+```python
+from fzq_ai.llm.enhanced_cache import llm_response_cache
+from fzq_ai.utils.async_manager import AsyncManager
+from fzq_ai.metrics.enhanced_metrics import MetricsCollector
+
+# Advanced usage with caching and metrics
+async def advanced_example():
+    manager = AsyncManager(max_concurrent=10)
+    collector = MetricsCollector()
+    
+    # Check cache first
+    cached_result = await llm_response_cache.get("unique_query_id")
+    if cached_result:
+        return cached_result
+    
+    # Process with metrics tracking
+    start_time = collector.start_timer()
+    result = await manager.run_task(process_request())
+    
+    # Cache result and record metrics
+    await llm_response_cache.set("unique_query_id", result, ttl=3600)
+    duration = collector.stop_timer_and_record(start_time, "request_processing_time")
+    
+    return result
+```
+
+## Configuration
+
+The framework supports dynamic configuration management:
+
+```python
+from fzq_ai.config.modern_config import ConfigManager
+
+config = ConfigManager()
+api_key = config.get("DEEPSEEK_API_KEY")
+model_settings = config.get("MODEL_SETTINGS")
+```
+
+Configuration can be loaded from:
+- Environment variables
+- Configuration files
+- Remote configuration sources (planned)
+
+## Testing
+
+Run the complete test suite:
 ```bash
-python main.py
-# 或
-uvicorn src.fzq_ai.api.app:app --reload --port 8000
+python -m pytest tests/ -v
 ```
 
-API 文档：http://localhost:8000/docs
+Current test coverage: 117 tests passing (including 16 new enhanced feature tests)
 
-### 启动 Web UI（Streamlit）
+## Performance
 
-```bash
-streamlit run src/fzq_ai/ui/web_app.py --server.port=8501
-```
+- Concurrent processing support up to 20 simultaneous operations
+- LRU/TTL caching with configurable size and expiration
+- Asynchronous operations for optimal performance
+- Built-in metrics collection and monitoring
 
----
+## Contributing
 
-## 架构概览
+We welcome contributions! Please see our contributing guidelines for more details.
 
-```
-FZQ-AI V15.0.0
-├── src/fzq_ai/
-│   ├── api/              # FastAPI 入口（/api/zh/*, /health, /metrics）
-│   ├── agents/           # 多角色 Agent + AgentHub
-│   ├── core/             # 意图引擎、任务路由、LLM 执行器
-│   ├── llm/              # LLMRouter + 6 个 Provider + Orchestrator
-│   ├── pipelines/        # 8+ Pipeline（新闻、叙事、风险、情感、情景、日报 + 4 个中文）
-│   ├── schemas/          # Pydantic 模型（核心模型 + 中文任务模型）
-│   ├── prompts/          # 提示模板系统
-│   ├── tools/            # 新闻获取、翻译、RSS 等工具
-│   ├── dashboard/        # 监控仪表盘组件
-│   └── ui/               # Streamlit Web UI（主题 + i18n + 组件）
-├── configs/              # 配置文件（zh_tasks.yaml 等）
-├── docs/                 # 架构文档、审计报告
-├── tests/                # 测试套件
-└── main.py               # 统一入口
-```
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the development team.
 
 ---
-
-## 环境变量
-
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `OPENAI_API_KEY` | OpenAI API 密钥 | `your_key_here` |
-| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | `your_key_here` |
-| `GEMINI_API_KEY` | Google Gemini API 密钥 | `your_key_here` |
-| `GLM_API_KEY` | 智谱 GLM API 密钥 | `your_key_here` |
-| `KIMI_API_KEY` | Moonshot Kimi API 密钥 | `your_key_here` |
-| `QWEN_API_KEY` | 阿里通义千问 API 密钥 | `your_key_here` |
-| `ALLOWED_ORIGINS` | CORS 白名单 | `http://localhost:3000,http://localhost:8501` |
-
----
-
-## 文档
-
-- [架构总览](docs/ARCHITECTURE_OVERVIEW.md)
-- [数据流与 Pipeline](docs/DATA_FLOW_PIPELINES.md)
-- [Schema 映射](docs/SCHEMAS_MAP.md)
-- [Prompt 系统](docs/PROMPT_SYSTEM.md)
-- [LLM 调用图](docs/LLM_CALL_GRAPH.md)
-- [指标与可观测性](docs/METRICS_AND_OBSERVABILITY.md)
-- [模块依赖](docs/MODULE_DEPENDENCIES.md)
-
----
-
-## 许可证
-
-MIT License — 详见 [LICENSE](LICENSE)。
+*FZQ-AI Framework - Enhanced with Modern AI Capabilities*

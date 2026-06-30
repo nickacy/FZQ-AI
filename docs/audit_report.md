@@ -40,7 +40,7 @@
 fzq_ai/
   └── quality/
       ├── deepseek_struct_opt.py       ← 18 KB（与 src/fzq_ai/quality/ 版本不同）
-      └── deepseek_struct_opt_v92.py   ← 与 deepseek_struct_opt.py 内容完全相同
+      └── deepseek_struct_opt_V192.py   ← 与 deepseek_struct_opt.py 内容完全相同
 ```
 
 **建议：** 删除根目录 `fzq_ai/`，将内容合并到 `src/fzq_ai/`。
@@ -164,13 +164,13 @@ def evidence_must_not_be_empty(cls, v):
 
 ---
 
-#### 2.2.3 重复文件：`deepseek_struct_opt.py` 与 `deepseek_struct_opt_v92.py`
+#### 2.2.3 重复文件：`deepseek_struct_opt.py` 与 `deepseek_struct_opt_V192.py`
 
 **位置：** `fzq_ai/quality/`
 
 **问题：** 两个文件内容完全相同（MD5 一致），浪费空间且增加维护负担。
 
-**建议：** 删除 `deepseek_struct_opt_v92.py`，保留 `deepseek_struct_opt.py`。若需要版本控制，使用 Git 版本历史而非文件复制。
+**建议：** 删除 `deepseek_struct_opt_V192.py`，保留 `deepseek_struct_opt.py`。若需要版本控制，使用 Git 版本历史而非文件复制。
 
 ---
 
@@ -299,7 +299,7 @@ setup(name="fzq_ai_agent", version="0.1", packages=find_packages())
 | 9 | **清理空文件** | 根目录 `*.py`（agent.py, memory.py, tools.py 等） | 删除空文件 |
 | 10 | **清理遗留目录** | `agent/`, `logs/`, `tools/`（根目录）, `tests_old/` | 删除完全未使用的目录 |
 | 11 | **清理大型无用文件** | `tree.txt`, `project_structure*.txt`, `structure.txt`, `tmp_*.py` | 删除 |
-| 12 | **清理重复文件** | `fzq_ai/quality/deepseek_struct_opt_v92.py` | 删除（与另一个文件内容相同） |
+| 12 | **清理重复文件** | `fzq_ai/quality/deepseek_struct_opt_V192.py` | 删除（与另一个文件内容相同） |
 | 13 | **修复 `setup.py`** | `setup.py` | 改为 `find_packages(where="src")` 或 `packages=find_packages("src")` |
 | 14 | **修复 `tests/conftest.py`** | `tests/conftest.py` | 使用 `pip install -e .` 替代 `sys.path.insert` |
 | 15 | **填充空 `__init__.py`** | `src/fzq_ai/api/__init__.py` 等（9 个） | 添加基础导出或删除（如果目录不需要被导入） |

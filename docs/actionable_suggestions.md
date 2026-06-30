@@ -1,4 +1,4 @@
-# KIMI 可执行改进建议（Actionable Suggestions）v9.2
+# KIMI 可执行改进建议（Actionable Suggestions）V19.2
 
 > KIMI 输出 — 文档优化与提示词增强专家  
 > 基于 Prompt ↔ Schema 一致性检查结果的改进路线图
@@ -292,6 +292,6 @@ Schema 中已有以下字段，Prompt 需增加输出要求：
 
 ---
 
-> 文档版本：v9.2  
+> 文档版本：V19.2  
 > 维护者：KIMI（文档优化与提示词增强专家）  
 > 最后更新：2024-XX-XX

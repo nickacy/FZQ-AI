@@ -7,9 +7,9 @@ from fzq_ai.schemas.llm import LLMRequestSchema
 class KimiProvider:
     """Moonshot KIMI Provider"""
 
-    def __init__(self):
+    def __init__(self, model: str = None):
         self.api_key = os.getenv("KIMI_API_KEY", "")
-        self.model = os.getenv("KIMI_MODEL", "moonshot-v1-32k")
+        self.model = model or os.getenv("KIMI_MODEL", "moonshot-v1-32k")
         self.url = "https://api.moonshot.cn/v1/chat/completions"
 
     async def run(self, req: Union[LLMRequestSchema, Dict[str, Any]]) -> Dict[str, Any]:

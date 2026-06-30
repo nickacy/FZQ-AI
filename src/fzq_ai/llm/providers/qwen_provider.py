@@ -7,9 +7,9 @@ from fzq_ai.schemas.llm import LLMRequestSchema
 class QwenProvider:
     """Alibaba Qwen Provider"""
 
-    def __init__(self):
+    def __init__(self, model: str = None):
         self.api_key = os.getenv("QWEN_API_KEY", "")
-        self.model = os.getenv("QWEN_MODEL", "qwen-max")
+        self.model = model or os.getenv("QWEN_MODEL", "qwen-max")
         self.url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 
     async def run(self, req: Union[LLMRequestSchema, Dict[str, Any]]) -> Dict[str, Any]:
