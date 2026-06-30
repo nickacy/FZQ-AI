@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Agents Package (V15-Final)
-智能体模块（V15 最终版）
+FZQ-AI Agents Package (V19-Final)
+智能体模块（V19 最终版）
 
 导出所有角色智能体，供 AgentHub / TaskRouter 使用。
 """

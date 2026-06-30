@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Web App (V17 Entry Layer)
+FZQ-AI Web App (V19 Entry Layer)
 Unified entry point.
 """
 
@@ -16,7 +16,7 @@ from entry.entry_service import EntryService
 from app.entry_adapter import AdaptedPipelineRegistry
 from core.task_router import TaskRouter
 
-app = FastAPI(title="FZQ-AI Entry Layer V17")
+app = FastAPI(title="FZQ-AI Entry Layer V19")
 
 import pathlib
 frontend_dir = pathlib.Path(__file__).parent.parent / "frontend"
@@ -62,4 +62,4 @@ async def entry_endpoint(query: UserQuery):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "version": "0.1.0"}
+    return {"status": "ok", "version": "19.0.0"}

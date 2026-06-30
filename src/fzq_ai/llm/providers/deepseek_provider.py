@@ -1,5 +1,5 @@
 # src/fzq_ai/llm/providers/deepseek_provider.py
-# V20 DeepSeek Provider — unified constructor, unified API client, unified output
+# V19 DeepSeek Provider — unified constructor, unified API client, unified output
 
 from __future__ import annotations
 

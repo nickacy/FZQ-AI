@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Chinese Intelligence API (V15-Final)
-中文情报任务 API（V15 最终版）
+FZQ-AI Chinese Intelligence API (V19-Final)
+中文情报任务 API（V19 最终版）
 
 本模块通过 TaskRouter 执行四大中文情报任务：
 - zh_policy_brief

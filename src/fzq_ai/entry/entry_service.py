@@ -1,7 +1,7 @@
 # src/fzq_ai/entry/entry_service.py
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Service (V20)
+FZQ-AI Entry Service (V19)
 统一入口层：HTTP / CLI / UI 都调用这里
 """
 
@@ -13,7 +13,7 @@ from fzq_ai.intel.pipeline_registry import PipelineRegistry
 
 class EntryService:
     """
-    V20 统一入口服务：
+    V19 统一入口服务：
     - 接收上层请求（UI / API）
     - 根据 task_type 选择 Pipeline
     - 调用 Pipeline.run()

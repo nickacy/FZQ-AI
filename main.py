@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Unified Entry (V15.0.0)
+FZQ-AI Unified Entry (V19.0.0)
 统一入口：启动 FastAPI（src.fzq_ai.api.app）
 """
 

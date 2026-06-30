@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Adapter (V17)
+FZQ-AI Entry Adapter (V19)
 Bridges the Entry Layer to the Pipeline Registry.
 """
 

@@ -1,5 +1,5 @@
 import aiohttp
-from typing import Any, Dict
+from typing import Any, Dict, Union
 import os
 from fzq_ai.schemas.llm import LLMRequestSchema
 
@@ -12,7 +12,21 @@ class KimiProvider:
         self.model = os.getenv("KIMI_MODEL", "moonshot-v1-32k")
         self.url = "https://api.moonshot.cn/v1/chat/completions"
 
-    async def run(self, req: LLMRequestSchema) -> Dict[str, Any]:
+    async def run(self, req: Union[LLMRequestSchema, Dict[str, Any]]) -> Dict[str, Any]:
+        """统一接口：接受 LLMRequestSchema 或 dict。"""
+        # 从 dict/Schema 中提取 prompt
+        if isinstance(req, dict):
+            if "messages" in req:
+                prompt = ""
+                for msg in req["messages"]:
+                    if msg.get("role") == "user":
+                        prompt = msg.get("content", "")
+                        break
+            else:
+                prompt = req.get("prompt", "")
+        else:
+            prompt = req.prompt
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
@@ -20,7 +34,7 @@ class KimiProvider:
 
         payload = {
             "model": self.model,
-            "messages": [{"role": "user", "content": req.prompt}],
+            "messages": [{"role": "user", "content": prompt}],
         }
 
         async with aiohttp.ClientSession() as session:
@@ -30,13 +44,12 @@ class KimiProvider:
                     content = data["choices"][0]["message"]["content"]
                 except Exception:
                     content = str(data)
+                usage = data.get("usage", {})
                 return {
-                    "content": content,
-                    "provider": "kimi",
+                    "output": content,
                     "model": self.model,
-                    "usage": data.get("usage", {}),
-                    "latency_ms": 0,
-                    "finish_reason": data.get("choices", [{}])[0].get("finish_reason", "stop"),
-                    "raw_response": data,
-                    "error": None,
+                    "provider": "kimi",
+                    "prompt_tokens": usage.get("prompt_tokens", 0),
+                    "completion_tokens": usage.get("completion_tokens", 0),
+                    "total_tokens": usage.get("total_tokens", 0),
                 }

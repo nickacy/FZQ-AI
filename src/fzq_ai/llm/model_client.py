@@ -1,5 +1,5 @@
 """
-Unified ModelClient for V20 multi-model routing.
+Unified ModelClient for V19 multi-model routing.
 Delegates actual work to provider.run()
 """
 
@@ -9,7 +9,7 @@ from typing import Any, Dict
 
 class ModelClient:
     """
-    V20 ModelClient — unified interface for all providers.
+    V19 ModelClient — unified interface for all providers.
     Providers must implement async run(req: Dict[str, Any]).
     """
 

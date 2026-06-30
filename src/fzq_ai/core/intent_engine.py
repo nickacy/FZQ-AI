@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Intent Engine (V15-Final)
-意图识别引擎（V15 最终融合版）
+FZQ-AI Intent Engine (V19-Final)
+意图识别引擎（V19 最终融合版）
 
 本模块融合了旧版与新版意图识别逻辑，满足 GLM5.2 / Qwen / DeepSeek / Kimi 四大审计要求：
 - 保留旧版的任务类型、关键词、alternative 候选

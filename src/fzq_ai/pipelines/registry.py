@@ -4,10 +4,10 @@ from typing import Any, Dict, Type
 
 from fzq_ai.pipelines.base import BasePipeline
 
-# from fzq_ai.pipelines.zh_policy_brief_pipeline import ZhPolicyBriefPipeline  # [V15: lazy import in register_defaults()]
-# from fzq_ai.pipelines.zh_risk_scan_pipeline import ZhRiskScanPipeline  # [V15: lazy import in register_defaults()]
-# from fzq_ai.pipelines.zh_opinion_landscape_pipeline import ZhOpinionLandscapePipeline  # [V15: lazy import in register_defaults()]
-# from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline  # [V15: lazy import in register_defaults()]
+# from fzq_ai.pipelines.zh_policy_brief_pipeline import ZhPolicyBriefPipeline  # [V19: lazy import in register_defaults()]
+# from fzq_ai.pipelines.zh_risk_scan_pipeline import ZhRiskScanPipeline  # [V19: lazy import in register_defaults()]
+# from fzq_ai.pipelines.zh_opinion_landscape_pipeline import ZhOpinionLandscapePipeline  # [V19: lazy import in register_defaults()]
+# from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultiSourceMergePipeline  # [V19: lazy import in register_defaults()]
 
 
 class PipelineRegistry:

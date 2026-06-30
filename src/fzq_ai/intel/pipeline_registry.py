@@ -1,7 +1,7 @@
 # src/fzq_ai/pipelines/pipeline_registry.py
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Pipeline Registry (V20)
+FZQ-AI Pipeline Registry (V19)
 统一管理任务类型到具体 Pipeline 的映射
 """
 
@@ -16,7 +16,7 @@ from fzq_ai.pipelines.zh_multisource_merge_pipeline import ZhMultisourceMergePip
 
 class PipelineRegistry:
     """
-    V20 统一 Pipeline 注册表：
+    V19 统一 Pipeline 注册表：
     - 按 task_type 选择对应 Pipeline
     - 提供简单的扩展点
     """

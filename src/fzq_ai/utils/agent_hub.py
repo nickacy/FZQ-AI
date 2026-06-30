@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Agent Hub (V15-Final)
-智能体注册中心（V15 最终版）
+FZQ-AI Agent Hub (V19-Final)
+智能体注册中心（V19 最终版）
 
 负责统一管理所有智能体实例，供 TaskRouter 调用。
 """

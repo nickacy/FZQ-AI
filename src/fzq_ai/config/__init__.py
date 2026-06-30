@@ -87,7 +87,7 @@ NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-VERSION = "2.5.0"
+VERSION = "19.0.0"
 BUILD_TIME = "2026-06-15"
 
 

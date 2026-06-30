@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Global Settings (V15-Final)
-全局配置（V15 最终版）
+FZQ-AI Global Settings (V19-Final)
+全局配置（V19 最终版）
 
 本文件提供：
 - PROVIDER_MAP（模型 Provider → Client 类）
@@ -20,7 +20,7 @@ import yaml
 
 
 class Settings:
-    """V15 全局配置"""
+    """V19 全局配置"""
 
     # ============================================================
     # 1. Provider → Client 映射

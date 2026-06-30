@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Task Router (V15-Final · Compatible Edition)
+FZQ-AI Task Router (V19-Final · Compatible Edition)
 完全兼容你现有的 zh-pipelines / registry / orchestrator / ModelClient
 """
 
@@ -27,23 +27,23 @@ class RouteResult:
 
 class TaskRouter:
     """
-    V15-Final 任务路由器（兼容你现有 zh-pipelines）
+    V19-Final 任务路由器（兼容你现有 zh-pipelines）
     """
 
     # task_type → pipeline_key 映射（带 @v1）
     PIPELINE_MAP = {
-        "zh_policy_brief": "zh_policy_brief@v1",
-        "zh_risk_scan": "zh_risk_scan@v1",
-        "zh_opinion_landscape": "zh_opinion_landscape@v1",
-        "zh_multisource_merge": "zh_multisource_merge@v1",
+        "zh_policy_brief": "zh_policy_brief",
+        "zh_risk_scan": "zh_risk_scan",
+        "zh_opinion_landscape": "zh_opinion_landscape",
+        "zh_multisource_merge": "zh_multisource_merge",
     }
 
     # fallback 顺序
     PIPELINE_FALLBACK = [
-        "zh_policy_brief@v1",
-        "zh_risk_scan@v1",
-        "zh_opinion_landscape@v1",
-        "zh_multisource_merge@v1",
+        "zh_policy_brief",
+        "zh_risk_scan",
+        "zh_opinion_landscape",
+        "zh_multisource_merge",
     ]
 
     # ------------------------------------------------------------

@@ -1,5 +1,5 @@
 # src/fzq_ai/llm/clients/qwen_api.py
-# V20 Qwen API Client — unified chat interface
+# V19 Qwen API Client — unified chat interface
 
 from __future__ import annotations
 from typing import Any, Dict
@@ -9,7 +9,7 @@ import aiohttp
 
 class QwenAPI:
     """
-    V20 Qwen API 客户端
+    V19 Qwen API 客户端
     Provider.run() 会调用本类的 chat()
     """
 

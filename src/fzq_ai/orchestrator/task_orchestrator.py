@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Task Orchestrator (V15-Final)
-任务编排器（V15 最终版）
+FZQ-AI Task Orchestrator (V19-Final)
+任务编排器（V19 最终版）
 
 核心功能：
 - 调用 Intent Engine → TaskRouter → ModelRouter → AgentHub → Pipelines
@@ -22,7 +22,7 @@ from fzq_ai.core.task_router import TaskRouter
 
 
 class TaskOrchestrator:
-    """V15-Final 任务编排器"""
+    """V19-Final 任务编排器"""
 
     def __init__(self):
         self.router = TaskRouter()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Service (V17)
+FZQ-AI Entry Service (V19)
 Unified entry: intent -> route -> execute
 """
 
@@ -12,7 +12,7 @@ from core.task_router import TaskRouter
 
 
 class EntryService:
-    """V17 unified entry service."""
+    """V19 unified entry service."""
 
     def __init__(self):
         self._intent_engine = classify
@@ -42,7 +42,7 @@ class EntryService:
         # 2. Route
         route_result = await self._task_router.route(intent, text)
 
-        if not route_result or not route_result.pipeline:
+        if not route_result or not route_result.success:
             return {
                 "status": "error",
                 "type": "routing_error",
@@ -50,18 +50,13 @@ class EntryService:
                 "intent": intent.__dict__,
             }
 
-        # 3. Execute pipeline
-        result = await route_result.pipeline.run(
-            input_text=text,
-            intent=intent,
-            route=route_result,
-        )
-
-        # 4. Structured output
+        # 3. Structured output from route result
         return {
             "status": "success",
             "type": intent.task_type,
             "intent": intent.__dict__,
-            "route": route_result.to_dict() if hasattr(route_result, "to_dict") else route_result.__dict__,
-            "data": result,
+            "output": route_result.output,
+            "model_used": route_result.model_used,
+            "pipeline_used": route_result.pipeline_used,
+            "data": route_result.output if route_result.output else {},
         }

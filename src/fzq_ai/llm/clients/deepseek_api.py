@@ -1,5 +1,5 @@
 # src/fzq_ai/llm/clients/deepseek_api.py
-# V20 DeepSeek API Client — unified chat interface
+# V19 DeepSeek API Client — unified chat interface
 
 from __future__ import annotations
 from typing import Any, Dict
@@ -9,7 +9,7 @@ import os
 
 class DeepSeekAPI:
     """
-    V20 DeepSeek API 客户端
+    V19 DeepSeek API 客户端
     负责真实调用 DeepSeek Chat API
     Provider.run() 会调用本类的 chat()
     """

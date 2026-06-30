@@ -1,7 +1,7 @@
 # src/fzq_ai/llm/model_router.py
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Model Router (V20)
+FZQ-AI Model Router (V19)
 多模型智能调度（统一 Provider 构造函数）
 """
 
@@ -18,7 +18,7 @@ from fzq_ai.llm.providers.kimi_provider import KimiProvider
 
 class ModelRouter:
     """
-    V20 多模型智能调度：
+    V19 多模型智能调度：
     - 按任务类型选择最佳模型
     - 按语言选择模型
     - 按场景选择模型
