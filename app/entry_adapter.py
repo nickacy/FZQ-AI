@@ -1,93 +1,93 @@
 # -*- coding: utf-8 -*-
 """
-FZQ-AI Entry Adapter (V19)
-Bridges the Entry Layer to the Pipeline Registry.
+FZQ-AI Entry Service (V23-Final)
+Unified Entry Layer → UnifiedOrchestrator(V23) → RouteResult
+Author: Nick
+Version: V23.3.0
 """
 
 from __future__ import annotations
-import uuid
-import time
 from typing import Any, Dict, Optional
 
-
-class AdaptedPipeline:
-    """A minimal pipeline wrapper returned by the adapted registry."""
-
-    def __init__(self, name: str, task_type: str):
-        self.name = name
-        self.task_type = task_type
-
-    async def run(
-        self, input_text: str = "", intent=None, route=None
-    ) -> Dict[str, Any]:
-        """Simulate pipeline execution. Replace with real LLM call in production."""
-        trace_id = str(uuid.uuid4())
-        t0 = time.perf_counter()
-
-        # Mock output based on task_type
-        outputs = {
-            "zh_risk_scan": {
-                "task_type": "zh_risk_scan",
-                "scan_window": None,
-                "risks": [],
-                "overall_risk_level": None,
-                "entity_watchlist": [],
-                "suggested_actions": [],
-                "summary": None,
-                "confidence": None,
-            },
-            "zh_policy_brief": {
-                "task_type": "zh_policy_brief",
-                "doc_id": None,
-                "title": None,
-                "summary": None,
-                "key_points": [],
-                "affected_entities": [],
-                "policy_category": None,
-                "confidence": None,
-            },
-            "zh_opinion_landscape": {
-                "task_type": "zh_opinion_landscape",
-                "clusters": [],
-                "sentiment_distribution": {},
-                "key_narratives": [],
-                "influencer_map": {},
-                "confidence": None,
-            },
-            "zh_multisource_merge": {
-                "task_type": "zh_multisource_merge",
-                "event_id": None,
-                "conflict_sources": [],
-                "resolved_sources": [],
-                "consistency_score": None,
-                "merged_narrative": None,
-                "confidence": None,
-            },
-        }
-
-        data = outputs.get(
-            self.task_type,
-            {"task_type": self.task_type},
-        )
-        data["trace_id"] = trace_id
-        data["duration_ms"] = round((time.perf_counter() - t0) * 1000, 2)
-        data["status"] = "success"
-        data["type"] = self.task_type
-        return data
+from fzq_ai.orchestrator.unified_orchestrator import UnifiedOrchestrator
+from fzq_ai.schemas.route import RouteResult
 
 
-class AdaptedPipelineRegistry:
-    """Minimal pipeline registry adapter for the entry layer."""
+class EntryServiceV23:
+    """
+    V23 Entry Layer
+    - Unified input structure
+    - Unified error structure
+    - Unified RouteResult output
+    - No routing logic (delegated to UnifiedOrchestrator)
+    """
 
-    def resolve_pipeline(self, task_type: str) -> Optional[AdaptedPipeline]:
-        """Resolve a pipeline for the given task_type."""
-        valid_types = [
-            "zh_risk_scan",
-            "zh_policy_brief",
-            "zh_opinion_landscape",
-            "zh_multisource_merge",
-        ]
-        if task_type in valid_types:
-            return AdaptedPipeline(name=f"{task_type}_pipeline", task_type=task_type)
-        # Fallback
-        return AdaptedPipeline(name="base_pipeline", task_type=task_type)
+    def __init__(self) -> None:
+        self.orch = UnifiedOrchestrator()
+
+    # ------------------------------------------------------------
+    # Unified V23 Entry
+    # ------------------------------------------------------------
+    async def handle(
+        self,
+        task: str,
+        ctx: Optional[Dict[str, Any]] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> RouteResult:
+        """
+        Unified entry point for all tasks.
+        Input:
+            task: str
+            ctx: dict (optional)
+            options: dict (optional)
+
+        Output:
+            RouteResult
+        """
+
+        # ------------------------------
+        # Validate input structure
+        # ------------------------------
+        if not isinstance(task, str):
+            return RouteResult.error(
+                code="TASK_TYPE_ERROR",
+                message="task must be a string",
+                debug_info={"task_type": type(task).__name__},
+            )
+
+        if ctx is not None and not isinstance(ctx, dict):
+            return RouteResult.error(
+                code="CTX_TYPE_ERROR",
+                message="ctx must be a dict",
+                debug_info={"ctx_type": type(ctx).__name__},
+            )
+
+        if options is not None and not isinstance(options, dict):
+            return RouteResult.error(
+                code="OPTIONS_TYPE_ERROR",
+                message="options must be a dict",
+                debug_info={"options_type": type(options).__name__},
+            )
+
+        # ------------------------------
+        # Delegate to UnifiedOrchestrator
+        # ------------------------------
+        try:
+            result = self.orch.run_v23(task_name=task, ctx=ctx, options=options)
+
+            # Ensure RouteResult
+            if not isinstance(result, RouteResult):
+                return RouteResult.error(
+                    code="ORCH_RETURN_ERROR",
+                    message="UnifiedOrchestrator returned non-RouteResult",
+                    debug_info={"return_type": type(result).__name__},
+                )
+
+            return result
+
+        except Exception as e:
+            return RouteResult.error(
+                code="ENTRY_EXCEPTION",
+                message=str(e),
+                debug_info={"task": task, "ctx": ctx, "options": options},
+            )
