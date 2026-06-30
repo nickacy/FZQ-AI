@@ -1,5 +1,5 @@
 # fzq_ai/quality/deepseek_struct_opt.py
-# DeepSeek V4 Pro — v9.3 Structure & Logic Optimization Expert
+# DeepSeek V23 — Structure & Logic Optimization Expert
 # Role: between GLM-5.2 (raw draft) and Minimax (validator)
 # Only: structure + logic + de-redundancy + 5W1H grouping + narrative layering
 # Never: create facts, add opinions, format, enforce schema
@@ -20,7 +20,15 @@ class StructOptResult:
 
 
 class DeepSeekStructOptimizer:
-    """v9.3 Structural Optimization Expert for FZQ-AI quality pipeline."""
+    """V23 Structural Optimization Expert for FZQ-AI quality pipeline.
+    
+    V23 核心改进：
+    - narratives: 从 {source, stance, claims} → {summary, evidence, source}
+    - risks: 从分类字典 → 列表 [{category, description, evidence}]
+    - policy_signals: 从字符串数组/分类字典 → [{signal, source, timestamp}]
+    - trend_signals: 从字符串数组/分类字典 → [{trend, evidence, timestamp}]
+    - raw_quotes: 从字符串数组 → [{quote, source, timestamp}]
+    """
 
     # ==================================================================
     # PUBLIC API
@@ -31,19 +39,19 @@ class DeepSeekStructOptimizer:
         """v9.2 legacy entry: field-reorder + logic-fix + dedup + hierarchy-unify."""
         return self._core_optimize(task_name, schema, raw_draft, mode="v9.2")
 
-    def optimize_v93(self, raw_draft: Dict[str, Any]) -> StructOptResult:
-        """v9.3 entry: receives GLM-5.2 8-field JSON, outputs schema-ready JSON."""
-        return self._core_optimize("glm_v93", {}, raw_draft, mode="v9.3")
+    def optimize_v23(self, raw_draft: Dict[str, Any]) -> StructOptResult:
+        """V23 entry: receives GLM-5.2 8-field JSON, outputs V23 schema-ready JSON."""
+        return self._core_optimize("glm_v23", {}, raw_draft, mode="v23")
 
     def _core_optimize(self, task_name: str, schema: Dict[str, Any],
                        raw_draft: Dict[str, Any], mode: str) -> StructOptResult:
         draft = copy.deepcopy(raw_draft)
         report = {"reordered": [], "logic_fixes": [], "deduplicated": [],
-                   "hierarchy_fixes": [], "warnings": [], "v93_groups": []}
+                   "hierarchy_fixes": [], "warnings": [], "v23_groups": []}
         t0 = datetime.now(timezone.utc)
         try:
-            if mode == "v9.3":
-                draft = self._v93_transform(draft, report)
+            if mode == "v23":
+                draft = self._v23_transform(draft, report)
             else:
                 draft = self._reorder_fields(draft, schema, report)
                 draft = self._fix_logic_consistency(draft, task_name, report)
@@ -60,10 +68,10 @@ class DeepSeekStructOptimizer:
                 metadata={"processed_at": t0.isoformat(), "version": mode})
 
     # ==================================================================
-    # v9.3 TRANSFORM (8-field GLM-5.2 → schema-ready JSON)
+    # v23 TRANSFORM (8-field GLM-5.2 → V23 schema-ready JSON)
     # ==================================================================
 
-    def _v93_transform(self, draft: Dict, report: Dict) -> Dict:
+    def _v23_transform(self, draft: Dict, report: Dict) -> Dict:
         facts = draft.get("core_facts", [])
         events_raw = draft.get("event_chain", [])
         actors = draft.get("actors", [])
@@ -118,10 +126,10 @@ class DeepSeekStructOptimizer:
                 groups["what"].append(text)
         for k in groups:
             groups[k] = list(dict.fromkeys(groups[k]))  # dedup preserve order
-        report["v93_groups"].append(f"5W1H: {sum(len(v) for v in groups.values())} facts grouped")
+        report["v23_groups"].append(f"5W1H: {sum(len(v) for v in groups.values())} facts grouped")
         return groups
 
-    # ---------- EVENT CHAIN PARSER ----------
+    # ---------- EVENT CHAIN PARSER (V23) ----------
     def _convert_event_chain(self, events_raw: List, report: Dict) -> List[Dict]:
         result = []
         if not events_raw:
@@ -133,17 +141,28 @@ class DeepSeekStructOptimizer:
                 part = part.strip()
                 if not part:
                     continue
-                node = {"step": i + 1, "action": part, "actor": "", "target": "", "timestamp": None}
+                # V23 standard: {timestamp, actor, action, target, location}
+                node = {
+                    "timestamp": None,
+                    "actor": "",
+                    "action": part,
+                    "target": "",
+                    "location": "",
+                }
                 actor_match = re.match(r"^(.+?)(?:宣布|表示|声明|警告|呼吁|实施|批评|制裁|禁止)", part)
                 if actor_match:
                     node["actor"] = actor_match.group(1).strip()
                     node["action"] = part
+                # Extract location if present
+                loc_match = re.search(r"(?:在|于)([\u4e00-\u9fff]{2,8}(?:市|省|地区|国))", part)
+                if loc_match:
+                    node["location"] = loc_match.group(1)
                 result.append(node)
         if result:
-            report["v93_groups"].append(f"event_chain: {len(result)} nodes")
+            report["v23_groups"].append(f"event_chain: {len(result)} nodes")
         return result
 
-    # ---------- ACTOR FILLER ----------
+    # ---------- ACTOR FILLER (V23) ----------
     def _fill_actors(self, actors: List, output_ref: Optional[List], report: Dict) -> List:
         if not isinstance(actors, list):
             actors = [actors] if actors else []
@@ -158,86 +177,158 @@ class DeepSeekStructOptimizer:
             if name in seen_names:
                 continue
             seen_names.add(name)
+            # V23 standard: role + affiliation in English
+            role_kw = {
+                "spokesperson": ["外交部", "发言人", "spokesperson", "official"],
+                "institution": ["机构", "组织", "organization", "agency", "ministry"],
+                "state_actor": ["政府", "国务院", "government", "state"],
+                "corporate": ["公司", "企业", "corporation", "company"],
+                "military": ["军队", "军方", "military", "troop"],
+            }
             if not a.get("role"):
-                a["role"] = "发言人" if any(k in str(a) for k in ["外交部","发言人"]) else "机构"
+                for role_label, kws in role_kw.items():
+                    if any(k in str(a) for k in kws):
+                        a["role"] = role_label
+                        break
+                if not a.get("role"):
+                    a["role"] = "institution"
+            if not a.get("affiliation"):
+                a["affiliation"] = a.get("name", "") if a.get("name") else ""
             if not a.get("position") and a.get("actions"):
-                a["position"] = "参与方"
+                a["position"] = "participant"
             if output_ref and not a.get("actions"):
                 a["actions"] = [e.get("action", "") for e in output_ref
                                 if name and name in str(e.get("actor", ""))]
             filled.append(a)
-        report["v93_groups"].append(f"actors: {len(filled)} deduped/filled")
+        report["v23_groups"].append(f"actors: {len(filled)} deduped/filled")
         return filled
 
-    # ---------- NARRATIVE LAYERING ----------
+    # ---------- NARRATIVE LAYERING (V23) ----------
+    # V23 standard: {summary, evidence, source}
     _SRC_KW = ["X国", "Y国", "Z国", "西方媒体", "中国媒体", "俄罗斯媒体", "中东媒体",
                "state media", "western media", "official", "US media", "Chinese media"]
 
     def _layer_narratives(self, narratives: List, report: Dict) -> List[Dict]:
+        """V23: 将 narratives 统一为 {summary, evidence, source} 结构。"""
         if not isinstance(narratives, list):
             return []
         layered = []
         seen_claims = set()
         for n in narratives:
             if isinstance(n, str):
-                src = "未知来源"
+                # 字符串 narrative → 推断 source
+                src = "unknown_source"
                 for kw in self._SRC_KW:
                     if kw in n:
                         src = kw; break
-                n = {"source": src, "stance": "", "claims": [n]}
+                n = {"source": src, "summary": n, "evidence": n}
             if not isinstance(n, dict):
                 continue
+            # 兼容旧版 {source, stance, claims} → {summary, evidence, source}
             claims = n.get("claims", [])
             if isinstance(claims, str):
                 claims = [claims]
+            # 去重 claims
             deduped_claims = []
             for c in claims:
                 h = hashlib.sha256(str(c).encode()).hexdigest()[:12]
                 if h not in seen_claims:
                     seen_claims.add(h)
                     deduped_claims.append(str(c))
-            n["claims"] = deduped_claims
-            layered.append(n)
-        report["v93_groups"].append(f"narratives: {len(layered)} sources layered")
+            # V23 结构：summary = 所有 claims 拼接，evidence = 第一个 claim
+            summary_text = "；".join(deduped_claims) if deduped_claims else n.get("summary", "")
+            evidence_text = deduped_claims[0] if deduped_claims else n.get("evidence", summary_text)
+            layered.append({
+                "summary": summary_text,
+                "evidence": evidence_text,
+                "source": n.get("source", "unknown_source"),
+            })
+        report["v23_groups"].append(f"narratives: {len(layered)} V23 structured")
         return layered
 
-    # ---------- SIGNAL CATEGORIZATION ----------
+    # ---------- SIGNAL CATEGORIZATION (V23) ----------
+    # V23 standardized risk categories: political/economic/social/tech/international
+    # V23 output: list of {category, description, evidence} — NOT a dict
     _CAT_MAP = {
         "political": ["政治", "选举", "制裁", "外交", "政府", "policy", "sanction", "election", "diplomacy", "parliament", "congress"],
         "economic": ["经济", "贸易", "关税", "股票", "市场", "衰退", "GDP", "economic", "trade", "tariff", "stock", "market", "inflation"],
-        "security": ["军事", "战争", "冲突", "导弹", "军事演习", "军队", "security", "military", "war", "conflict", "missile", "troop"],
-        "technological": ["芯片", "AI", "科技", "出口管制", "半导体", "tech", "chip", "semiconductor", "AI", "artificial intelligence"],
         "social": ["民众", "抗议", "舆论", "社会", "民心", "social", "protest", "public", "civil"],
+        "tech": ["芯片", "AI", "科技", "出口管制", "半导体", "tech", "chip", "semiconductor", "AI", "artificial intelligence", "量子", "quantum"],
+        "international": ["军事", "战争", "冲突", "导弹", "军事演习", "军队", "security", "military", "war", "conflict", "missile", "troop", "地缘", "geopolitical"],
     }
 
-    def _categorize_signals(self, signals: List, signal_type: str, report: Dict) -> Dict[str, List]:
-        categories: Dict[str, List] = {"political": [], "economic": [], "security": [], "technological": [], "social": []}
+    def _categorize_signals(self, signals: List, signal_type: str, report: Dict) -> List[Dict]:
+        """V23: 将 risks 转换为列表 [{category, description, evidence}]。"""
+        results: List[Dict] = []
         if not isinstance(signals, list):
-            return categories
+            return results
         for s in signals:
-            text = str(s.get("description", s)) if isinstance(s, dict) else str(s)
+            if isinstance(s, dict):
+                text = str(s.get("description", s.get("signal", "")))
+                evidence = s.get("evidence", text)
+            else:
+                text = str(s)
+                evidence = text
             placed = False
             for cat, kws in self._CAT_MAP.items():
                 if any(kw.lower() in text.lower() for kw in kws):
-                    categories[cat].append(s if isinstance(s, dict) else {"signal": text})
-                    placed = True; break
+                    results.append({"category": cat, "description": text, "evidence": evidence})
+                    placed = True
+                    break
             if not placed:
-                categories["political"].append(s if isinstance(s, dict) else {"signal": text})
-        total = sum(len(v) for v in categories.values())
-        report["v93_groups"].append(f"{signal_type}: {total} signals categorized")
-        return categories
+                results.append({"category": "political", "description": text, "evidence": evidence})
+        report["v23_groups"].append(f"{signal_type}: {len(results)} V23 structured")
+        return results
 
-    def _struct_policy_signals(self, signals: List, report: Dict) -> List:
-        return self._categorize_signals(signals, "policy", report)
+    def _struct_policy_signals(self, signals: List, report: Dict) -> List[Dict]:
+        """V23: policy_signals → [{signal, source, timestamp}]。"""
+        results: List[Dict] = []
+        if not isinstance(signals, list):
+            return results
+        for s in signals:
+            if isinstance(s, dict):
+                results.append({
+                    "signal": str(s.get("signal", s.get("description", ""))),
+                    "source": str(s.get("source", "unknown")),
+                    "timestamp": str(s.get("timestamp", "")),
+                })
+            else:
+                results.append({"signal": str(s), "source": "unknown", "timestamp": ""})
+        report["v23_groups"].append(f"policy_signals: {len(results)} V23 structured")
+        return results
 
-    def _struct_trend_signals(self, signals: List, report: Dict) -> List:
-        return self._categorize_signals(signals, "trend", report) if isinstance(signals, list) else []
+    def _struct_trend_signals(self, signals: List, report: Dict) -> List[Dict]:
+        """V23: trend_signals → [{trend, evidence, timestamp}]。"""
+        results: List[Dict] = []
+        if not isinstance(signals, list):
+            return results
+        for s in signals:
+            if isinstance(s, dict):
+                results.append({
+                    "trend": str(s.get("trend", s.get("signal", s.get("description", "")))),
+                    "evidence": str(s.get("evidence", "")),
+                    "timestamp": str(s.get("timestamp", "")),
+                })
+            else:
+                results.append({"trend": str(s), "evidence": "", "timestamp": ""})
+        report["v23_groups"].append(f"trend_signals: {len(results)} V23 structured")
+        return results
 
-    def _preserve_quotes(self, quotes: List, report: Dict) -> List[str]:
+    def _preserve_quotes(self, quotes: List, report: Dict) -> List[Dict]:
+        """V23: raw_quotes → [{quote, source, timestamp}]。"""
         if not isinstance(quotes, list):
             return []
-        result = [str(q) for q in quotes]
-        report["v93_groups"].append(f"raw_quotes: {len(result)} preserved verbatim")
+        result = []
+        for q in quotes:
+            if isinstance(q, dict):
+                result.append({
+                    "quote": str(q.get("quote", q.get("text", ""))),
+                    "source": str(q.get("source", "unknown")),
+                    "timestamp": str(q.get("timestamp", "")),
+                })
+            else:
+                result.append({"quote": str(q), "source": "unknown", "timestamp": ""})
+        report["v23_groups"].append(f"raw_quotes: {len(result)} V23 structured")
         return result
 
     # ==================================================================
@@ -380,6 +471,6 @@ def optimize(task_name: str, schema: Dict[str, Any], raw_draft: Dict[str, Any]) 
     return get_optimizer().optimize(task_name, schema, raw_draft)
 
 
-def optimize_v93(raw_draft: Dict[str, Any]) -> StructOptResult:
-    """v9.3: receives GLM-5.2 8-field JSON, outputs schema-ready JSON."""
-    return get_optimizer().optimize_v93(raw_draft)
+def optimize_v23(raw_draft: Dict[str, Any]) -> StructOptResult:
+    """V23: receives GLM-5.2 8-field JSON, outputs V23 schema-ready JSON."""
+    return get_optimizer().optimize_v23(raw_draft)

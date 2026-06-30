@@ -1,17 +1,17 @@
 """
-FZQ-AI v9.3 · Kimi 文档与提示词优化专家
-解释层（Interpretation Layer）
+FZQ-AI V23 · Kimi 文档解释层专家（Interpretation Layer）
+解释层（V23 标准结构）
 
-职责：接收来自 Step 4（豆包）的最终格式化 JSON，生成 7 类自然语言输出。
+职责：接收来自 DeepSeek 结构优化后的 V23 标准 JSON，生成 7 类自然语言输出。
 
 7 个输出部分：
 1. Chinese_Report      — 中文自然语言报告
 2. English_Report      — 英文自然语言报告
 3. UI_Summary          — 卡片式摘要、要点
 4. User_Summary        — 面向用户的简短总结
-5. Developer_Notes     — 字段解释、结构说明
+5. Developer_Notes     — V23 字段解释、结构说明
 6. Explainability_Layer — 模型协作解释
-7. Prompt_Optimization  — 提示词优化建议
+7. Prompt_Optimization  — V23 提示词优化建议
 
 使用示例：
     from fzq_ai.interpreter.kimi_interpreter import KimiInterpreter
@@ -129,16 +129,16 @@ class KimiInterpretationResult:
 # ---------------------------------------------------------------------------
 
 class KimiInterpreter:
-    """Kimi v9.3 文档与提示词优化专家。
+    """Kimi V23 文档解释层专家。
 
-    接收来自 Step 4（豆包）的最终格式化 JSON，生成 7 类自然语言输出。
+    接收来自 DeepSeek 结构优化后的 V23 标准 JSON，生成 7 类自然语言输出。
 
     使用方式：
         interpreter = KimiInterpreter(llm_router)
         result = await interpreter.interpret(json_data)
     """
 
-    SYSTEM_PROMPT_PATH: str = "src/fzq_ai/prompts/system/kimi_v9.3.txt"
+    SYSTEM_PROMPT_PATH: str = "src/fzq_ai/prompts/system/kimi_v23.txt"
 
     def __init__(self, llm_router: Optional[Any] = None):
         """
@@ -415,31 +415,43 @@ class KimiInterpreter:
                 if name:
                     lines.append(f"- {name} ({role or '角色未明确'})")
 
-        risk_parts = []
-        for cat, items in risks.items():
-            if items:
-                risk_parts.append(f"{cat}风险：{', '.join(items)}")
-        if risk_parts:
+        # V23 risks: list of {category, description, evidence}
+        if risks:
             lines.append("\n风险分析：")
-            for rp in risk_parts:
-                lines.append(f"- {rp}")
+            for r in risks:
+                if isinstance(r, dict):
+                    cat = r.get("category", "未分类")
+                    desc = r.get("description", "")
+                    lines.append(f"- [{cat}] {desc}")
+                else:
+                    lines.append(f"- {r}")
 
+        # V23 policy_signals: list of {signal, source, timestamp}
         if policy_signals:
-            lines.append(f"\n政策信号：{', '.join(policy_signals)}")
+            sigs = [s.get("signal", str(s)) if isinstance(s, dict) else str(s) for s in policy_signals]
+            lines.append(f"\n政策信号：{', '.join(sigs)}")
+        # V23 trend_signals: list of {trend, evidence, timestamp}
         if trend_signals:
-            lines.append(f"趋势信号：{', '.join(trend_signals)}")
+            trends = [s.get("trend", str(s)) if isinstance(s, dict) else str(s) for s in trend_signals]
+            lines.append(f"趋势信号：{', '.join(trends)}")
 
+        # V23 raw_quotes: list of {quote, source, timestamp}
         if raw_quotes:
             lines.append("\n原文引用：")
             for q in raw_quotes:
-                lines.append(f"- {q}")
+                if isinstance(q, dict):
+                    quote_text = q.get("quote", "")
+                    source = q.get("source", "")
+                    lines.append(f"- {quote_text} [{source}]")
+                else:
+                    lines.append(f"- {q}")
 
         return "\n".join(lines)
 
     def _generate_english_report(
         self, facts, events, actors, risks, policy_signals, trend_signals, raw_quotes
     ) -> str:
-        # 基于中文报告生成英文版（简化版，实际应由 LLM 翻译）
+        # V23 兼容版：基于中文报告生成英文版（简化版，实际应由 LLM 翻译）
         who = ", ".join(facts.get("who", [])) or "Not specified"
         what = ", ".join(facts.get("what", [])) or "Not specified"
         when = ", ".join(facts.get("when", [])) or "Not specified"
@@ -467,19 +479,25 @@ class KimiInterpreter:
                 if name:
                     lines.append(f"- {name} ({role or 'Role unspecified'})")
 
-        risk_parts = []
-        for cat, items in risks.items():
-            if items:
-                risk_parts.append(f"{cat} risk: {', '.join(items)}")
-        if risk_parts:
+        # V23 risks: list of {category, description, evidence}
+        if risks:
             lines.append("\nRisk Analysis:")
-            for rp in risk_parts:
-                lines.append(f"- {rp}")
+            for r in risks:
+                if isinstance(r, dict):
+                    cat = r.get("category", "uncategorized")
+                    desc = r.get("description", "")
+                    lines.append(f"- [{cat}] {desc}")
+                else:
+                    lines.append(f"- {r}")
 
+        # V23 policy_signals: list of {signal, source, timestamp}
         if policy_signals:
-            lines.append(f"\nPolicy Signals: {', '.join(policy_signals)}")
+            sigs = [s.get("signal", str(s)) if isinstance(s, dict) else str(s) for s in policy_signals]
+            lines.append(f"\nPolicy Signals: {', '.join(sigs)}")
+        # V23 trend_signals: list of {trend, evidence, timestamp}
         if trend_signals:
-            lines.append(f"Trend Signals: {', '.join(trend_signals)}")
+            trends = [s.get("trend", str(s)) if isinstance(s, dict) else str(s) for s in trend_signals]
+            lines.append(f"Trend Signals: {', '.join(trends)}")
 
         return "\n".join(lines)
 
@@ -491,14 +509,19 @@ class KimiInterpreter:
         if events:
             lines.append(f"• 进展：{len(events)} 个关键节点")
 
-        risk_count = sum(len(v) for v in risks.values() if isinstance(v, list))
+        # V23 risks: list of {category, description, evidence}
+        risk_count = len(risks) if isinstance(risks, list) else 0
         if risk_count > 0:
             lines.append(f"• 风险：{risk_count} 项已识别")
 
+        # V23 policy_signals: list of {signal, source, timestamp}
         if policy_signals:
-            lines.append(f"• 政策：{', '.join(policy_signals[:2])}")
+            sigs = [s.get("signal", str(s)) if isinstance(s, dict) else str(s) for s in policy_signals[:2]]
+            lines.append(f"• 政策：{', '.join(sigs)}")
+        # V23 trend_signals: list of {trend, evidence, timestamp}
         if trend_signals:
-            lines.append(f"• 趋势：{', '.join(trend_signals[:2])}")
+            trends = [s.get("trend", str(s)) if isinstance(s, dict) else str(s) for s in trend_signals[:2]]
+            lines.append(f"• 趋势：{', '.join(trends)}")
 
         return "\n".join(lines)
 
@@ -506,18 +529,20 @@ class KimiInterpreter:
         what = ", ".join(facts.get("what", [])) or "相关事件"
         who = ", ".join(facts.get("who", [])) or "相关方"
 
-        risk_count = sum(len(v) for v in risks.values() if isinstance(v, list))
+        # V23 risks: list of {category, description, evidence}
+        risk_count = len(risks) if isinstance(risks, list) else 0
         risk_text = f"已识别 {risk_count} 项风险" if risk_count > 0 else "暂未识别明确风险"
 
         policy_text = ""
         if policy_signals:
-            policy_text = f"涉及政策信号：{', '.join(policy_signals[:2])}"
+            sigs = [s.get("signal", str(s)) if isinstance(s, dict) else str(s) for s in policy_signals[:2]]
+            policy_text = f"涉及政策信号：{', '.join(sigs)}"
 
         return f"这是关于 {who} {what} 的分析。{risk_text}。{policy_text}"
 
     def _generate_developer_notes(self, data: Dict[str, Any]) -> str:
         lines = [
-            "【数据结构说明】",
+            "【V23 数据结构说明】",
             "",
             "facts: 5W1H 事实提取",
             "- who: 涉事主体（字符串数组）",
@@ -540,16 +565,31 @@ class KimiInterpreter:
             "- position: 职位/身份（字符串）",
             "- actions: 已执行动作（字符串数组）",
             "",
-            "risks: 风险分类（对象）",
-            "- political: 政治风险（字符串数组）",
-            "- economic: 经济风险（字符串数组）",
-            "- security: 安全风险（字符串数组）",
-            "- technological: 技术风险（字符串数组）",
-            "- social: 社会风险（字符串数组）",
+            "narratives: 叙事层（V23 对象数组）",
+            "- summary: 叙事摘要（字符串）",
+            "- evidence: 证据支撑（字符串）",
+            "- source: 来源标识（字符串）",
             "",
-            "policy_signals: 政策信号（字符串数组）",
-            "trend_signals: 趋势信号（字符串数组）",
-            "raw_quotes: 原文引用（字符串数组）",
+            "risks: 风险分类（V23 对象数组）",
+            "- category: 风险类别（political/economic/social/tech/international）",
+            "- description: 风险描述（字符串）",
+            "- evidence: 证据支撑（字符串）",
+            "",
+            "policy_signals: 政策信号（V23 对象数组）",
+            "- signal: 信号内容（字符串）",
+            "- source: 来源（字符串）",
+            "- timestamp: 时间戳（字符串）",
+            "",
+            "trend_signals: 趋势信号（V23 对象数组）",
+            "- trend: 趋势内容（字符串）",
+            "- evidence: 证据支撑（字符串）",
+            "- timestamp: 时间戳（字符串）",
+            "",
+            "raw_quotes: 原文引用（V23 对象数组）",
+            "- quote: 引用文本（字符串）",
+            "- source: 来源（字符串）",
+            "- timestamp: 时间戳（字符串）",
+            "",
             "error_report: 错误报告（字符串数组）",
         ]
         return "\n".join(lines)
@@ -558,33 +598,36 @@ class KimiInterpreter:
         self, facts, events, actors, risks, error_report
     ) -> str:
         lines = [
-            "【模型协作解释】",
+            "【V23 模型协作解释】",
             "",
-            "数据流：GLM-5.2 → DeepSeek → Minimax → 豆包 → Kimi",
+            "数据流：GLM-5.2 → DeepSeek → Minimax → Doubao → Kimi",
             "",
             "1. GLM-5.2（原始提取）：",
             "   - 从原始文本中提取 5W1H 事实骨架",
             f"   - 提取 who: {len(facts.get('who', []))} 个主体",
             f"   - 提取 what: {len(facts.get('what', []))} 个动作",
             "",
-            "2. DeepSeek（结构化）：",
+            "2. DeepSeek（结构化 + V23 优化）：",
             f"   - 构建事件时间线：{len(events)} 个节点",
             f"   - 识别参与者：{len(actors)} 个主体",
-            "   - 分析风险分类",
+            "   - 叙事层结构化：summary + evidence + source",
+            "   - 风险分类统一：category + description + evidence",
+            "   - 信号结构化：signal + source + timestamp",
+            "   - 引用结构化：quote + source + timestamp",
             "",
             "3. Minimax（校验）：",
-            "   - Schema 验证",
-            "   - 字段补全",
-            "   - 枚举修正",
+            "   - V23 Schema 验证",
+            "   - 字段补全与类型检查",
+            "   - 枚举值校验",
             "",
             "4. 豆包（格式化）：",
-            "   - 输出标准化 JSON",
+            "   - V23 标准 JSON 输出",
             "   - 错误汇总",
             "",
-            "5. Kimi（解释层）：",
-            "   - 生成自然语言报告",
+            "5. Kimi（V23 解释层）：",
+            "   - 生成 7 类自然语言输出",
             "   - 提供 UI 摘要",
-            "   - 输出开发者文档",
+            "   - 输出开发者文档与提示词优化建议",
         ]
 
         if error_report:
@@ -596,22 +639,26 @@ class KimiInterpreter:
 
     def _generate_prompt_optimization(self, data: Dict[str, Any]) -> str:
         lines = [
-            "【提示词优化建议】",
+            "【V23 提示词优化建议】",
             "",
-            "基于输入 JSON 的结构特征，给出以下优化建议：",
+            "基于 V23 结构化输出特征，给出以下优化建议：",
             "",
         ]
 
         facts = data.get("facts", {})
         events = data.get("events", [])
         actors = data.get("actors", [])
-        risks = data.get("risks", {})
+        risks = data.get("risks", [])
+        narratives = data.get("narratives", [])
+        policy_signals = data.get("policy_signals", [])
+        trend_signals = data.get("trend_signals", [])
+        raw_quotes = data.get("raw_quotes", [])
         error_report = data.get("error_report", [])
 
-        # 根据数据结构特征给出建议
+        # 根据 V23 数据结构特征给出建议
         if not facts.get("who"):
             lines.append("1. 事实提取阶段：")
-            lines.append("   - 建议在未来 Prompt 中增加 '识别所有涉事主体' 的明确要求")
+            lines.append("   - 建议在 Prompt 中增加 '识别所有涉事主体' 的明确要求")
             lines.append("   - 当前 who 字段为空，可能导致分析报告主体缺失")
             lines.append("")
 
@@ -633,23 +680,42 @@ class KimiInterpreter:
             lines.append("   - 当前 actors 为空，影响主体分析深度")
             lines.append("")
 
-        risk_count = sum(len(v) for v in risks.values() if isinstance(v, list))
+        risk_count = len(risks) if isinstance(risks, list) else 0
         if risk_count == 0:
             lines.append("5. 风险评估阶段：")
             lines.append("   - 建议增加 '识别多维度风险' 的明确要求（政治/经济/安全/技术/社会）")
-            lines.append("   - 当前 risks 全为空，可能遗漏风险信号")
+            lines.append("   - 当前 risks 为空，可能遗漏风险信号")
+            lines.append("")
+
+        if not narratives:
+            lines.append("6. 叙事分析阶段：")
+            lines.append("   - 建议增加 '提取各方叙事立场' 的明确要求")
+            lines.append("   - 当前 narratives 为空，无法生成叙事对比")
+            lines.append("")
+
+        if not policy_signals and not trend_signals:
+            lines.append("7. 信号识别阶段：")
+            lines.append("   - 建议增加 '识别政策信号与趋势信号' 的明确要求")
+            lines.append("   - 当前 signals 为空，影响前瞻性分析")
+            lines.append("")
+
+        if not raw_quotes:
+            lines.append("8. 证据溯源阶段：")
+            lines.append("   - 建议增加 '提取原文引用并标注来源' 的明确要求")
+            lines.append("   - 当前 raw_quotes 为空，削弱报告可信度")
             lines.append("")
 
         if error_report:
-            lines.append(f"6. 错误处理：")
+            lines.append(f"9. 错误处理：")
             lines.append(f"   - 当前处理过程中出现 {len(error_report)} 个异常")
             lines.append("   - 建议增加输入校验和降级处理机制")
             lines.append("")
 
-        lines.append("7. 通用建议：")
-        lines.append("   - 建议在所有阶段增加 '证据溯源' 要求，确保每个结论都有原文支撑")
-        lines.append("   - 建议在输出中增加 '置信度' 字段，标注分析可靠性")
-        lines.append("   - 建议增加 '缺失信息说明'，明确标注哪些维度无法从输入中提取")
+        lines.append("10. V23 通用建议：")
+        lines.append("   - 所有结构化输出必须包含 evidence 字段，确保结论可溯源")
+        lines.append("   - 建议增加 '置信度' 字段，标注分析可靠性")
+        lines.append("   - 建议增加 '缺失信息说明'，明确标注哪些维度无法提取")
+        lines.append("   - 建议统一使用 V23 标准结构，避免旧版与新版的混用")
 
         return "\n".join(lines)
 
