@@ -18,4 +18,6 @@ class EntryRequest(BaseModel):
 @router.post("/entry")
 def run_single_agent(req: EntryRequest):
     result = orchestrator.run(req.task, req.ctx)
+    if hasattr(result, 'to_dict'):
+        return result.to_dict()
     return {"task": req.task, "result": result}

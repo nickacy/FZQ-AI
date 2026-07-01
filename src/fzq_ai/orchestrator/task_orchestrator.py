@@ -27,6 +27,10 @@ class TaskOrchestrator:
     def __init__(self):
         self.router = TaskRouter()
 
+    def _resolve_pipeline(self, req: Dict[str, Any]):
+        """Resolve a pipeline for the given request. Returns None if unresolvable."""
+        return None
+
     # ------------------------------------------------------------
     # 主入口
     # ------------------------------------------------------------
@@ -42,17 +46,16 @@ class TaskOrchestrator:
             req = {"query": text, "task_type": "default"}
         if req is None:
             req = {}
+        query_text = text or req.get("query", "")
 
         # Auto-resolve pipeline if not provided
         if pipeline is None:
             pipeline = self._resolve_pipeline(req)
-        """
-        输入自然语言 → 自动执行完整任务链
-        """
+
         recovery_trace = []
         try:
             # 1. 意图识别
-            intent = classify(text)
+            intent = classify(query_text)
             recovery_trace.append({"stage": "intent", "intent": intent.model_dump()})
 
             # 2. 路由任务

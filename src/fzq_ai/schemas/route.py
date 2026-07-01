@@ -67,7 +67,11 @@ class RouteResult:
         )
 
     @staticmethod
-    def error(code: str, message: str, debug_info=None):
+    def error(code: str, message: str = None, debug_info=None):
+        # Accept both: error("msg") and error("CODE", "msg")
+        if message is None:
+            message = code
+            code = "ERROR"
         return RouteResult(
             status="error",
             data={"code": code, "message": message},

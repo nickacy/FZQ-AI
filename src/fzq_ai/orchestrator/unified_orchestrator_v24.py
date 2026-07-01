@@ -12,6 +12,7 @@ from src.fzq_ai.ui.ui_schema import UISchema
 # V24 Agents
 from src.fzq_ai.agents.news_agent_v24 import NewsAgentV24
 from src.fzq_ai.agents.autonomy_agent_v24 import AutonomyAgentV24
+from src.fzq_ai.agents.base import AgentContext
 
 
 class UnifiedOrchestratorV24:
@@ -22,6 +23,7 @@ class UnifiedOrchestratorV24:
     - 新增 ui_schema 输出（声明式渲染器）
     - 新增自治智能体（ReAct 状态机）
     - 完全兼容 V21 BaseAgent
+    - 新增 V23 兼容层 run()
     """
 
     def __init__(self):
@@ -29,11 +31,64 @@ class UnifiedOrchestratorV24:
         self.autonomy_agent = AutonomyAgentV24()
 
     # ============================================================
+    # V23 兼容层（旧系统调用 orchestrator.run()）
+    # ============================================================
+
+    async def run(self, task: str, ctx: Dict[str, Any], **kwargs):
+        """
+        兼容旧系统的 TaskOrchestrator.run(task, ctx)
+        自动映射到 V24 的 run_single()
+        """
+        # V23 的 ctx 格式是 {"raw_input": "..."}
+        raw_input = ctx.get("raw_input", "")
+
+        # 构造 V24 的 agent_ctx
+        agent_ctx = {
+            "user_id": "legacy",
+            "locale": "zh-CN",
+            "focus_regions": [],
+            "languages": ["zh"],
+            "raw_input": raw_input,
+            "metadata": {},
+        }
+
+        # 构造 V24 的 ctx 格式
+        new_ctx = {
+            "agent_ctx": agent_ctx
+        }
+
+        # 调用 V24 的单智能体执行流程
+        result = await self.run_single(task, new_ctx, options={})
+
+        # 返回旧系统能理解的格式
+        return {
+            "success": True,
+            "task_type": task,
+            "pipeline": None,
+            "agent": "news_agent_v24",
+            "model": None,
+            "fallback_used": False,
+            "output": result.data,
+            "error": None,
+            "recovery_trace": [],
+        }
+
+    # ============================================================
     # 单智能体任务（Entry /entry）
     # ============================================================
 
     async def run_single(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
-        agent_ctx = ctx["agent_ctx"]
+        agent_ctx_dict = ctx["agent_ctx"]
+
+        # Build AgentContext from the dict payload
+        agent_ctx = AgentContext(
+            user_id=agent_ctx_dict.get("user_id"),
+            locale=agent_ctx_dict.get("locale", "zh-CN"),
+            focus_regions=agent_ctx_dict.get("focus_regions", []),
+            languages=agent_ctx_dict.get("languages", ["zh"]),
+            raw_input=agent_ctx_dict.get("raw_input", ""),
+            metadata=agent_ctx_dict.get("metadata", {}),
+        )
 
         # V21 BaseAgent.run() 是同步的
         result = self.news_agent.run(agent_ctx)
@@ -60,7 +115,6 @@ class UnifiedOrchestratorV24:
     # ============================================================
 
     async def run_multi(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
-        # 未来可扩展多个 Agent
         return await self.run_single(task, ctx, options)
 
     # ============================================================

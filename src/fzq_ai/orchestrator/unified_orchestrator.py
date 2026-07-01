@@ -70,14 +70,15 @@ class UnifiedOrchestrator:
     def run_single(self, task_name: str, ctx: Any) -> Dict[str, Any]:
         """
         Unified entry for old single-agent tasks.
-        返回旧系统的原始 Dict 结果，由上层封装为 RouteResult。
         """
         # run_scenario exists in scenario_orchestrator.py
         if hasattr(self.single, "run_scenario"):
             return self.single.run_scenario(task_name)  # type: ignore[attr-defined]
 
-        # run_nl exists in task_orchestrator.py
-        return self.single.run_nl(task_name.replace("_", " "))  # type: ignore[attr-defined]
+        # Fallback: use TaskOrchestrator.run with text input
+        if isinstance(ctx, dict) and "raw_input" in ctx:
+            return self.single.run(text=ctx["raw_input"])
+        return self.single.run(text=str(ctx))
 
     # ------------------------------------------------------------
     # Multi-agent execution (V22)
@@ -111,6 +112,10 @@ class UnifiedOrchestrator:
     # ------------------------------------------------------------
     # Unified V23 entry
     # ------------------------------------------------------------
+    def run(self, task_name: str, ctx: Any = None) -> RouteResult:
+        """Convenience entry — delegates to run_v23.  Used by /v23/entry."""
+        return self.run_v23(task_name, ctx)
+
     def run_v23(
         self,
         task_name: str,
