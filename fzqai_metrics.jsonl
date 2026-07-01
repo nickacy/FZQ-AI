@@ -22,3 +22,6 @@
 {"timestamp": 1782889287.218481, "datetime": "2026-07-01T07:01:27.218481+00:00", "name": "provider_call", "duration_ms": 26497.66182899475, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
 {"timestamp": 1782889288.998964, "datetime": "2026-07-01T07:01:28.998964+00:00", "name": "provider_call", "duration_ms": 1772.8569507598877, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
 {"timestamp": 1782889306.736576, "datetime": "2026-07-01T07:01:46.736576+00:00", "name": "provider_call", "duration_ms": 13285.492658615112, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
+{"timestamp": 1782889355.173421, "datetime": "2026-07-01T07:02:35.173421+00:00", "name": "provider_call", "duration_ms": 18755.470514297485, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
+{"timestamp": 1782889357.701798, "datetime": "2026-07-01T07:02:37.701798+00:00", "name": "provider_call", "duration_ms": 2518.361806869507, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
+{"timestamp": 1782889362.184637, "datetime": "2026-07-01T07:02:42.184637+00:00", "name": "provider_call", "duration_ms": 1318.711280822754, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
