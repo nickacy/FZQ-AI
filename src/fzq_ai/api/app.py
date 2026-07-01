@@ -95,7 +95,7 @@ async def entry_v24(payload: dict):
     单智能体入口（V24）
     """
     result = await entry_service.handle_single(payload)
-    return result.__dict__
+    return result.to_dict()
 
 
 @app.post("/multi")
@@ -104,7 +104,7 @@ async def multi_v24(payload: dict):
     多智能体入口（V24）
     """
     result = await entry_service.handle_multi(payload)
-    return result.__dict__
+    return result.to_dict()
 
 
 @app.post("/autonomy")
@@ -113,7 +113,7 @@ async def autonomy_v24(payload: dict):
     自治智能体入口（V24）
     """
     result = await entry_service.handle_autonomy(payload)
-    return result.__dict__
+    return result.to_dict()
 
 
 # ============================================================

@@ -73,3 +73,17 @@ class RouteResult:
             data={"code": code, "message": message},
             debug_info=debug_info,
         )
+
+    def to_dict(self):
+        """Safe serialization — returns only public fields."""
+        return {
+            "status": self.status,
+            "data": self.data,
+            "ui_layout": self.ui_layout,
+            "debug_info": self.debug_info,
+            "trace_id": self.trace_id,
+            "timeline": self.timeline,
+            "ui_schema": self.ui_schema,
+            "warnings": self.warnings,
+            "trace": self.trace,
+        }

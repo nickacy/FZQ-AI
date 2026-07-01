@@ -9,13 +9,13 @@ FZQ-AI Agents Package (V19-Final)
 from .tasks.risk_scan_agent import RiskScanAgent
 from .tasks.policy_brief_agent import PolicyBriefAgent
 from .tasks.opinion_landscape_agent import OpinionLandscapeAgent
-from .tasks.multisource_merge_agent import MultiSourceMergeAgent
+from .tasks.multisource_merge_agent import MultisourceMergeAgent
 from .news_center_agent import NewsCenterAgent
 
 __all__ = [
     "RiskScanAgent",
     "PolicyBriefAgent",
     "OpinionLandscapeAgent",
-    "MultiSourceMergeAgent",
+    "MultisourceMergeAgent",
     "NewsCenterAgent",
 ]
