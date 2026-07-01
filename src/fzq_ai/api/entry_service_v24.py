@@ -1,102 +1,254 @@
-# src/fzq_ai/api/entry_service_v24.py
-# V24 — EntryService（统一入口层 · 最终版）
-# 保留 V23 设计风格 + 增量增强（single / multi / autonomy）
+# src/fzq_ai/orchestrator/unified_orchestrator_v24.py
+# V24 — Unified Orchestrator（最终版）
+# 保留 V23 全部功能 + 增量增强（timeline + ui_schema + autonomy）
 
 from __future__ import annotations
 from typing import Any, Dict
 
-from src.fzq_ai.orchestrator.unified_orchestrator_v24 import UnifiedOrchestratorV24
+from src.fzq_ai.orchestrator.blackboard import Blackboard
 from src.fzq_ai.schemas.route import RouteResult
+from src.fzq_ai.ui.ui_schema import UISchema
+
+# V24 Agents
+from src.fzq_ai.agents.news_agent_v24 import NewsAgentV24
+from src.fzq_ai.agents.autonomy_agent_v24 import AutonomyAgentV24
+from src.fzq_ai.agents.base import AgentContext
 
 
-class EntryServiceV24:
+class UnifiedOrchestratorV24:
     """
-    V24 统一入口层：
-    - 对接 UnifiedOrchestratorV24
-    - 提供 single / multi / autonomy 三种入口模式
-    - 返回 RouteResult（含 timeline + ui_schema）
+    V24 — 最终 orchestrator：
+    - 保留 V23 全部功能
+    - 新增 timeline 输出（协作链）
+    - 新增 ui_schema 输出（声明式渲染器）
+    - 新增自治智能体（ReAct 状态机）
+    - 完全兼容 V21 BaseAgent
+    - 新增 V23 兼容层 run()
     """
 
     def __init__(self):
-        self.orchestrator = UnifiedOrchestratorV24()
+        self.news_agent = NewsAgentV24()
+        self.autonomy_agent = AutonomyAgentV24()
 
     # ============================================================
-    # 公共上下文构造
+    # V23 兼容层（旧系统调用 orchestrator.run()）
     # ============================================================
 
-    def _build_ctx(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    async def run(self, task: str, ctx: Dict[str, Any], **kwargs):
         """
-        将前端 / APP 传入的 JSON 转换为内部上下文结构。
-        这里保持简单，方便你后续扩展。
+        兼容旧系统的 TaskOrchestrator.run(task, ctx)
+        自动映射到 V24 的 run_single()
+        V23 ctx 格式：{"raw_input": "..."}
         """
-        raw_input = payload.get("input", "")
-        languages = payload.get("languages", ["zh"])
-        focus_regions = payload.get("focus_regions", [])
-        metadata = payload.get("metadata", {})
+        raw_input = ""
+        if isinstance(ctx, dict):
+            raw_input = ctx.get("raw_input", str(ctx))
+        else:
+            raw_input = str(ctx)
 
         agent_ctx = {
+            "user_id": "legacy",
+            "locale": "zh-CN",
+            "focus_regions": [],
+            "languages": ["zh"],
             "raw_input": raw_input,
-            "languages": languages,
-            "focus_regions": focus_regions,
-            "metadata": metadata,
+            "metadata": {},
         }
 
-        return {
-            "agent_ctx": agent_ctx,
+        new_ctx = {
+            "agent_ctx": agent_ctx
         }
 
+        try:
+            result = await self.run_single(task, new_ctx, options={})
+            return {
+                "success": True,
+                "task_type": task,
+                "pipeline": None,
+                "agent": "news_agent_v24",
+                "model": None,
+                "fallback_used": False,
+                "output": result.data,
+                "error": None,
+                "recovery_trace": [],
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "task_type": task,
+                "pipeline": None,
+                "agent": "news_agent_v24",
+                "model": None,
+                "fallback_used": True,
+                "output": None,
+                "error": str(e),
+                "recovery_trace": [
+                    {"stage": "exception", "error": str(e)}
+                ],
+            }
+
     # ============================================================
-    # 单智能体入口（/entry）
+    # 单智能体任务（Entry /entry）
     # ============================================================
 
-    async def handle_single(self, payload: Dict[str, Any]) -> RouteResult:
+    async def run_single(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
         """
-        单智能体任务入口：
-        - 对接 UnifiedOrchestratorV24.run_single()
+        V24 单智能体执行：
+        - 使用 NewsAgentV24
+        - 输出 timeline + ui_schema
+        - 返回 RouteResult（兼容 V23 + V24）
         """
-        ctx = self._build_ctx(payload)
-        options: Dict[str, Any] = {}
+        agent_ctx_dict = ctx.get("agent_ctx", {})
 
-        return await self.orchestrator.run_single(
-            task=payload.get("task", "single"),
-            ctx=ctx,
-            options=options,
+        agent_ctx = AgentContext(
+            user_id=agent_ctx_dict.get("user_id"),
+            locale=agent_ctx_dict.get("locale", "zh-CN"),
+            focus_regions=agent_ctx_dict.get("focus_regions", []),
+            languages=agent_ctx_dict.get("languages", ["zh"]),
+            raw_input=agent_ctx_dict.get("raw_input", ""),
+            metadata=agent_ctx_dict.get("metadata", {}),
+        )
+
+        try:
+            result = self.news_agent.run(agent_ctx)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AGENT_EXEC_ERROR",
+                debug_info={
+                    "agent": "news_agent_v24",
+                    "task": task,
+                    "raw_input": agent_ctx.raw_input,
+                },
+            )
+
+        timeline = Blackboard.read("sys.timeline", [])
+
+        ui_schema = UISchema.layout([
+            UISchema.card("智能体输出", result.data),
+            UISchema.timeline_block("协作链", timeline),
+        ])
+
+        return RouteResult.ok(
+            data=result.data,
+            ui_layout=None,
+            debug_info=result.trace,
+            timeline=timeline,
+            ui_schema=ui_schema,
+            warnings=result.warnings,
+            trace=result.trace,
         )
 
     # ============================================================
-    # 多智能体入口（/multi）
+    # 多智能体任务（Entry /multi）
     # ============================================================
 
-    async def handle_multi(self, payload: Dict[str, Any]) -> RouteResult:
+    async def run_multi(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
         """
-        多智能体任务入口：
-        - 当前复用 run_single()
-        - 未来可扩展为真正多 Agent 协作
+        V24 多智能体占位实现：
+        当前复用单智能体逻辑，未来可扩展为真正的多智能体协作。
         """
-        ctx = self._build_ctx(payload)
-        options: Dict[str, Any] = {}
-
-        return await self.orchestrator.run_multi(
-            task=payload.get("task", "multi"),
-            ctx=ctx,
-            options=options,
-        )
+        return await self.run_single(task, ctx, options)
 
     # ============================================================
-    # 自治智能体入口（/autonomy）
+    # 自治智能体任务（Entry /autonomy）
     # ============================================================
 
-    async def handle_autonomy(self, payload: Dict[str, Any]) -> RouteResult:
+    async def run_autonomy(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
         """
-        自治智能体任务入口：
-        - 对接 UnifiedOrchestratorV24.run_autonomy()
-        - 输出状态机 + 协作链 + 最终总结
+        V24 自治智能体（ReAct 状态机）执行流程：
+        - DECOMPOSE / ACT / REFLECT / FINALIZE
+        - 输出状态机轨迹 + timeline + ui_schema
         """
-        ctx = self._build_ctx(payload)
-        options: Dict[str, Any] = {}
+        agent_ctx = ctx.get("agent_ctx", {})
 
-        return await self.orchestrator.run_autonomy(
-            task=payload.get("task", "autonomy"),
-            ctx=ctx,
-            options=options,
+        try:
+            plan = self.autonomy_agent.plan(agent_ctx)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_PLAN_ERROR",
+                debug_info={
+                    "stage": "DECOMPOSE",
+                    "task": task,
+                    "agent_ctx": agent_ctx,
+                },
+            )
+
+        try:
+            model = self.autonomy_agent.route(plan)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_ROUTE_ERROR",
+                debug_info={
+                    "stage": "ROUTE",
+                    "task": task,
+                    "plan": plan,
+                },
+            )
+
+        try:
+            act_result = await self.autonomy_agent.execute(model, plan)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_EXEC_ERROR",
+                debug_info={
+                    "stage": "ACT",
+                    "task": task,
+                    "model": model,
+                    "plan": plan,
+                },
+            )
+
+        try:
+            reflect_result = self.autonomy_agent.reflect(act_result)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_REFLECT_ERROR",
+                debug_info={
+                    "stage": "REFLECT",
+                    "task": task,
+                    "act_result": act_result,
+                },
+            )
+
+        try:
+            final_result = self.autonomy_agent.heal(reflect_result)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_HEAL_ERROR",
+                debug_info={
+                    "stage": "FINALIZE",
+                    "task": task,
+                    "reflect_result": reflect_result,
+                },
+            )
+
+        states = {
+            "DECOMPOSE": Blackboard.read("autonomy.DECOMPOSE", {}),
+            "ACT": Blackboard.read("autonomy.ACT", {}),
+            "REFLECT": Blackboard.read("autonomy.REFLECT", {}),
+            "FINALIZE": Blackboard.read("autonomy.FINALIZE", {}),
+        }
+
+        timeline = Blackboard.read("sys.timeline", [])
+
+        ui_schema = UISchema.layout([
+            UISchema.state_machine("自治智能体状态机", states),
+            UISchema.timeline_block("协作链", timeline),
+            UISchema.card("最终输出", final_result),
+        ])
+
+        return RouteResult.ok(
+            data=final_result,
+            ui_layout=None,
+            debug_info={"states": states},
+            timeline=timeline,
+            ui_schema=ui_schema,
+            warnings=[],
+            trace=[],
         )

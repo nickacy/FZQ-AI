@@ -38,11 +38,14 @@ class UnifiedOrchestratorV24:
         """
         兼容旧系统的 TaskOrchestrator.run(task, ctx)
         自动映射到 V24 的 run_single()
+        V23 ctx 格式：{"raw_input": "..."}
         """
-        # V23 的 ctx 格式是 {"raw_input": "..."}
-        raw_input = ctx.get("raw_input", "")
+        raw_input = ""
+        if isinstance(ctx, dict):
+            raw_input = ctx.get("raw_input", str(ctx))
+        else:
+            raw_input = str(ctx)
 
-        # 构造 V24 的 agent_ctx
         agent_ctx = {
             "user_id": "legacy",
             "locale": "zh-CN",
@@ -52,35 +55,51 @@ class UnifiedOrchestratorV24:
             "metadata": {},
         }
 
-        # 构造 V24 的 ctx 格式
         new_ctx = {
             "agent_ctx": agent_ctx
         }
 
-        # 调用 V24 的单智能体执行流程
-        result = await self.run_single(task, new_ctx, options={})
-
-        # 返回旧系统能理解的格式
-        return {
-            "success": True,
-            "task_type": task,
-            "pipeline": None,
-            "agent": "news_agent_v24",
-            "model": None,
-            "fallback_used": False,
-            "output": result.data,
-            "error": None,
-            "recovery_trace": [],
-        }
+        try:
+            result = await self.run_single(task, new_ctx, options={})
+            return {
+                "success": True,
+                "task_type": task,
+                "pipeline": None,
+                "agent": "news_agent_v24",
+                "model": None,
+                "fallback_used": False,
+                "output": result.data,
+                "error": None,
+                "recovery_trace": [],
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "task_type": task,
+                "pipeline": None,
+                "agent": "news_agent_v24",
+                "model": None,
+                "fallback_used": True,
+                "output": None,
+                "error": str(e),
+                "recovery_trace": [
+                    {"stage": "exception", "error": str(e)}
+                ],
+            }
 
     # ============================================================
     # 单智能体任务（Entry /entry）
     # ============================================================
 
     async def run_single(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
-        agent_ctx_dict = ctx["agent_ctx"]
+        """
+        V24 单智能体执行：
+        - 使用 NewsAgentV24
+        - 输出 timeline + ui_schema
+        - 返回 RouteResult（兼容 V23 + V24）
+        """
+        agent_ctx_dict = ctx.get("agent_ctx", {})
 
-        # Build AgentContext from the dict payload
         agent_ctx = AgentContext(
             user_id=agent_ctx_dict.get("user_id"),
             locale=agent_ctx_dict.get("locale", "zh-CN"),
@@ -90,8 +109,18 @@ class UnifiedOrchestratorV24:
             metadata=agent_ctx_dict.get("metadata", {}),
         )
 
-        # V21 BaseAgent.run() 是同步的
-        result = self.news_agent.run(agent_ctx)
+        try:
+            result = self.news_agent.run(agent_ctx)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AGENT_EXEC_ERROR",
+                debug_info={
+                    "agent": "news_agent_v24",
+                    "task": task,
+                    "raw_input": agent_ctx.raw_input,
+                },
+            )
 
         timeline = Blackboard.read("sys.timeline", [])
 
@@ -115,6 +144,10 @@ class UnifiedOrchestratorV24:
     # ============================================================
 
     async def run_multi(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
+        """
+        V24 多智能体占位实现：
+        当前复用单智能体逻辑，未来可扩展为真正的多智能体协作。
+        """
         return await self.run_single(task, ctx, options)
 
     # ============================================================
@@ -122,24 +155,79 @@ class UnifiedOrchestratorV24:
     # ============================================================
 
     async def run_autonomy(self, task: str, ctx: Dict[str, Any], options: Dict[str, Any]):
-        agent_ctx = ctx["agent_ctx"]
+        """
+        V24 自治智能体（ReAct 状态机）执行流程：
+        - DECOMPOSE / ACT / REFLECT / FINALIZE
+        - 输出状态机轨迹 + timeline + ui_schema
+        """
+        agent_ctx = ctx.get("agent_ctx", {})
 
-        # 1. 规划（DECOMPOSE）
-        plan = self.autonomy_agent.plan(agent_ctx)
+        try:
+            plan = self.autonomy_agent.plan(agent_ctx)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_PLAN_ERROR",
+                debug_info={
+                    "stage": "DECOMPOSE",
+                    "task": task,
+                    "agent_ctx": agent_ctx,
+                },
+            )
 
-        # 2. 模型选择
-        model = self.autonomy_agent.route(plan)
+        try:
+            model = self.autonomy_agent.route(plan)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_ROUTE_ERROR",
+                debug_info={
+                    "stage": "ROUTE",
+                    "task": task,
+                    "plan": plan,
+                },
+            )
 
-        # 3. 执行（ACT）
-        act_result = await self.autonomy_agent.execute(model, plan)
+        try:
+            act_result = await self.autonomy_agent.execute(model, plan)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_EXEC_ERROR",
+                debug_info={
+                    "stage": "ACT",
+                    "task": task,
+                    "model": model,
+                    "plan": plan,
+                },
+            )
 
-        # 4. 反思（REFLECT）
-        reflect_result = self.autonomy_agent.reflect(act_result)
+        try:
+            reflect_result = self.autonomy_agent.reflect(act_result)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_REFLECT_ERROR",
+                debug_info={
+                    "stage": "REFLECT",
+                    "task": task,
+                    "act_result": act_result,
+                },
+            )
 
-        # 5. 自愈（FINALIZE）
-        final_result = self.autonomy_agent.heal(reflect_result)
+        try:
+            final_result = self.autonomy_agent.heal(reflect_result)
+        except Exception as e:
+            return RouteResult.error(
+                message=str(e),
+                code="AUTONOMY_HEAL_ERROR",
+                debug_info={
+                    "stage": "FINALIZE",
+                    "task": task,
+                    "reflect_result": reflect_result,
+                },
+            )
 
-        # 6. 读取状态机轨迹
         states = {
             "DECOMPOSE": Blackboard.read("autonomy.DECOMPOSE", {}),
             "ACT": Blackboard.read("autonomy.ACT", {}),
