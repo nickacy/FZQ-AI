@@ -1,0 +1,3 @@
+{"timestamp": 1782986199.519248, "datetime": "2026-07-02T09:56:39.519248+00:00", "name": "provider_call", "duration_ms": 7019.908905029297, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
+{"timestamp": 1782986204.195238, "datetime": "2026-07-02T09:56:44.195238+00:00", "name": "provider_call", "duration_ms": 4666.991710662842, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}
+{"timestamp": 1782986208.098772, "datetime": "2026-07-02T09:56:48.098772+00:00", "name": "provider_call", "duration_ms": 1262.4163627624512, "extra": {"provider": "deepseek", "model": "deepseek-chat", "success": true}}

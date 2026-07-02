@@ -1,7 +1,13 @@
 /**
- * FZQ‑AI Dashboard Frontend (V19 · Status Bar Enhanced)
- * 使用 ui_layout 自动渲染组件 + 状态栏渲染 + 国际化
+ * FZQ-AI Dashboard Frontend (V24 — Fixed)
+ * Aligned with V24 /entry contract: sends {input}, reads {data, ui_schema, timeline}
  */
+
+let currentLang = "zh";
+
+/* ============================================================
+ * 1. 发送请求 — 对齐 V24 API 契约
+ * ============================================================ */
 
 async function sendQuery() {
     const text = document.getElementById("userInput").value;
@@ -10,9 +16,8 @@ async function sendQuery() {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            text: text,
-            language: currentLang,
-            session_id: "web-session-001"
+            input: text,
+            languages: [currentLang],
         })
     });
 
@@ -21,324 +26,142 @@ async function sendQuery() {
         data = await response.json();
     } catch (e) {
         document.getElementById("resultArea").innerHTML =
-            `<b>${t("error.non_json")}</b>`;
+            "<b>" + (t("error.non_json") || "Backend returned non-JSON response.") + "</b>";
         return;
     }
 
     // 显示原始 JSON（调试用）
     document.getElementById("resultArea").innerHTML =
-        `<pre>${JSON.stringify(data.result, null, 2)}</pre>`;
+        "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
 
-    // ⭐ 渲染状态栏
+    // 渲染状态栏
     renderStatusBar(data);
 
     clearCharts();
     clearPolicyCard();
     clearDynamicComponents();
 
-    const layout = data.ui_layout;
-    const result = data.result;
+    // V24 契约: ui_schema 包含 layout; data.data 包含实际结果
+    const layout = data.ui_schema || data.ui_layout;
+    const result = data.data || {};
 
-    if (!layout || !layout.layout_type) {
-        console.warn("后端未返回 ui_layout");
-        return;
+    if (layout && layout.blocks) {
+        renderLayout(layout, result);
+    } else {
+        console.warn("No ui_schema.blocks returned");
     }
-
-    renderLayout(layout, result);
 }
 
 
 /* ============================================================
- * 1. 状态栏渲染（模型 / 管线 / trace_id）
+ * 2. 状态栏
  * ============================================================ */
 
 function renderStatusBar(data) {
-    const modelSpan = document.getElementById("statusModel");
-    const pipelineSpan = document.getElementById("statusPipeline");
-    const traceSpan = document.getElementById("statusTrace");
-
-    // 从后端 result.route 中读取 pipeline
-    const route = data.result.route || {};
-    const modelName = route.model_name || "N/A";
-    const pipelineName = route.pipeline || "N/A";
-
-    // trace_id
-    const traceId = data.trace_id || "N/A";
-
-    modelSpan.innerText = `${t("status.model")}: ${modelName}`;
-    pipelineSpan.innerText = `${t("status.pipeline")}: ${pipelineName}`;
-    traceSpan.innerText = `${t("status.trace_id")}: ${traceId}`;
+    const m = document.getElementById("statusModel");
+    const p = document.getElementById("statusPipeline");
+    const t = document.getElementById("statusTrace");
+    if (m) m.innerText = (t("status.model") || "Model") + ": N/A";
+    if (p) p.innerText = (t("status.pipeline") || "Pipeline") + ": N/A";
+    if (t) t.innerText = (t("status.trace_id") || "Trace") + ": " + (data.trace_id || "N/A");
 }
 
 
 /* ============================================================
- * 2. 根据 ui_layout 渲染组件（国际化）
+ * 3. 根据 ui_schema 渲染组件
  * ============================================================ */
 
 function renderLayout(layout, result) {
-    const components = layout.components || [];
-
-    components.forEach(component => {
-        switch (component.type) {
-
-            case "risk_block":
-                renderRiskBlock(result.data);
+    const blocks = layout.blocks || [];
+    blocks.forEach(function(block) {
+        switch (block.type) {
+            case "card":
+                renderCard(block, result);
                 break;
-
-            case "risk_radar":
-                renderRadarChart(result.data);
-                break;
-
-            case "sentiment_trend":
-                renderTrendChart(result.data);
-                break;
-
-            case "narrative_graph":
-                renderGraph(result.data);
-                break;
-
-            case "policy_brief_card":
-                renderPolicyCard(result.data);
-                break;
-
             case "timeline":
-                renderTimeline(result.data);
+                renderTimeline(block, result);
                 break;
-
-            case "source_list":
-                renderSourceList(result.data);
+            case "state_machine":
+                renderStateMachine(block, result);
                 break;
-
-            case "merge_summary":
-                renderMergeSummary(result.data);
-                break;
-
             default:
-                console.warn("未知组件类型：", component.type);
+                console.warn("Unknown block type:", block.type);
         }
     });
 }
 
 
 /* ============================================================
- * 3. 清理动态组件区域
+ * 4. 辅助清理函数
  * ============================================================ */
 
-function clearDynamicComponents() {
-    const areas = [
-        "riskBlockArea",
-        "timelineArea",
-        "sourceListArea",
-        "mergeSummaryArea"
-    ];
+function clearCharts() {
+    var ids = ["radarChart", "trendChart"];
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            var ctx = el.getContext("2d");
+            if (ctx) ctx.clearRect(0, 0, el.width, el.height);
+        }
+    });
+}
 
-    areas.forEach(id => {
-        const el = document.getElementById(id);
+function clearPolicyCard() {
+    var el = document.getElementById("policyCardArea");
+    if (el) el.innerHTML = "";
+}
+
+function clearDynamicComponents() {
+    ["timelineArea", "sourceListArea", "mergeSummaryArea", "graphArea"].forEach(function(id) {
+        var el = document.getElementById(id);
         if (el) el.innerHTML = "";
     });
 }
 
 
 /* ============================================================
- * 4. 风险扫描组件（国际化）
+ * 5. Card 组件
  * ============================================================ */
 
-function renderRiskBlock(data) {
-    const area = document.getElementById("policyCardArea");
+function renderCard(block, result) {
+    var area = document.getElementById("policyCardArea");
     if (!area) return;
-
-    const html = `
-        <div class="risk-block">
-            <h3>${t("risk.title")}</h3>
-            <p><b>${t("risk.overall")}：</b> ${data.overall_risk}</p>
-            <p><b>${t("risk.key_points")}：</b></p>
-            <ul>
-                ${data.key_risks.map(r => `<li>${r}</li>`).join("")}
-            </ul>
-        </div>
-    `;
-
-    area.innerHTML = html;
+    area.innerHTML = "<div class=\"policy-card\"><h3>" + (block.title || "") + "</h3><pre>" +
+        JSON.stringify(block.items || result, null, 2) + "</pre></div>";
 }
 
 
 /* ============================================================
- * 5. 舆情趋势图（国际化）
+ * 6. Timeline 组件
  * ============================================================ */
 
-function renderTrendChart(data) {
-    const ctx = document.getElementById("trendChart").getContext("2d");
-
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: data.timeline,
-            datasets: [{
-                label: t("sentiment.title"),
-                data: data.values,
-                borderColor: "#4CAF50",
-                fill: false
-            }]
-        }
-    });
-}
-
-
-/* ============================================================
- * 6. 风险雷达图（国际化）
- * ============================================================ */
-
-function renderRadarChart(data) {
-    const ctx = document.getElementById("radarChart").getContext("2d");
-
-    new Chart(ctx, {
-        type: "radar",
-        data: {
-            labels: data.dimensions,
-            datasets: [{
-                label: t("risk.title"),
-                data: data.scores,
-                backgroundColor: "rgba(255, 99, 132, 0.2)",
-                borderColor: "rgba(255, 99, 132, 1)"
-            }]
-        }
-    });
-}
-
-
-/* ============================================================
- * 7. 叙事图谱（D3.js）
- * ============================================================ */
-
-function renderGraph(data) {
-    const area = document.getElementById("graphArea");
-    area.innerHTML = "";
-
-    const width = 600, height = 400;
-
-    const svg = d3.select("#graphArea")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    const simulation = d3.forceSimulation(data.nodes)
-        .force("link", d3.forceLink(data.links).distance(80))
-        .force("charge", d3.forceManyBody().strength(-120))
-        .force("center", d3.forceCenter(width / 2, height / 2));
-
-    const link = svg.append("g")
-        .selectAll("line")
-        .data(data.links)
-        .enter().append("line")
-        .attr("stroke", "#aaa");
-
-    const node = svg.append("g")
-        .selectAll("circle")
-        .data(data.nodes)
-        .enter().append("circle")
-        .attr("r", 8)
-        .attr("fill", "#4CAF50");
-
-    simulation.on("tick", () => {
-        link.attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
-
-        node.attr("cx", d => d.x)
-            .attr("cy", d => d.y);
-    });
-}
-
-
-/* ============================================================
- * 8. 政策简报卡片（国际化）
- * ============================================================ */
-
-function renderPolicyCard(data) {
-    const area = document.getElementById("policyCardArea");
+function renderTimeline(block, result) {
+    var area = document.getElementById("timelineArea");
     if (!area) return;
-
-    const html = `
-        <div class="policy-card">
-            <h3>${t("policy.title")}</h3>
-            <p><b>${t("policy.summary")}：</b> ${data.summary}</p>
-            <p><b>${t("policy.key_points")}：</b></p>
-            <ul>
-                ${data.key_points.map(p => `<li>${p}</li>`).join("")}
-            </ul>
-        </div>
-    `;
-
-    area.innerHTML = html;
+    var items = block.items || result.timeline || [];
+    area.innerHTML = "<h3>" + (t("timeline.title") || "Timeline") + "</h3><ul>" +
+        items.map(function(i) { return "<li>" + JSON.stringify(i) + "</li>"; }).join("") +
+        "</ul>";
 }
 
 
 /* ============================================================
- * 9. 时间线组件（国际化）
+ * 7. State Machine 组件
  * ============================================================ */
 
-function renderTimeline(data) {
-    const area = document.getElementById("timelineArea");
+function renderStateMachine(block, result) {
+    var area = document.getElementById("resultArea");
     if (!area) return;
-
-    const html = `
-        <h3>${t("timeline.title")}</h3>
-        <ul>
-            ${data.timeline.map(t => `<li>${t.date} — ${t.event}</li>`).join("")}
-        </ul>
-    `;
-
-    area.innerHTML = html;
+    area.innerHTML += "<div class=\"policy-card\"><h3>" + (block.title || "State Machine") +
+        "</h3><pre>" + JSON.stringify(block.states || result, null, 2) + "</pre></div>";
 }
 
 
 /* ============================================================
- * 10. 多源合并组件（国际化）
+ * 8. i18n bridge (redirects to i18n.js t())
  * ============================================================ */
 
-function renderSourceList(data) {
-    const area = document.getElementById("sourceListArea");
-    if (!area) return;
-
-    const html = `
-        <h3>${t("merge.sources")}</h3>
-        <ul>
-            ${data.sources.map(s => `<li>${s}</li>`).join("")}
-        </ul>
-    `;
-
-    area.innerHTML = html;
-}
-
-function renderMergeSummary(data) {
-    const area = document.getElementById("mergeSummaryArea");
-    if (!area) return;
-
-    const html = `
-        <h3>${t("merge.summary")}</h3>
-        <p>${data.summary}</p>
-    `;
-
-    area.innerHTML = html;
-}
-
-
-/* ============================================================
- * 11. 清理函数
- * ============================================================ */
-
-function clearCharts() {
-    const radar = document.getElementById("radarChart");
-    const trend = document.getElementById("trendChart");
-    const graph = document.getElementById("graphArea");
-
-    if (radar) radar.getContext("2d").clearRect(0, 0, radar.width, radar.height);
-    if (trend) trend.getContext("2d").clearRect(0, 0, trend.width, trend.height);
-    if (graph) graph.innerHTML = "";
-}
-
-function clearPolicyCard() {
-    const cardArea = document.getElementById("policyCardArea");
-    if (cardArea) cardArea.innerHTML = "";
+function t(key) {
+    if (typeof window._t === "function") return window._t(key);
+    return key;
 }
