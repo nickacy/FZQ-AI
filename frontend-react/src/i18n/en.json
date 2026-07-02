@@ -1,0 +1,22 @@
+{
+  "app.title": "FZQ-AI Intelligence System",
+  "app.subtitle": "Cross-Civilization Personal Intelligence Officer",
+  "nav.workspace": "Workspace",
+  "nav.history": "History",
+  "nav.favorites": "Favorites",
+  "nav.agents": "Agents",
+  "nav.settings": "Settings",
+  "status.connected": "Backend Connected",
+  "status.error": "Backend Error",
+  "status.online": "Online",
+  "status.offline": "Offline",
+  "theme.light": "Light Mode",
+  "theme.dark": "Dark Mode",
+  "error.title": "System Error",
+  "error.return": "Return to Workspace",
+  "workspace.execute": "Execute",
+  "workspace.input.placeholder": "Enter task, e.g., help me with a risk scan",
+  "workspace.state": "Execution State",
+  "workspace.timeline": "Collaboration Timeline",
+  "workspace.output": "Output Results"
+}

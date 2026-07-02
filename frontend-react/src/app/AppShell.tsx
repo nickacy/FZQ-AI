@@ -31,15 +31,15 @@ export const AppShell: React.FC = () => {
     };
   }, []);
 
-  // --- 后端心跳轮询 ---
+  // --- 后端心跳轮询（使用 /health 端点） ---
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('/api/v1/heartbeat');
+        const res = await fetch('/health');
         if (res.ok) {
           const data = await res.json();
           setApiStatus('connected');
-          setBackendVersion(data.backend_version || '');
+          setBackendVersion(data.version || '');
           setHeartbeat(Date.now());
         } else {
           setApiStatus('error');

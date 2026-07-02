@@ -42,7 +42,7 @@ export const useSystemState = create<SystemState>((set) => ({
   apiStatus: 'disconnected',
   systemHealth: 'healthy',
 
-  systemVersion: '24.0.0',
+  systemVersion: '19.0.0',
   backendVersion: '',
 
   lastHeartbeat: Date.now(),

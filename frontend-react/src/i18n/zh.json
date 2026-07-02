@@ -1,0 +1,22 @@
+{
+  "app.title": "FZQ-AI 智能体系统",
+  "app.subtitle": "跨文明个人情报官",
+  "nav.workspace": "工作台",
+  "nav.history": "历史",
+  "nav.favorites": "收藏",
+  "nav.agents": "智能体",
+  "nav.settings": "设置",
+  "status.connected": "后端已连接",
+  "status.error": "后端错误",
+  "status.online": "在线",
+  "status.offline": "离线",
+  "theme.light": "浅色模式",
+  "theme.dark": "深色模式",
+  "error.title": "系统发生错误",
+  "error.return": "返回工作台",
+  "workspace.execute": "执行",
+  "workspace.input.placeholder": "请输入任务，例如：帮我做一个风险扫描",
+  "workspace.state": "执行状态",
+  "workspace.timeline": "协作链路",
+  "workspace.output": "输出结果"
+}

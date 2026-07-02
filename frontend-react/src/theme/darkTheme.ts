@@ -1,0 +1,35 @@
+export default {
+  colors: {
+    background: '#0f172a',
+    surface: '#1e293b',
+    text: '#f8fafc',
+    textSecondary: '#94a3b8',
+    border: '#334155',
+    navBackground: '#1e293b',
+    navText: '#f8fafc',
+    navBorder: '#334155',
+    navActive: '#3b82f6',
+    statusOk: '#22c55e',
+    statusError: '#ef4444',
+    buttonPrimary: '#3b82f6',
+    buttonText: '#ffffff',
+    errorBackground: '#7f1d1d',
+    errorText: '#fca5a5',
+  },
+  texts: {
+    zh: {
+      'nav.workspace': '工作台',
+      'nav.history': '历史',
+      'nav.favorites': '收藏',
+      'nav.agents': '智能体',
+      'nav.settings': '设置',
+    },
+    en: {
+      'nav.workspace': 'Workspace',
+      'nav.history': 'History',
+      'nav.favorites': 'Favorites',
+      'nav.agents': 'Agents',
+      'nav.settings': 'Settings',
+    },
+  },
+};

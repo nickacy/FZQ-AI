@@ -10,18 +10,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from fzq_ai.api.v24_routes import router as v24_router
+
 # V24 入口层
-from src.fzq_ai.api.entry_service_v24 import EntryServiceV24
+from fzq_ai.api.entry_service_v24 import EntryServiceV24
 
 # V23 兼容入口
-from src.fzq_ai.api.entry import router as v23_router
+from fzq_ai.api.entry import router as v23_router
 
 
 # ============================================================
 # 1. FastAPI 初始化
 # ============================================================
 
-app = FastAPI(title="FZQ-AI Entry Layer V24", version="24.0")
+app = FastAPI(title="FZQ-AI API", version="19.0.0")
 
 
 # ============================================================
@@ -83,7 +85,14 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # ============================================================
-# 5. V24 入口层（主入口）
+# 5. V24 路由（前端契约 /api/v1/*）
+# ============================================================
+
+app.include_router(v24_router)
+
+
+# ============================================================
+# 6. V24 入口层（主入口，兼容层）
 # ============================================================
 
 entry_service = EntryServiceV24()
@@ -117,16 +126,16 @@ async def autonomy_v24(payload: dict):
 
 
 # ============================================================
-# 6. V23 兼容入口（保留旧系统）
+# 7. V23 兼容入口（保留旧系统）
 # ============================================================
 
 app.include_router(v23_router, prefix="/v23")
 
 
 # ============================================================
-# 7. 健康检查
+# 8. 健康检查
 # ============================================================
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "version": "24.0"}
+    return {"status": "ok", "version": "19.0.0"}
