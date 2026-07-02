@@ -7,3 +7,4 @@
 # full source-tree import path.
 
 from src.fzq_ai.api.app import app  # noqa: F401
+app.include_router(api_v24.router)
