@@ -1,25 +1,21 @@
-# -*- coding: utf-8 -*-
 """
-FZQ-AI Unified Entry (V19.0.0)
-统一入口：启动 FastAPI（src.fzq_ai.api.app）
+FZQ-AI Unified Entry Layer (V24)
+FastAPI + Uvicorn unified startup
 """
 
-from __future__ import annotations
 import uvicorn
+from fzq_ai.ui.web_app import create_app
 
 
 def main():
-    """
-    启动 FZQ-AI API 服务：
-    - src/fzq_ai/api/app.py 中的 FastAPI 应用
-    - 包含中文情报端点 /api/zh/*
-    - 健康检查 /health
-    """
+    app = create_app()
+
     uvicorn.run(
-        "src.fzq_ai.api.app:app",
+        app,
         host="0.0.0.0",
         port=8000,
-        reload=True,
+        log_level="info",
+        reload=True
     )
 
 
