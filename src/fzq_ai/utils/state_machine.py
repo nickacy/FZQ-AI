@@ -107,3 +107,16 @@ def get_state_machine(agent: str) -> StateMachine:
     if agent not in _state_machines:
         _state_machines[agent] = StateMachine(agent)
     return _state_machines[agent]
+
+
+def save_checkpoint(agent: str) -> dict:
+    sm = _state_machines.get(agent)
+    if not sm: return None
+    import time
+    return {'agent':agent,'current':sm.current,'history':list(sm.history),'ts':time.time()}
+
+def restore_checkpoint(agent: str, cp: dict):
+    sm = get_state_machine(agent)
+    if cp and cp.get('current') in ALLOWED_TRANSITIONS:
+        sm.force(cp['current'])
+    return sm

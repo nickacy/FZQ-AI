@@ -7,7 +7,7 @@ import time
 from typing import Any, Callable, Awaitable, Dict
 
 # 这里假设你已有 Blackboard，如果在其他模块，请按实际路径导入
-from src.fzq_ai.orchestrator.blackboard import Blackboard  # 如路径不同，请调整
+from fzq_ai.orchestrator.blackboard import Blackboard
 
 
 def auto_blackboard_sync(agent_method: Callable[..., Awaitable[Any]]):

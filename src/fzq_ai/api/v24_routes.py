@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional
 
 from fzq_ai.entry.entry_service_v23 import EntryServiceV23
-from fzq_ai.agents.blackboard import Blackboard
+from fzq_ai.orchestrator.blackboard import Blackboard
 
 router = APIRouter(prefix="/api/v1", tags=["V24 Frontend API"])
 service = EntryServiceV23()

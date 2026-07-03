@@ -5,14 +5,14 @@
 from __future__ import annotations
 from typing import Any, Dict
 
-from src.fzq_ai.orchestrator.blackboard import Blackboard
-from src.fzq_ai.schemas.route import RouteResult
-from src.fzq_ai.ui.ui_schema import UISchema
+from fzq_ai.orchestrator.blackboard import Blackboard
+from fzq_ai.schemas.route import RouteResult
+from fzq_ai.ui.ui_schema import UISchema
 
 # V24 Agents
-from src.fzq_ai.agents.news_agent_v24 import NewsAgentV24
-from src.fzq_ai.agents.autonomy_agent_v24 import AutonomyAgentV24
-from src.fzq_ai.agents.base import AgentContext
+from fzq_ai.agents.news_agent_v24 import NewsAgentV24
+from fzq_ai.agents.autonomy_agent_v24 import AutonomyAgentV24
+from fzq_ai.agents.base import AgentContext
 
 
 class UnifiedOrchestratorV24:

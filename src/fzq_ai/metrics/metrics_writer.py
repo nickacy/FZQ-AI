@@ -27,7 +27,7 @@ class MetricsWriter:
     """
 
     def __init__(self, path: Optional[Path] = None) -> None:
-        self.path = Path(path) if path is not None else Path("fzqai_metrics.jsonl")
+        self.path = Path(path) if path is not None else Path("data/logs/fzqai_metrics.jsonl")
 
     def append(self, name: str, duration_ms: float, extra: Optional[Dict[str, Any]] = None) -> None:
         now = datetime.now(timezone.utc)

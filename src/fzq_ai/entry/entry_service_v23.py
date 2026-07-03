@@ -9,7 +9,7 @@ from fzq_ai.orchestrator.unified_orchestrator import UnifiedOrchestrator
 # 新系统 orchestrator（V24）
 from fzq_ai.orchestrator.unified_orchestrator_v24 import UnifiedOrchestratorV24
 
-from fzq_ai.agents.blackboard import Blackboard
+from fzq_ai.orchestrator.blackboard import Blackboard
 from fzq_ai.schemas.route import RouteResult
 
 

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="fzq_ai_agent",
-    version="19.0.0",
+    version="24.0.0",
     description="FZQ-AI Multi-Model Intelligence Analysis System",
     packages=find_packages(where="src"),
     package_dir={"": "src"},

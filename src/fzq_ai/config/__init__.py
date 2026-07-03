@@ -1,11 +1,11 @@
 """
-FZQ‑AI v10 全局配置中心（终极版）
+FZQ‑AI 全局配置中心 (V24)
 
 职责：
 1. 加载 config.yaml / config.json（声明性配置）
 2. 提供 API Keys / RSS / 日志级别 / 版本号
 3. 提供统一 get_config() 接口
-4. 与新版 # settings.py  # [v13: reference removed]（模型优先级 + 任务覆盖）并存，不冲突
+4. 与 fzq_ai.config.global_settings（模型优先级 + 任务覆盖）并存，不冲突
 
 注意：.env 加载已统一移至应用入口（main.py / app.py），
       本模块不再调用 load_dotenv()，避免重复加载和不可预测的覆盖。
@@ -20,11 +20,38 @@ from typing import Any, Dict
 
 import yaml
 
+# Re-export dataclass-style config types so callers can use either:
+#   - dict-style:  from fzq_ai.config import get_config           # -> dict
+#   - dataclass:   from fzq_ai.config import AppConfig, ConfigManager
+# The dataclass API is intended for typed config access (e.g. tests,
+# future plugins) — both styles load from the same env / yaml sources.
+from fzq_ai.config.modern_config import (  # noqa: F401
+    AppConfig,
+    ProviderConfig,
+    CacheConfig,
+    LoggingConfig,
+    PipelineConfig,
+    ConfigManager,
+    init_config,
+    get_config as get_typed_config,  # alias to avoid shadowing the dict-style get_config below
+)
+
 # ------------------------------------------------------------
 # 1. 配置文件路径
 # ------------------------------------------------------------
 _CONFIG_DIR = Path(__file__).parent
 _PROJECT_ROOT = _CONFIG_DIR.parent.parent
+
+
+def _read_version() -> str:
+    """Read VERSION from VERSION.txt, falling back to a hard-coded default."""
+    version_file = _PROJECT_ROOT / "VERSION.txt"
+    if version_file.exists():
+        try:
+            return version_file.read_text(encoding="utf-8").strip()
+        except Exception:
+            pass
+    return "24.0.0"
 
 
 # ------------------------------------------------------------
@@ -87,8 +114,9 @@ NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-VERSION = "19.0.0"
-BUILD_TIME = "2026-06-15"
+# Source of truth: VERSION.txt (single source for version string)
+VERSION = _read_version()
+BUILD_TIME = "2026-07-03"
 
 
 # ------------------------------------------------------------

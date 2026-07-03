@@ -54,7 +54,7 @@ class TokenMonitor:
 
         # 2. 日志文件路径
         if log_path is None:
-            self.log_path = Path("fzqai_token_log.jsonl")
+            self.log_path = Path("data/logs/fzqai_token_log.jsonl")
         else:
             self.log_path = Path(log_path)
 

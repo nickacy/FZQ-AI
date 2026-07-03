@@ -127,19 +127,19 @@ class UnifiedOrchestrator:
     # ------------------------------------------------------------
     # Multi-agent execution (V22)
     # ------------------------------------------------------------
-def run_multi(self, tasks: List[Dict[str, Any]]) -> RouteResult:
-    """
-    Unified entry for multi-agent tasks (V22).
-    输入为任务字典列表，输出为 RouteResult 包裹的多智能体结果。
-    """
-    agent_tasks = [
-        AgentTask(agent=t["agent"], intent=t["intent"], payload=t["payload"])
-        for t in tasks
-    ]
-    results = self.multi.assign(agent_tasks)
+    def run_multi(self, tasks: List[Dict[str, Any]]) -> RouteResult:
+        """
+        Unified entry for multi-agent tasks (V22).
+        输入为任务字典列表，输出为 RouteResult 包裹的多智能体结果。
+        """
+        agent_tasks = [
+            AgentTask(agent=t["agent"], intent=t["intent"], payload=t["payload"])
+            for t in tasks
+        ]
+        results = self.multi.assign(agent_tasks)
 
-    # ⭐ 修复：RouteResult.ok 需要 Dict[str, Any]
-    return RouteResult.ok(data={"results": results})
+        # ⭐ 修复：RouteResult.ok 需要 Dict[str, Any]
+        return RouteResult.ok(data={"results": results})
 
 
     # ------------------------------------------------------------

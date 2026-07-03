@@ -19,10 +19,10 @@ class MultisourceMergeAgent(BaseAgent):
         trace.append("pipeline_loaded")
 
         # Build payload from context
-        payload = {{
+        payload = {
             "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
             "sources": ctx.metadata.get("sources", []),
-        }}
+        }
 
         try:
             result = asyncio.run(pipeline.run_async(**payload))
@@ -34,7 +34,7 @@ class MultisourceMergeAgent(BaseAgent):
                 trace=trace,
             )
         except Exception as e:
-            trace.append(f"error: {{e}}")
+            trace.append(f"error: {e}")
             return AgentResult(
                 ok=False,
                 data=None,

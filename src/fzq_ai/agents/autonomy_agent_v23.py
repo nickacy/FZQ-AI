@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from fzq_ai.agents.blackboard import Blackboard
+from fzq_ai.orchestrator.blackboard import Blackboard
 from fzq_ai.schemas.route import RouteResult
 
 

@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 from typing import Any, Dict
-from src.fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
 
 
 class NewsAgentV24(BaseAgent):
@@ -27,7 +27,7 @@ class NewsAgentV24(BaseAgent):
 
     def execute(self, model: str, plan: Dict[str, Any]) -> Dict[str, Any]:
         try:
-            from src.fzq_ai.orchestrator.blackboard import Blackboard
+            from fzq_ai.orchestrator.blackboard import Blackboard
             import time
             Blackboard.write(f"agents.{self.name}.input", {"payload": repr(plan), "ts": time.time()})
             summary = f"[{model}] {plan.get('raw', '')[:80]}..."

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import os
 import pathlib
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,19 +24,43 @@ from fzq_ai.api.entry import router as v23_router
 # 1. FastAPI 初始化
 # ============================================================
 
-app = FastAPI(title="FZQ-AI API", version="19.0.0")
+app = FastAPI(title="FZQ-AI API", version="24.0.0")
 
 
 # ============================================================
-# 2. CORS 设置（APP 封装需要）
+# 2. CORS 设置（从环境变量读白名单；不允许 * + credentials）
 # ============================================================
+
+def _load_cors_origins() -> list[str]:
+    """Load allowed CORS origins from environment.
+    - ALLOWED_ORIGINS="http://a,http://b"  → list
+    - 缺省：仅允许本地前端（开发期）
+    - APP 模式（APP_MODE=mobile）下允许 chrome-extension://* 与 http://localhost
+      （移动 WebView 容器）；仍避免与 credentials=True 冲突
+    """
+    raw = os.getenv("ALLOWED_ORIGINS", "").strip()
+    if raw:
+        origins = [o.strip() for o in raw.split(",") if o.strip()]
+    else:
+        origins = [
+            "http://localhost:3000",
+            "http://localhost:8501",
+            "http://127.0.0.1:3000",
+        ]
+    if os.getenv("APP_MODE", "").lower() == "mobile":
+        # APP 封装允许的来源（WebView 默认不会发 Origin，无需 credentials）
+        origins.extend(["null"])  # file:// 或 webview 内请求
+    return origins
+
+
+_cors_origins = _load_cors_origins()
+# 若配置了 credentials，origins 不能含 "*"
+_allow_credentials = bool(_cors_origins) and "*" not in _cors_origins
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*",  # APP 封装必须允许全部来源
-    ],
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -138,4 +163,4 @@ app.include_router(v23_router, prefix="/v23")
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "version": "19.0.0"}
+    return {"status": "ok", "version": "24.0.0"}

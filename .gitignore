@@ -28,8 +28,19 @@ build/
 *.sqlite
 *.db
 *.log
+*.jsonl
+.pytest_cache/
 tmp/
 temp/
+
+# ================================
+# FZQ-AI runtime artifacts
+# ================================
+# Token / metrics logs that can be regenerated at runtime
+fzqai_token_log.jsonl
+fzqai_metrics.jsonl
+agent_checkpoints/
+data/logs/
 
 # ================================
 # Project-specific backups
@@ -55,7 +66,24 @@ Desktop.ini
 .streamlit/
 
 # ================================
-# Zipped Files
+# Zipped / Archive Files
 # ================================
 *.zip
 FZQ-AI.zip
+FZQ_AI_Daily_Run.xml
+FZQ-AI.tar.gz
+
+# ================================
+# Windows task scheduler exports
+# ================================
+*.xml.export
+
+# ================================
+# Temporary / one-off scripts (not part of source)
+# ================================
+pack.ps1
+clean_*.ps1
+project_structure_clean.txt
+test_report.pdf
+_test_wl.json
+"Git 清理和Push Files.txt"

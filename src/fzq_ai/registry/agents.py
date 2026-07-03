@@ -7,6 +7,7 @@ from typing import Any, Dict, Type
 # ── Agent imports ──
 from fzq_ai.agents.report_agent import ReportAgent
 from fzq_ai.agents.watchlist_agent import WatchlistAgent
+from fzq_ai.agents.news_center_agent import NewsCenterAgent
 from fzq_ai.agents.tasks.policy_brief_agent import PolicyBriefAgent
 from fzq_ai.agents.tasks.risk_scan_agent import RiskScanAgent
 from fzq_ai.agents.tasks.opinion_landscape_agent import OpinionLandscapeAgent
@@ -28,16 +29,21 @@ def register_agent(name: str, cls: Type[Any], **meta) -> None:
 
 
 def get_agent(name: str) -> Any:
-    """Instantiate and return an agent by name."""
+    """Instantiate and return an agent by name.
+
+    Returns None if the agent is not registered (caller can decide how to
+    handle missing agents — e.g. fallback or graceful skip).
+    """
     cls = AGENT_REGISTRY.get(name)
-    if not cls:
-        raise ValueError(f"Agent '{name}' not found in registry.")
+    if cls is None:
+        return None
     return cls()
 
 
 # ── Auto-register all agents ──
 register_agent("report", ReportAgent)
 register_agent("watchlist", WatchlistAgent)
+register_agent("news_center", NewsCenterAgent)
 register_agent("zh_policy_brief", PolicyBriefAgent)
 register_agent("zh_risk_scan", RiskScanAgent)
 register_agent("zh_opinion_landscape", OpinionLandscapeAgent)

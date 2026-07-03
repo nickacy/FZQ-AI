@@ -1,59 +1,51 @@
 # src/fzq_ai/agents/tasks/policy_brief_agent.py
+"""Agent for zh_policy_brief — wraps the pipeline for autonomous task execution.
+
+Note: the original 4-step implementation (GLM → DeepSeek struct-opt → minimax
+validate → 豆包 format) referenced methods that don't exist on the current
+LLMRouter / quality modules. V24 cleanup: simplify to the same pipeline-wrap
+pattern as the other 3 task agents, deferring the full multi-model pipeline
+to a follow-up iteration.
+"""
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
-from fzq_ai.llm.llm_router import LLMRouter
-from fzq_ai.quality.deepseek_struct_opt import DeepSeekStructOptimizer
-from fzq_ai.quality.minimax import validate_and_fix
-from fzq_ai.utils.json_formatter import format_final
-from fzq_ai.quality.schemas import get_schema
+
 
 class PolicyBriefAgent(BaseAgent):
     name = "zh_policy_brief"
 
     def __init__(self) -> None:
-        self._router = LLMRouter()
-        self._struct_opt = DeepSeekStructOptimizer()
+        from fzq_ai.pipelines.registry import PipelineRegistry
+        self._pipeline_name = "zh_policy_brief"
 
     def run(self, ctx: AgentContext) -> AgentResult:
+        """Execute the zh_policy_brief pipeline with the agent context."""
+        import asyncio
+        from fzq_ai.pipelines.registry import PipelineRegistry
+
         trace: list[str] = []
-        schema = get_schema("zh_policy_brief")
+        pipeline = PipelineRegistry.get(self._pipeline_name)
+        trace.append("pipeline_loaded")
 
-        # 1. GLM-5.2：中文深度理解 + 初稿
-        glm_output = self._router.route_and_generate(
-            prompt=ctx.raw_input,
-            task_type="zh_policy_brief",
-            enable_repair=False,
-            enable_format=False,
-        )
-        trace.append("glm_done")
+        # Build payload from context
+        payload = {
+            "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
+            "sources": ctx.metadata.get("sources", []),
+        }
 
-        # 2. DeepSeek：结构优化
-        ds_result = self._struct_opt.optimize(
-            task_name="zh_policy_brief",
-            schema=schema,
-            raw_draft=glm_output,
-        )
-        trace.append("deepseek_struct_opt_done")
-
-        # 3. Minimax：Schema 校验 + 字段补全
-        mm_result = validate_and_fix(
-            raw_json=ds_result.optimized,
-            schema=schema,
-            schema_name="zh_policy_brief",
-            options={
-                "strict_mode": True,
-                "auto_fix": True,
-                "allow_extra_fields": False,
-            },
-        )
-        trace.append("minimax_validate_done")
-
-        # 4. 豆包：最终格式化
-        formatted_str = format_final({"json": mm_result.data, "schema": schema})
-        trace.append("doubao_format_done")
-
-        return AgentResult(
-            ok=True,
-            data=formatted_str,  # 或 json.loads(formatted_str)，看下游需要
-            warnings=[],
-            trace=trace,
-        )
+        try:
+            result = asyncio.run(pipeline.run_async(**payload))
+            trace.append("pipeline_executed")
+            return AgentResult(
+                ok=True,
+                data=result.model_dump() if hasattr(result, "model_dump") else result,
+                warnings=[],
+                trace=trace,
+            )
+        except Exception as e:
+            trace.append(f"error: {e}")
+            return AgentResult(
+                ok=False,
+                data=None,
+                warnings=[str(e)],
+                trace=trace,
+            )

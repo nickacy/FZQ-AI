@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 @dataclass
 class ProviderConfig:
     """LLM提供商配置"""
-    api_key: str
+    api_key: str = ""
     base_url: str = ""
     model: str = ""
     timeout: int = 60

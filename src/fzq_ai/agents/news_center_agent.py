@@ -1,49 +1,81 @@
 # src/fzq_ai/agents/news_center_agent.py
-from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
-from fzq_ai.agents.orchestrator import AgentOrchestrator
+"""V24 — NewsCenterAgent: 个人全球信息新闻中心总控。
 
-class NewsCenterAgent(BaseAgent):
+- 拉取多源多语言原始信息（占位：ctx.raw_input 视为已获取的多源文本）
+- 并行调度 4 个任务子 agent（policy_brief / risk_scan / opinion_landscape / multisource_merge）
+- 聚合成"广泛、平衡、尽量无偏"的个人情报视图
+"""
+from __future__ import annotations
+from typing import Any, Dict, List, Optional
+
+from fzq_ai.agents.base import AgentContext, AgentResult
+
+
+# Default 4 sub-agents composing the "news center" view
+DEFAULT_SUB_AGENTS: List[str] = [
+    "zh_policy_brief",
+    "zh_risk_scan",
+    "zh_opinion_landscape",
+    "zh_multisource_merge",
+]
+
+
+class NewsCenterAgent:
+    """Aggregates downstream intelligence agents into a single personal-intel view.
+
+    NOT a BaseAgent subclass — NewsCenterAgent is a *coordinator* that
+    invokes other agents rather than implementing the plan-execute-reflect-
+    heal loop itself. Keeping it BaseAgent-free avoids the trap of forcing
+    9 abstract methods onto what is fundamentally a fan-out/fan-in pattern.
     """
-    个人全球信息新闻中心总控 Agent：
-    - 拉取多源多语言信息
-    - 交给下游任务 Agent（policy/risk/opinion/merge）
-    - 聚合成“广泛、平衡、尽量无偏”的个人情报视图
-    """
+
     name = "news_center"
 
-    def __init__(self) -> None:
-        self._orchestrator = AgentOrchestrator()
+    def __init__(self, sub_agents: Optional[List[str]] = None) -> None:
+        self._sub_agents = sub_agents or DEFAULT_SUB_AGENTS
 
     def run(self, ctx: AgentContext) -> AgentResult:
-        trace: list[str] = []
+        # Lazy import to avoid circular dependency with fzq_ai.registry.agents
+        from fzq_ai.registry.agents import get_agent
 
-        # 1. 拉取多源多语言原始信息（后续可接 RSS/API/抓取）
-        # placeholder: ctx.raw_input 视为已获取的多源文本
+        trace: list[str] = ["news_center_start"]
 
-        # 2. 调用四大任务 Agent（可并行）
-        policy = self._orchestrator.run_task("zh_policy_brief", ctx)
-        risk = self._orchestrator.run_task("zh_risk_scan", ctx)
-        opinion = self._orchestrator.run_task("zh_opinion_landscape", ctx)
-        merge = self._orchestrator.run_task("zh_multisource_merge", ctx)
+        # 1. Pull per-sub-agent results sequentially (deterministic, easy to debug).
+        #    Parallelism is left for V25; current sub-agents are LLM-bound and
+        #    rate-limited, so sequential keeps things simple and observable.
+        merged: Dict[str, Any] = {}
+        all_warnings: List[str] = []
+        any_failed = False
 
-        trace.extend([
-            "policy_brief_done",
-            "risk_scan_done",
-            "opinion_landscape_done",
-            "multisource_merge_done",
-        ])
+        for sub_name in self._sub_agents:
+            try:
+                agent = get_agent(sub_name)
+                if agent is None:
+                    all_warnings.append(f"{sub_name}: not registered")
+                    any_failed = True
+                    continue
+                result = agent.run(ctx)
+                merged[sub_name] = result.data
+                trace.append(f"{sub_name}_done")
+                all_warnings.extend(result.warnings)
+                if not result.ok:
+                    any_failed = True
+            except Exception as e:  # noqa: BLE001 — keep all sub-failures isolated
+                all_warnings.append(f"{sub_name}: {type(e).__name__}: {e}")
+                merged[sub_name] = None
+                any_failed = True
+                trace.append(f"{sub_name}_error")
 
-        # 3. 聚合为“个人信息中心视图”（后续可细化结构）
-        data = {
-            "policy_brief": policy.data,
-            "risk_scan": risk.data,
-            "opinion_landscape": opinion.data,
-            "multisource_merge": merge.data,
-        }
-
+        # 2. Aggregate into a personal-intel view
         return AgentResult(
-            ok=True,
-            data=data,
-            warnings=[*policy.warnings, *risk.warnings, *opinion.warnings, *merge.warnings],
+            ok=not any_failed,
+            data={
+                "view_type": "personal_intel_center",
+                "topic": ctx.raw_input,
+                "languages": ctx.languages,
+                "focus_regions": ctx.focus_regions,
+                "components": merged,
+            },
+            warnings=all_warnings,
             trace=trace,
         )

@@ -1,29 +1,51 @@
 """
-Prompt Loader
+Prompt Loader — loads prompt templates from package resources.
+
+Uses importlib.resources (PEP 451) so that:
+  - works regardless of current working directory
+  - works inside zipapp / PyInstaller
+  - works inside Docker (no /src baked paths)
 """
+from __future__ import annotations
+
+from importlib import resources
 from pathlib import Path
-
-# Base directory: src/fzq_ai -> resolves to the fzq_ai package root
-# The prompt files are at: src/fzq_ai/prompts/zh/*.txt
-# Pipeline code passes paths like: "fzq_ai/prompts/zh/zh_risk_scan.txt"
-# Those are relative to the `src` directory.
-_SRC_DIR = Path(__file__).resolve().parent.parent.parent  # utils -> fzq_ai -> src
+from typing import Union
 
 
-def load_prompt_template(path: str) -> str:
-    """Load a prompt template from file.
+def load_prompt_template(path: Union[str, Path]) -> str:
+    """Load a prompt template from the `fzq_ai.prompts` package.
 
-    Supports two path forms:
-    1. Relative to src/ (e.g. "fzq_ai/prompts/zh/zh_risk_scan.txt")
-    2. Absolute path (e.g. "C:/.../prompts.txt")
-    3. Relative to CWD (fallback if neither matches)
+    Args:
+        path: Either:
+          - A relative path like "zh/zh_risk_scan.txt" (resolved under fzq_ai.prompts)
+          - A package-relative path like "fzq_ai/prompts/zh/zh_risk_scan.txt"
+            (legacy: we strip the "fzq_ai/prompts/" prefix)
+          - An absolute filesystem path
+
+    Returns:
+        File contents as a UTF-8 string.
+
+    Raises:
+        FileNotFoundError: if the resource cannot be located.
     """
+    # Absolute filesystem path → open directly.
     p = Path(path)
-    if p.is_absolute() and p.exists():
-        pass  # use as-is
-    elif (_SRC_DIR / path).exists():
-        p = _SRC_DIR / path
-    # else: fallback to original path (let FileNotFoundError surface)
+    if p.is_absolute():
+        return p.read_text(encoding="utf-8")
 
-    with open(p, "r", encoding="utf-8") as f:
-        return f.read()
+    text = str(path).replace("\\", "/")
+
+    # Normalize legacy "fzq_ai/prompts/X" form to "X"
+    prefix = "fzq_ai/prompts/"
+    if text.startswith(prefix):
+        text = text[len(prefix):]
+
+    # Try the package resource
+    try:
+        return (resources.files("fzq_ai.prompts") / text).read_text(encoding="utf-8")
+    except (FileNotFoundError, ModuleNotFoundError):
+        pass
+
+    # Fallback: treat as a filesystem path relative to CWD
+    return p.read_text(encoding="utf-8")

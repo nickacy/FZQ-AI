@@ -30,12 +30,18 @@ class RouterV2:
         return ranked[0]
 
     def get_provider(self, provider_name: str):
-        """
-        返回 provider 实例（与 Router v1 一致）
-        """
-        client = settings.get_client(provider_name)
-        model = settings.get_model(provider_name)
+        """Return a unified ModelClient for the given provider name.
 
-        from fzq_ai.llm.router import PROVIDER_MAP
-        provider_class = PROVIDER_MAP[provider_name]
-        return provider_class(client=client, model=model)
+        Settings.PROVIDER_MAP is only a declaration table (string names);
+        the actual unified client lives in fzq_ai.clients.model_client.ModelClient.
+        """
+        from fzq_ai.clients.model_client import ModelClient
+
+        if provider_name not in settings.PROVIDER_MAP:
+            raise ValueError(
+                f"Unknown provider '{provider_name}'. "
+                f"Available: {list(settings.PROVIDER_MAP.keys())}"
+            )
+
+        model = settings.get_model(provider_name)
+        return ModelClient(provider=provider_name, model=model)

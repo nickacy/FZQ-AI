@@ -1,6 +1,6 @@
 # src/fzq_ai/orchestrator/blackboard.py
-# V24 — Standalone Blackboard (no dependency on agents/__init__.py)
-# Context-local shared state via contextvars; same API as agents.blackboard.
+# V24 — Blackboard: request-level shared context (consolidated here after V24 cleanup).
+# Context-local shared state via contextvars.
 
 from __future__ import annotations
 from typing import Any, Dict, Optional
@@ -51,3 +51,18 @@ class Blackboard:
         data = Blackboard._get_data().copy()
         data.update(values)
         Blackboard._set_data(data)
+
+    @staticmethod
+    def wait_for(key: str, timeout: float = 30.0, backoff: float = 0.1) -> Any:
+        """Poll for a key with exponential backoff. Returns None on timeout."""
+        import time
+        elapsed = 0.0
+        delay = backoff
+        while elapsed < timeout:
+            val = Blackboard.read(key)
+            if val is not None:
+                return val
+            time.sleep(delay)
+            elapsed += delay
+            delay = min(delay * 2, 5.0)
+        return None

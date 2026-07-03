@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fzq_ai_agent"
-version = "19.0.0"
+version = "24.0.0"
 description = "FZQ-AI Multi-Model Intelligence Analysis System"
 readme = "README.md"
 license = {text = "MIT"}

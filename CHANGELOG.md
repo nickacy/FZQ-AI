@@ -1,5 +1,51 @@
 # FZQ-AI CHANGELOG
 
+## V24.0.0 (2026-07-03) — Cleanup & Hardening Pass / 清理与硬化
+
+> 本版本聚焦**代码质量与工程卫生**硬化，未引入新功能；为 V25 业务迭代铺路。
+
+### 修复 / Fixed
+- **P0-1 严重 bug**：9 处 `from src.fzq_ai` 错误路径 → 统一为 `from fzq_ai`
+  - `orchestrator/unified_orchestrator_v24.py` (7 处)
+  - `agents/news_agent_v24.py` (2 处)
+  - `agents/aop_blackboard.py` (1 处)
+- **P0-2 严重 bug**：`UnifiedOrchestrator.run_multi` 缩进错位成 module-level 函数 → 修正为 class method
+- **P0-3 安全**：`api/app.py` 与 `ui/web_app.py` 的 CORS `["*"]` + `credentials=True` 违反 spec → 改为从 `ALLOWED_ORIGINS` env 读白名单，credentials 仅在不含 `*` 时启用
+- **P0-4 部署**：`frontend-react/Dockerfile` 的 `CMD ["npm", "start"]` 不存在 → 改为 multi-stage build + `npm run preview`；`package.json` 补 `start` 脚本
+- **版本号混乱**：`config/__init__.py` 的 `VERSION = "19.0.0"` → 改为从 `VERSION.txt` 读取（source of truth）
+- **CORS / 配置文件**：`api/app.py` 硬编码 `version="24.0.0"` → 复用 `load_version()`
+- **依赖 / `.gitignore`**：增加 `*.jsonl`, `agent_checkpoints/`, `data/logs/`, `FZQ_AI_Daily_Run.xml`, `pack.ps1`, `clean_*.ps1` 等
+
+### 清理 / Cleanup
+- **合并 Blackboard**：`agents/blackboard.py` 删除，全部 import 改走 `orchestrator/blackboard.py`（3 处：`api/v24_routes.py`, `entry/entry_service_v23.py`, `agents/autonomy_agent_v23.py`）
+- **删除孤立文件**：
+  - `src/fzq_ai/llm/enhanced_router.py`（0 引用）
+  - `ci_health_check.py`, `check_prompts.py`（孤立脚本，CI 不调用）
+  - 根目录 `_test_wl.json`, `FZQ_AI_Daily_Run.xml`, `test_report.pdf`, `pack.ps1`, `clean_frontend_audit.ps1`, `clean_v17.ps1`, `Git 清理和Push Files.txt`, `project_structure_clean.txt`
+- **归档开发档案**：根目录 `IMPROVEMENT_PLAN.md`, `IMPROVEMENT_SUMMARY.md`, `APPLY_CHANGES.md`, `DELETION_GUIDE.md` 移至 `docs/audits/`；`README_legacy.md` 移至 `archive/`
+- **整理 `docs/`**：9 个历史审计报告（含 `audit_report.md`, `REAUDIT_REPORT_20250703.md`, `minimax_alignment_report.{md,json}` 等）移入 `docs/audits/`
+- **统一架构文档**：`docs/ARCHITECTURE_OVERVIEW.md` 由 V19 中文版（含 `real/` 双层目录、`task_registry/`）同步为 V24 双语版
+
+### 改进 / Improved
+- **Prompt 路径解析**：`utils/prompt_loader.py` 由 `_SRC_DIR.parent.parent.parent` 魔法拼接改为 `importlib.resources` —— 任意工作目录、zipapp、Docker 中均可用
+- **版本号来源**：单一 `VERSION.txt`，`config/__init__.py` 启动时读取，fallback `24.0.0`
+
+### 已知问题 / Known Issues（留待 V25）
+- `agents/orchestrator.py` 仍是 15 行 stub（被 `news_center_agent.py` 引用但未真正运行；安全保留）
+- `llm/router_v2/` 与 `llm/router.py` 并存，待统一
+- `config/modern_config.py`（dataclass 风格）未真正接入 `get_config()`，仅 `tests/test_enhanced_features.py` 使用
+- `civilization/civil_federation_*_v2.py` 18 个 V2 副本无外部 import，待决断
+- 测试 e2e 深度仍较薄（`test_full_pipeline.py` 31 行、`test_json_repairer.py` 12 行）
+
+### 验证 / Verification
+- `pytest tests/ -v` → **117 passed, 0 failed, 1 warning**
+- `from fzq_ai.orchestrator.blackboard import Blackboard` → OK
+- `from fzq_ai.agents import blackboard` → `ImportError`（已删）
+- `from fzq_ai.llm import enhanced_router` → `ImportError`（已删）
+- `prompt_loader("zh/zh_risk_scan.txt")` 与 legacy 路径均返回相同 4345 字节
+
+---
+
 ## V15.0.0 (2026-06-27) — Entry Layer Upgrade / 入口层升级
 
 ### 新增 / Added

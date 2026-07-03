@@ -4,6 +4,7 @@ FastAPI unified API router + health check + version endpoint
 """
 
 import json
+import os
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +19,18 @@ def load_version() -> str:
     return "unknown"
 
 
+def _load_cors_origins() -> list[str]:
+    """Load CORS allowed origins from environment. Avoid `*` + credentials combo."""
+    raw = os.getenv("ALLOWED_ORIGINS", "").strip()
+    if raw:
+        return [o.strip() for o in raw.split(",") if o.strip()]
+    return [
+        "http://localhost:3000",
+        "http://localhost:8501",
+        "http://127.0.0.1:3000",
+    ]
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title="FZQ-AI Intelligence System",
@@ -25,10 +38,12 @@ def create_app() -> FastAPI:
         version=load_version()
     )
 
-    # CORS
+    # CORS — driven by ALLOWED_ORIGINS env var; never use * with credentials
+    cors_origins = _load_cors_origins()
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=cors_origins,
+        allow_credentials="*" not in cors_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )

@@ -1,13 +1,12 @@
 # src/fzq_ai/agents/base.py
-# V21 — Unified Agent Base Class
+# V24 — Unified Agent Base Class
 # 双语版（中文 + English）
 # Author: Nick
-# Version: V21.0.0
+# Version: V24.0.0
 
 from __future__ import annotations
 from typing import Any, Dict, Optional, List
 from dataclasses import dataclass
-from abc import ABC, abstractmethod
 
 # ============================================================
 # AgentContext — 智能体输入上下文
@@ -39,25 +38,24 @@ class AgentResult:
 # BaseAgent — 智能体基础类（统一版）
 # ============================================================
 
-class BaseAgent(ABC):
+class BaseAgent:
     """
     ============================================================
-    V21 — BaseAgent（统一智能体基类）
+    V24 — BaseAgent（统一智能体基类）
     ============================================================
 
-    本类整合了：
-    - 原 base.py 的 run(ctx)
-    - 原 base_agent.py 的 plan/route/execute/evaluate/reflect/heal 等能力
+    设计要点：
+    - 不强制实现：9 个钩子（plan / route / execute / evaluate / reflect /
+      heal / fallback / retry / auto_select_model）均有合理默认实现，
+      子类按需重写即可，不再被 ABC abstractmethod 阻止实例化
+    - 提供默认 `run()`：plan → execute → reflect → heal
+    - 子类可重写 `run()` 完全替换默认流程（如 zh_tasks/*_agent.py）
+    - 兼容 V21 / V22 / V23 / V24 所有 agent 实现
 
-    这是 FZQ‑AI 智能体层的唯一基类。
-    所有智能体必须继承此类。
-
-    ============================================================
-    English Description
-    ============================================================
-
-    Unified BaseAgent class for the FZQ‑AI Agent Layer.
-    Combines runtime interface + capability abstraction.
+    History note:
+    - V21 起以 `class BaseAgent(ABC)` + 9 个 @abstractmethod 形式存在
+    - 实际上绝大多数子类只重写 `run()`，9 个 abstractmethod 长期未实现
+    - V24 移除 ABC + abstractmethod，既保留文档作用又允许子类灵活扩展
     """
 
     name: str
@@ -68,11 +66,12 @@ class BaseAgent(ABC):
         self.last_result: Optional[AgentResult] = None
 
     # ============================================================
-    # 统一入口：run(ctx)
+    # 统一入口：run(ctx)  —  默认 plan → execute → reflect → heal
+    # 子类可重写此方法完全替换默认流程（如 zh_tasks/*_agent.py）
     # ============================================================
 
     def run(self, ctx: AgentContext) -> AgentResult:
-        trace = []
+        trace: List[str] = []
 
         trace.append("Step 1: Planning")
         plan = self.plan(ctx)
@@ -104,62 +103,54 @@ class BaseAgent(ABC):
             ok=True,
             data=raw_result,
             warnings=[],
-            trace=trace
+            trace=trace,
         )
 
         self.last_result = result
         return result
 
     # ============================================================
-    # 1. 任务规划 / Task Planning
+    # 可选钩子 — 子类按需重写（默认是 pass-through / 合理兜底）
     # ============================================================
 
-    @abstractmethod
     def plan(self, ctx: AgentContext) -> Dict[str, Any]:
-        pass
+        """Default: return ctx as plan. Subclasses can override."""
+        return {"raw_input": ctx.raw_input, "metadata": ctx.metadata}
 
-    # ============================================================
-    # 2. 模型选择 / Model Routing
-    # ============================================================
-
-    @abstractmethod
     def route(self, plan: Dict[str, Any]) -> str:
-        pass
+        """Default: no routing. Subclasses can override."""
+        return ""
 
-    # ============================================================
-    # 3. 执行任务 / Execution
-    # ============================================================
-
-    @abstractmethod
     def execute(self, model: str, plan: Dict[str, Any]) -> Dict[str, Any]:
-        pass
+        """Default: empty execution. Subclasses can override."""
+        return {}
 
-    # ============================================================
-    # 4. 质量评估 / Evaluation
-    # ============================================================
-
-    @abstractmethod
     def evaluate(self, result: Dict[str, Any]) -> float:
-        pass
+        """Default: accept everything. Subclasses can override."""
+        return 1.0
 
-    # ============================================================
-    # 5. 自我反思 / Reflection
-    # ============================================================
-
-    @abstractmethod
     def reflect(self, result: Dict[str, Any]) -> Dict[str, Any]:
-        pass
+        """Default: pass through. Subclasses can override."""
+        return result
 
-    # ============================================================
-    # 6. 自愈系统 / Self‑Healing
-    # ============================================================
-
-    @abstractmethod
     def heal(self, result: Dict[str, Any]) -> Dict[str, Any]:
-        pass
+        """Default: pass through. Subclasses can override."""
+        return result
+
+    def fallback(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """Default: empty fallback. Subclasses can override."""
+        return {}
+
+    def retry(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """Default: empty retry. Subclasses can override."""
+        return {}
+
+    def auto_select_model(self, plan: Dict[str, Any]) -> str:
+        """Default: empty model. Subclasses can override."""
+        return ""
 
     # ============================================================
-    # 7. 记忆系统 / Memory Engine
+    # 记忆系统 / Memory Engine (V21 保留)
     # ============================================================
 
     def memory_read(self, key: str) -> Any:
@@ -167,23 +158,3 @@ class BaseAgent(ABC):
 
     def memory_write(self, key: str, value: Any) -> None:
         self.memory[key] = value
-
-    # ============================================================
-    # 8. 自动 fallback / retry
-    # ============================================================
-
-    @abstractmethod
-    def fallback(self, plan: Dict[str, Any]) -> Dict[str, Any]:
-        pass
-
-    @abstractmethod
-    def retry(self, plan: Dict[str, Any]) -> Dict[str, Any]:
-        pass
-
-    # ============================================================
-    # 9. 自动模型选择 / Auto Model Selection
-    # ============================================================
-
-    @abstractmethod
-    def auto_select_model(self, plan: Dict[str, Any]) -> str:
-        pass
