@@ -1,11 +1,14 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Panel } from "../components/ui/Panel";
+import { SectionTitle } from "../components/ui/SectionTitle";
 
-export const DebugPage: React.FC = () => {
+export default function DebugPage() {
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="调试" en="Debug" /></h1>
-      <p><BilingualText zh="调试工具页面" en="Debug Tools" /></p>
+    <div>
+      <SectionTitle title="Debug Tools" />
+
+      <Panel>
+        <p>Debug information will appear here.</p>
+      </Panel>
     </div>
   );
-};
+}

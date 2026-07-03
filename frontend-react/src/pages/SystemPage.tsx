@@ -1,11 +1,14 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Card } from "../components/ui/Card";
+import { SectionTitle } from "../components/ui/SectionTitle";
 
-export const SystemPage: React.FC = () => {
+export default function SystemPage() {
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="系统" en="System" /></h1>
-      <p><BilingualText zh="系统状态监控" en="System Status Monitor" /></p>
+    <div>
+      <SectionTitle title="System Info" />
+
+      <Card>
+        <p>System version, health, and status will appear here.</p>
+      </Card>
     </div>
   );
-};
+}

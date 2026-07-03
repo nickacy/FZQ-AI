@@ -1,11 +1,20 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Card } from "../components/ui/Card";
+import { SectionTitle } from "../components/ui/SectionTitle";
+import { Input } from "../components/ui/Input";
+import { t } from "../i18n";
+import { useLanguageStore } from "../state/languageState";
 
-export const SettingsPage: React.FC = () => {
+export default function SettingsPage() {
+  const lang = useLanguageStore((s) => s.language);
+
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="设置" en="Settings" /></h1>
-      <p><BilingualText zh="系统设置页面" en="System Settings" /></p>
+    <div>
+      <SectionTitle title={t("nav.settings", lang)} />
+
+      <Card>
+        <h3>System Settings</h3>
+        <Input placeholder="Setting value..." />
+      </Card>
     </div>
   );
-};
+}

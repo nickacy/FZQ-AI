@@ -1,11 +1,19 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Card } from "../components/ui/Card";
+import { SectionTitle } from "../components/ui/SectionTitle";
+import { t } from "../i18n";
+import { useLanguageStore } from "../state/languageState";
 
-export const FavoritesPage: React.FC = () => {
+export default function FavoritesPage() {
+  const lang = useLanguageStore((s) => s.language);
+
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="收藏" en="Favorites" /></h1>
-      <p><BilingualText zh="暂无收藏" en="No favorites yet" /></p>
+    <div>
+      <SectionTitle title={t("nav.favorites", lang)} />
+
+      <Card>
+        <h3>Favorite Items</h3>
+        <p>Your saved items will appear here.</p>
+      </Card>
     </div>
   );
-};
+}

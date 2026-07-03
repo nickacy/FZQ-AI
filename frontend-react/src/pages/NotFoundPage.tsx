@@ -1,11 +1,10 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Card } from "../components/ui/Card";
 
-export const NotFoundPage: React.FC = () => {
+export default function NotFoundPage() {
   return (
-    <div style={{ padding: '24px', textAlign: 'center' }}>
-      <h1>404</h1>
-      <p><BilingualText zh="页面未找到" en="Page Not Found" /></p>
-    </div>
+    <Card>
+      <h2>404 - Not Found</h2>
+      <p>The page you are looking for does not exist.</p>
+    </Card>
   );
-};
+}

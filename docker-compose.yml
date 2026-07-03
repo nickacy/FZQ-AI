@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  fzq-ai-backend:
+    build: .
+    container_name: fzq-ai-backend
+    ports:
+      - "8000:8000"
+    restart: always
+
+  fzq-ai-frontend:
+    build:
+      context: ./frontend-react
+    container_name: fzq-ai-frontend
+    ports:
+      - "3000:3000"
+    restart: always

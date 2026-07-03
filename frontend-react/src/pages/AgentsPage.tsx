@@ -1,11 +1,21 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Card } from "../components/ui/Card";
+import { SectionTitle } from "../components/ui/SectionTitle";
+import { Button } from "../components/ui/Button";
+import { t } from "../i18n";
+import { useLanguageStore } from "../state/languageState";
 
-export const AgentsPage: React.FC = () => {
+export default function AgentsPage() {
+  const lang = useLanguageStore((s) => s.language);
+
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="智能体" en="Agents" /></h1>
-      <p><BilingualText zh="智能体管理页面" en="Agent Management" /></p>
+    <div>
+      <SectionTitle title={t("nav.agents", lang)} />
+
+      <Card>
+        <h3>Agent List</h3>
+        <p>All configured agents will appear here.</p>
+        <Button variant="primary">Add Agent</Button>
+      </Card>
     </div>
   );
-};
+}

@@ -1,26 +1,25 @@
-import React, { Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import { ErrorBoundary } from '../components/layout/ErrorBoundary';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { ErrorBoundary } from "../components/layout/ErrorBoundary";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
-// --- Lazy-loaded pages ---
-const WorkspacePage = React.lazy(() => import('../pages/WorkspacePage'));
-const HistoryPage = React.lazy(() => import('../pages/HistoryPage'));
-const FavoritesPage = React.lazy(() => import('../pages/FavoritesPage'));
-const AgentsPage = React.lazy(() => import('../pages/AgentsPage'));
-const SettingsPage = React.lazy(() => import('../pages/SettingsPage'));
-
-const SystemPage = React.lazy(() => import('../pages/SystemPage'));
-const DebugPage = React.lazy(() => import('../pages/DebugPage'));
-const DiagnosticsPage = React.lazy(() => import('../pages/DiagnosticsPage'));
-
-const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
+// Lazy-loaded pages (must have default export)
+const WorkspacePage = React.lazy(() => import("../pages/WorkspacePage"));
+const HistoryPage = React.lazy(() => import("../pages/HistoryPage"));
+const FavoritesPage = React.lazy(() => import("../pages/FavoritesPage"));
+const AgentsPage = React.lazy(() => import("../pages/AgentsPage"));
+const SettingsPage = React.lazy(() => import("../pages/SettingsPage"));
+const SystemPage = React.lazy(() => import("../pages/SystemPage"));
+const DebugPage = React.lazy(() => import("../pages/DebugPage"));
+const DiagnosticsPage = React.lazy(() => import("../pages/DiagnosticsPage"));
+const NotFoundPage = React.lazy(() => import("../pages/NotFoundPage"));
 
 export const AppRoutes: React.FC = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
+        {/* Redirect root → /workspace */}
         <Route path="/" element={<Navigate to="/workspace" replace />} />
 
         <Route
@@ -68,7 +67,7 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* --- System-level pages --- */}
+        {/* System-level pages */}
         <Route
           path="/system"
           element={
@@ -96,7 +95,7 @@ export const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* --- 404 --- */}
+        {/* 404 */}
         <Route
           path="*"
           element={

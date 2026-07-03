@@ -1,0 +1,14 @@
+{
+  "name": "FZQ-AI",
+  "version": "24.0.0",
+  "description": "Cross-Civilization Personal Intelligence Officer",
+  "entrypoint": "/entry",
+  "author": "Nick",
+  "language": ["zh", "en"],
+  "pipelines": [
+    "zh_risk_scan",
+    "zh_opinion_landscape",
+    "zh_multisource_merge",
+    "zh_policy_brief"
+  ]
+}

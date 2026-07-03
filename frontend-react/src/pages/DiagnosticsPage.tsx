@@ -1,11 +1,14 @@
-import React from 'react';
-import { BilingualText } from '../../components/i18n/BilingualText';
+import { Panel } from "../components/ui/Panel";
+import { SectionTitle } from "../components/ui/SectionTitle";
 
-export const DiagnosticsPage: React.FC = () => {
+export default function DiagnosticsPage() {
   return (
-    <div style={{ padding: '24px' }}>
-      <h1><BilingualText zh="诊断" en="Diagnostics" /></h1>
-      <p><BilingualText zh="系统诊断页面" en="System Diagnostics" /></p>
+    <div>
+      <SectionTitle title="Diagnostics" />
+
+      <Panel>
+        <p>System diagnostics will appear here.</p>
+      </Panel>
     </div>
   );
-};
+}
