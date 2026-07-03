@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { useLanguageState } from '../../state/languageState';
+import { useLanguageStore } from '../../state/languageState';
 import { useThemeState } from '../../state/themeState';
 import { useSystemState } from '../../state/systemState';
 
 import { BilingualText } from '../i18n/BilingualText';
 
 export const TopNavBar: React.FC = () => {
-  const { current, setLanguage } = useLanguageState();
+  const { current, setLanguage } = useLanguageStore();
   const { current: themeMode, toggleTheme, theme } = useThemeState();
   const { apiStatus, networkStatus } = useSystemState();
 

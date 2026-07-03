@@ -2,7 +2,7 @@ import React from 'react';
 import { BilingualText } from '../../components/i18n/BilingualText';
 
 import { useThemeState } from '../../state/themeState';
-import { useLanguageState } from '../../state/languageState';
+import { useLanguageStore } from '../../state/languageState';
 import { useWorkspaceState } from '../../state/workspaceState';
 
 interface InputPanelProps {
@@ -19,7 +19,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({
   isLoading,
 }) => {
   const { theme } = useThemeState();
-  const { current } = useLanguageState();
+  const { current } = useLanguageStore();
   const { smartSuggestions, quickTemplates, inputMode } = useWorkspaceState();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

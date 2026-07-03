@@ -65,33 +65,57 @@ def wrap_response(route_result):
 # 3. 四大中文情报任务端点
 # ============================================================
 
+async def _run_task(payload: ZhIntelPayload, expected_task: str):
+    """Unified classify → route → pipeline chain with error guard."""
+    try:
+        intent = classify(payload.text)
+        # Preserve intent if clarification is needed
+        if intent.task_type == "clarification_required":
+            return {
+                "success": False,
+                "task_type": "clarification_required",
+                "pipeline": None,
+                "agent": None,
+                "model": None,
+                "fallback_used": None,
+                "error": intent.reason,
+                "output": None,
+                "clarification_needed": True,
+            }
+        intent.task_type = expected_task
+        result = await task_router.route(intent, payload.text)
+        response = wrap_response(result)
+        response["clarification_needed"] = False
+        return response
+    except Exception as e:
+        return {
+            "success": False,
+            "task_type": expected_task,
+            "pipeline": None,
+            "agent": None,
+            "model": None,
+            "fallback_used": "api_error_guard",
+            "error": f"API chain failed: {str(e)}",
+            "output": None,
+            "clarification_needed": False,
+        }
+
+
 @router.post("/policy_brief")
 async def api_zh_policy_brief(payload: ZhIntelPayload):
-    intent = classify(payload.text)
-    intent.task_type = "zh_policy_brief"
-    result = await task_router.route(intent, payload.text)
-    return wrap_response(result)
+    return await _run_task(payload, "zh_policy_brief")
 
 
 @router.post("/risk_scan")
 async def api_zh_risk_scan(payload: ZhIntelPayload):
-    intent = classify(payload.text)
-    intent.task_type = "zh_risk_scan"
-    result = await task_router.route(intent, payload.text)
-    return wrap_response(result)
+    return await _run_task(payload, "zh_risk_scan")
 
 
 @router.post("/opinion_landscape")
 async def api_zh_opinion_landscape(payload: ZhIntelPayload):
-    intent = classify(payload.text)
-    intent.task_type = "zh_opinion_landscape"
-    result = await task_router.route(intent, payload.text)
-    return wrap_response(result)
+    return await _run_task(payload, "zh_opinion_landscape")
 
 
 @router.post("/multisource_merge")
 async def api_zh_multisource_merge(payload: ZhIntelPayload):
-    intent = classify(payload.text)
-    intent.task_type = "zh_multisource_merge"
-    result = await task_router.route(intent, payload.text)
-    return wrap_response(result)
+    return await _run_task(payload, "zh_multisource_merge")

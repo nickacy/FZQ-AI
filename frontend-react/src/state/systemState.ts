@@ -12,6 +12,7 @@ interface FeatureFlags {
 }
 
 interface SystemState {
+  networkStatus: string;
   apiStatus: ApiStatus;
   systemHealth: SystemHealth;
 
@@ -39,6 +40,7 @@ interface SystemState {
 }
 
 export const useSystemState = create<SystemState>((set) => ({
+  networkStatus: 'online',
   apiStatus: 'disconnected',
   systemHealth: 'healthy',
 
@@ -71,7 +73,8 @@ export const useSystemState = create<SystemState>((set) => ({
 
   resetSystem: () =>
     set({
-      apiStatus: 'disconnected',
+      networkStatus: 'online',
+  apiStatus: 'disconnected',
       systemHealth: 'healthy',
       backendVersion: '',
       lastHeartbeat: Date.now(),

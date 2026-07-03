@@ -15,3 +15,5 @@ export const lightTheme = {
   "--error-bg": "#fef2f2",
   "--error-text": "#991b1b"
 };
+
+export default lightTheme;

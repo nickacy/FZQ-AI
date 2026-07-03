@@ -6,6 +6,9 @@ export interface OutputCard {
 
   componentType: string;               // 来自 UI Schema
   props: Record<string, any>;          // 来自 UI Schema
+  type?: string;                       // UI block type
+  rows?: any[];                        // Table row data
+  code?: string;                       // Code block content
 
   title?: { zh: string; en: string };
   content?: { zh: string; en: string };

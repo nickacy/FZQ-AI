@@ -32,7 +32,7 @@ export default function WorkspacePage() {
       const data = await apiClient.post("/entry", { query: input });
 
       if (data.ui_schema) {
-        const mapped = schemaAdapter.toOutputCards(data.ui_schema);
+        const mapped = schemaAdapter.toOutputCards(data.ui_schema) as any;
         setCards(mapped);
       }
     } catch (err) {

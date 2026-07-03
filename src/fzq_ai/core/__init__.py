@@ -1,4 +1,4 @@
-﻿"""FZQ-AI Core: intent engine, task router, LLM executor, config."""
+"""FZQ-AI Core: intent engine, task router, LLM executor, config."""
 
 
 def __getattr__(name: str):

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useThemeState } from '../../state/themeState';
-import { useLanguageState } from '../../state/languageState';
+import { useLanguageStore } from '../../state/languageState';
 import { useSystemState } from '../../state/systemState';
 
 import { BilingualText } from '../i18n/BilingualText';
@@ -12,7 +12,7 @@ export const BottomNavBar: React.FC = () => {
   const location = useLocation();
 
   const { theme } = useThemeState();
-  const { current } = useLanguageState();
+  const { current } = useLanguageStore();
   const { apiStatus, networkStatus } = useSystemState();
 
   const navItems = [

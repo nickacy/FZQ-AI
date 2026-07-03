@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 
-type Phase = 'DECOMPOSE' | 'ROUTE' | 'ACT' | 'REFLECT' | 'FINALIZE';
+export type Phase = 'DECOMPOSE' | 'ROUTE' | 'ACT' | 'REFLECT' | 'FINALIZE';
 
-interface TimelineEvent {
+export interface TimelineEvent {
   agent: string;
   step: string;
   input: string;
@@ -38,6 +38,7 @@ interface ExecutionState {
 
   // 执行耗时
   durationMs: number;
+  traceId: string;
 
   // 智能体名称
   agentName: string | null;
@@ -68,6 +69,7 @@ export const useExecutionState = create<ExecutionState>((set) => ({
 
   timeline: [],
   durationMs: 0,
+  traceId: '',
 
   agentName: null,
 

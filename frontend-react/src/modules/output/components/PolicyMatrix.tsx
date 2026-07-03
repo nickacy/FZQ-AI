@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useThemeState } from '../../../state/themeState';
-import { useLanguageState } from '../../../state/languageState';
+import { useLanguageStore } from '../../../state/languageState';
 import { useExecutionState } from '../../../state/executionState';
 import { useAgentState } from '../../../state/agentState';
 
@@ -28,7 +28,7 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
   agentId,
 }) => {
   const { theme } = useThemeState();
-  const { current } = useLanguageState();
+  const { current } = useLanguageStore();
   const { isStreaming } = useExecutionState();
   const { agents } = useAgentState();
 

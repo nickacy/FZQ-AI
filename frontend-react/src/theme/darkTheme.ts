@@ -15,3 +15,5 @@ export const darkTheme = {
   "--error-bg": "#7f1d1d",
   "--error-text": "#fca5a5"
 };
+
+export default darkTheme;
