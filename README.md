@@ -1,153 +1,136 @@
-# FZQ-AI Framework
+# FZQ‑AI V24 旗舰版
 
-FZQ-AI is an advanced AI application framework designed for intelligence analysis, news processing, and multi-model orchestration. This framework provides a comprehensive solution for processing and analyzing large volumes of data using various AI models.
-
-## Features
-
-### Core Components
-- **LLM Router**: Intelligent routing between multiple AI providers (DeepSeek, OpenAI, Qwen, Kimi, Gemini)
-- **Pipeline System**: Modular processing pipelines for various tasks (news, narrative, risk, sentiment analysis)
-- **Orchestrator**: Task orchestration with fallback mechanisms and recovery capabilities
-- **Unified Interface**: Consistent APIs across different AI providers and processing tasks
-
-### Enhanced Capabilities (New!)
-- **Modern Configuration Management**: Dynamic configuration with hot reload capabilities
-- **Advanced Error Handling**: Circuit breaker patterns, retry mechanisms, and graceful degradation
-- **Performance Optimization**: LRU/TTL caching, concurrent processing, and async optimization
-- **Monitoring & Observability**: Comprehensive metrics collection with Prometheus export
-- **Security**: Secure credential management and error sanitization
-
-## Architecture
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   API Layer     │───▶│  Orchestrator   │───▶│  LLM Providers  │
-│ (REST/GraphQL)  │    │ (Task Routing)   │    │ (Multi-Model)   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                    ┌──────────────────┐
-                    │   Pipelines      │
-                    │ (News, Analysis, │
-                    │  Reports, etc.)  │
-                    └──────────────────┘
-                                │
-                                ▼
-                    ┌──────────────────┐
-                    │   Utilities      │
-                    │ (Cache, Logger,  │
-                    │  Metrics, etc.)  │
-                    └──────────────────┘
-```
-
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd FZQ-AI
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your API keys and configurations
-```
-
-## Usage
-
-### Basic Example
-```python
-from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
-
-# Initialize orchestrator
-orchestrator = TaskOrchestrator()
-
-# Process a request
-result = orchestrator.run({
-    "query": "Analyze recent developments in AI regulation",
-    "task_type": "news_analysis"
-})
-
-print(result)
-```
-
-### Using Enhanced Features
-```python
-from fzq_ai.llm.enhanced_cache import llm_response_cache
-from fzq_ai.utils.async_manager import AsyncManager
-from fzq_ai.metrics.enhanced_metrics import MetricsCollector
-
-# Advanced usage with caching and metrics
-async def advanced_example():
-    manager = AsyncManager(max_concurrent=10)
-    collector = MetricsCollector()
-    
-    # Check cache first
-    cached_result = await llm_response_cache.get("unique_query_id")
-    if cached_result:
-        return cached_result
-    
-    # Process with metrics tracking
-    start_time = collector.start_timer()
-    result = await manager.run_task(process_request())
-    
-    # Cache result and record metrics
-    await llm_response_cache.set("unique_query_id", result, ttl=3600)
-    duration = collector.stop_timer_and_record(start_time, "request_processing_time")
-    
-    return result
-```
-
-## Configuration
-
-The framework supports dynamic configuration management:
-
-```python
-from fzq_ai.config.modern_config import ConfigManager
-
-config = ConfigManager()
-api_key = config.get("DEEPSEEK_API_KEY")
-model_settings = config.get("MODEL_SETTINGS")
-```
-
-Configuration can be loaded from:
-- Environment variables
-- Configuration files
-- Remote configuration sources (planned)
-
-## Testing
-
-Run the complete test suite:
-```bash
-python -m pytest tests/ -v
-```
-
-Current test coverage: 117 tests passing (including 16 new enhanced feature tests)
-
-## Performance
-
-- Concurrent processing support up to 20 simultaneous operations
-- LRU/TTL caching with configurable size and expiration
-- Asynchronous operations for optimal performance
-- Built-in metrics collection and monitoring
-
-## Contributing
-
-We welcome contributions! Please see our contributing guidelines for more details.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the development team.
+跨文明个人情报官系统 · Cross-Civilization Personal Intelligence Officer
 
 ---
-*FZQ-AI Framework - Enhanced with Modern AI Capabilities*
+
+## 🏗️ Architecture
+
+```
+                            ╔══════════════════════╗
+        Frontend ──────────▶║   FastAPI Entry Layer ║──▶ POST /entry /multi /autonomy
+        (React + TS)        ╚══════════╤═══════════╝
+                                       │
+                            ╔══════════▼═══════════╗
+                            ║   V24 Orchestrator   ║
+                            ║   AgentSelector      ║──▶ classify → route → pipeline
+                            ║   ExecutionBuilder   ║
+                            ╚══════════╤═══════════╝
+                                       │
+              ┌────────────────────────┼────────────────────────┐
+              │                        │                        │
+    ╔═════════▼═════════╗   ╔══════════▼══════════╗   ╔═════════▼═════════╗
+    ║   Agent Loop      ║   ║  LLM Router V24     ║   ║  Civilization    ║
+    ║   StateMachine    ║   ║  choose_model()     ║   ║  Parliament      ║
+    ║   Planning        ║   ║  call_llm()         ║   ║  Consensus       ║
+    ║   Reflection      ║   ║  Failover (3-tier)  ║   ║  KnowledgeGraph  ║
+    ║   Healing         ║   ║  PromptEngine (13)  ║   ║  Evolution       ║
+    ║   Memory          ║   ╚══════════╤══════════╝   ╚═════════╤═════════╝
+    ║   Personality     ║              │                        │
+    ║   Goals           ║   ╔══════════▼══════════╗             │
+    ╚═══════════════════╝   ║  Providers          ║             │
+                            ║  DeepSeek GLM Qwen  ║             │
+                            ║  OpenAI  Gemini Kimi║             │
+                            ╚═════════════════════╝             │
+                                       │                        │
+                            ╔══════════▼════════════════════════▼══╗
+                            ║   Observability                     ║
+                            ║   Structlog JSON · Tracing          ║
+                            ║   Prometheus Metrics · /metrics     ║
+                            ╚═════════════════════════════════════╝
+```
+
+---
+
+## 🚀 Quick Start
+
+```bash
+git clone https://github.com/nickacy/FZQ-AI
+cd FZQ-AI
+pip install -r requirements.txt
+cp .env.example .env       # edit with your API keys
+python main.py              # starts FastAPI on :8000
+```
+
+## 📡 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/entry` | POST | Single-agent execution (`{"input": "..."}`) |
+| `/multi` | POST | Multi-agent collaboration |
+| `/autonomy` | POST | Autonomous agent loop |
+| `/api/zh/risk_scan` | POST | Chinese risk scan pipeline |
+| `/api/zh/policy_brief` | POST | Chinese policy brief pipeline |
+| `/api/zh/opinion_landscape` | POST | Chinese opinion landscape |
+| `/api/zh/multisource_merge` | POST | Chinese multi-source merge |
+| `/v23/entry` | POST | V23 backward-compatible entry |
+| `/metrics` | GET | Prometheus metrics |
+| `/health` | GET | Health check |
+
+### Example
+
+```bash
+curl -X POST http://127.0.0.1:8000/entry \
+  -H "Content-Type: application/json" \
+  -d '{"input":"分析金融风险","languages":["zh"]}'
+```
+
+Response (V24 contract):
+```json
+{
+  "execution": {
+    "intent": {}, "route": {"task_type":"zh_risk_scan"},
+    "pipeline": "zh_risk_scan", "model": "deepseek-chat", "agent": "deepseek-risk",
+    "timeline": [], "state_machine": {"current":"COMPLETED","history":["INIT","PLANNING","EXECUTING","REFLECTING","HEALING","COMPLETED"]},
+    "trace_id": "...", "fallback_used": null
+  },
+  "ui_schema": {"blocks": [...]},
+  "output": null
+}
+```
+
+## 🧪 Testing
+
+```bash
+python -m pytest tests/ -v
+# 117 passed, 1 warning
+```
+
+## 📊 Key Metrics
+
+| Metric | Value |
+|--------|-------|
+| Backend tests | 117/117 |
+| TypeScript errors | 0 |
+| Python files | 352 |
+| Classes | 432 |
+| Functions | 1,173 |
+| Supported LLMs | 7 (DeepSeek, GLM, Qwen, OpenAI, Gemini, Kimi, Moonshot) |
+| Agent dimensions | 8 (Memory, Personality, Goals, Planning, Reflection, Healing, StateMachine, Loop) |
+| Civilization modules | 54 (Parliament, Consensus, KnowledgeGraph, Evolution, etc.) |
+| Prompt templates | 13 |
+
+---
+
+## 📂 Module Map
+
+```
+src/fzq_ai/
+├── api/             FastAPI entry layer (V23 + V24 routes)
+├── core/            IntentEngine + TaskRouter + LLMExecutor
+├── llm/             Router, Failover, PromptEngine, Providers
+├── agents/          BaseAgent + MultiAgent + V24 agents
+├── orchestrator/    TaskOrchestrator + AgentSelector + ExecutionBuilder
+├── pipelines/       zh_risk_scan, zh_policy_brief, news, etc.
+├── civilization/    Parliament, Consensus, KnowledgeGraph, Evolution, Federation
+├── schemas/         Pydantic v2 DTOs (core_models, route, validator)
+├── registry/        Unified Agent Registry (7 agents)
+├── utils/           Memory, Personality, Goals, Planning, Reflection, Healing,
+│                    StateMachine, Loop, Tracing, Monitoring, Logger, AsyncManager
+├── config/          ModernConfig + GlobalSettings (YAML + env)
+├── metrics/         EnhancedMetrics (Prometheus-compatible)
+├── quality/         DeepSeek struct optimizer + Minimax validator
+├── prompts/         Prompt templates (zh + en)
+├── tools/           Translator, NewsFetcher, Embedding, etc.
+└── ui/              UISchema definitions
+```
