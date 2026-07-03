@@ -1,72 +1,62 @@
-import { OutputCard } from '../state/outputState';
+import { useLanguageStore } from "../state/languageState";
+
+interface RawCard {
+  type: string;
+  title?: { zh: string; en: string } | string;
+  content?: { zh: string; en: string } | string;
+  rows?: any[];
+  code?: string;
+}
+
+interface OutputCard {
+  type: string;
+  title?: { zh: string; en: string };
+  content?: { zh: string; en: string };
+  rows?: any[];
+  code?: string;
+}
 
 export const schemaAdapter = {
-  toOutputCards(schema: any): OutputCard[] {
-    if (!schema) return [];
+  toOutputCards(uiSchema: any): OutputCard[] {
+    if (!uiSchema || !Array.isArray(uiSchema.cards)) return [];
 
-    const cards: OutputCard[] = [];
+    return uiSchema.cards.map((raw: RawCard) => {
+      const card: OutputCard = {
+        type: raw.type,
+        rows: raw.rows,
+        code: raw.code,
+        title: normalizeBilingual(raw.title),
+        content: normalizeBilingual(raw.content),
+      };
 
-    const extractBilingual = (obj: any): { zh: string; en: string } => {
-      if (typeof obj === 'string') {
-        return { zh: obj, en: obj };
-      }
-      if (obj && typeof obj === 'object') {
-        return {
-          zh: obj.zh || '',
-          en: obj.en || '',
-        };
-      }
-      return { zh: '', en: '' };
-    };
-
-    const processNode = (node: any, order = 0) => {
-      if (!node || typeof node !== 'object') return;
-
-      // 递归处理 children
-      if (Array.isArray(node.children)) {
-        node.children.forEach((child: any, index: number) =>
-          processNode(child, index)
-        );
-        return;
-      }
-
-      // UI Schema 标准组件
-      if (node.component) {
-        cards.push({
-          cardId: node.cardId || crypto.randomUUID(),
-          order: node.order ?? order,
-
-          componentType: node.component,
-          props: node.props || {},
-
-          title: node.title ? extractBilingual(node.title) : undefined,
-          content: node.content ? extractBilingual(node.content) : undefined,
-
-          collapsed: node.collapsed || false,
-          highlighted: node.highlighted || false,
-        });
-        return;
-      }
-
-      // 兼容旧版 card/text 节点
-      if (node.type === 'card' || node.type === 'text') {
-        cards.push({
-          cardId: crypto.randomUUID(),
-          order,
-
-          componentType: node.type,
-          props: node.props || {},
-
-          title: extractBilingual(node.title),
-          content: extractBilingual(node.content),
-
-          collapsed: node.collapsed || false,
-          highlighted: node.highlighted || false,
-        });
-      }
-    };
-
-    processNode(schema);
-    return cards.sort((a, b) => a.order - b.order);
+      return card;
+    });
   }
 };
+
+/**
+ * 将 title/content 转换为双语结构
+ * 支持三种情况：
+ * 1. { zh: "...", en: "..." }
+ * 2. "纯字符串" → 自动转换为 { zh: str, en: str }
+ * 3. undefined → 返回 { zh: "", en: "" }
+ */
+function normalizeBilingual(value: any): { zh: string; en: string } {
+  if (!value) {
+    return { zh: "", en: "" };
+  }
+
+  if (typeof value === "string") {
+    return { zh: value, en: value };
+  }
+
+  if (typeof value === "object" && value.zh && value.en) {
+    return value;
+  }
+
+  // fallback：如果结构不完整，自动补齐
+  return {
+    zh: value.zh ?? "",
+    en: value.en ?? ""
+  };
+}

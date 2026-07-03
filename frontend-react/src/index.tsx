@@ -1,23 +1,44 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
-import { router } from "./app/routes";
+import App from "./App";
 
-// 全局样式（如果你有）
-import "./theme/lightTheme.ts";
-import "./theme/darkTheme.ts";
+import { useThemeState } from "./state/themeState";
+import { useLanguageStore } from "./state/languageState";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+import "./styles/global.css";
 
-root.render(
+function Root() {
+  const theme = useThemeState((s) => s.theme);
+  const lang = useLanguageStore((s) => s.language);
+
+  const rootStyle =
+    theme.mode === "dark"
+      ? {
+          "--bg-primary": "#0d0d0d",
+          "--bg-secondary": "#1a1a1a",
+          "--text-primary": "#ffffff",
+          "--text-secondary": "#cccccc",
+          "--border": "#333333",
+          "--accent": "#0077ff",
+        }
+      : {
+          "--bg-primary": "#ffffff",
+          "--bg-secondary": "#f5f5f5",
+          "--text-primary": "#000000",
+          "--text-secondary": "#444444",
+          "--border": "#dddddd",
+          "--accent": "#0066dd",
+        };
+
+  return (
+    <div style={rootStyle as any}>
+      <App />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Root />
   </React.StrictMode>
 );
-
-// 注册 Service Worker（PWA）
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}

@@ -1,18 +1,23 @@
-import { useLanguageState } from '../state/languageState';
+import { useLanguageStore } from '../state/languageState';
 import { useSystemState } from '../state/systemState';
 
 const BASE_URL = '/api/v1';
 
 export const apiClient = {
+  // ---------------------- Standard POST ----------------------
   async post(endpoint: string, payload: any) {
-    const { current } = useLanguageState.getState();
-    const { setApiStatus, setBackendVersion, setHeartbeat } = useSystemState.getState();
+    const { language } = useLanguageStore.getState();   // ← 正确字段名
+    const {
+      setApiStatus,
+      setBackendVersion,
+      setHeartbeat
+    } = useSystemState.getState();
 
     try {
       const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...payload, language: current }),
+        body: JSON.stringify({ ...payload, language }),
       });
 
       if (!response.ok) {
@@ -22,7 +27,7 @@ export const apiClient = {
 
       const data = await response.json();
 
-      // 更新系统状态
+      // --- Update system status ---
       setApiStatus('connected');
       if (data.backend_version) setBackendVersion(data.backend_version);
       setHeartbeat(Date.now());
@@ -34,13 +39,12 @@ export const apiClient = {
     }
   },
 
-  // SSE 流式执行（使用 fetch + ReadableStream）
+  // ---------------------- SSE Streaming ----------------------
   async postStream(endpoint: string, payload: any, onMessage: (msg: any) => void) {
-    const { current } = useLanguageState.getState();
+    const { language } = useLanguageStore.getState();   // ← 正确字段名
     const { setSseStatus } = useSystemState.getState();
 
     const url = `${BASE_URL}${endpoint}`;
-
     setSseStatus('streaming');
 
     try {
@@ -50,7 +54,7 @@ export const apiClient = {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream',
         },
-        body: JSON.stringify({ ...payload, language: current }),
+        body: JSON.stringify({ ...payload, language }),
       });
 
       if (!response.body) {
@@ -73,10 +77,12 @@ export const apiClient = {
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6);
+
             if (data === '[DONE]') {
               setSseStatus('idle');
               return;
             }
+
             try {
               const parsed = JSON.parse(data);
               onMessage(parsed);

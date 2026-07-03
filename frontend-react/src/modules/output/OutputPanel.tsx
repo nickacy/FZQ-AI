@@ -1,92 +1,99 @@
-import React from 'react';
+import React from "react";
+import { Card } from "../../components/ui/Card";
+import { useLanguageStore } from "../../state/languageState";
 
-import { useThemeState } from '../../state/themeState';
-import { useExecutionState } from '../../state/executionState';
-import { useOutputState } from '../../state/outputState';
+interface OutputCard {
+  title?: { zh: string; en: string };
+  content?: { zh: string; en: string };
+  type: string;
+  rows?: any[];
+  code?: string;
+}
 
-import { BilingualText } from '../../components/i18n/BilingualText';
-
-// --- Component Registry ---
-import { OutputCard } from './OutputCard';
-import { RiskRadar } from './components/RiskRadar';
-import { PolicyMatrix } from './components/PolicyMatrix';
-import { OpinionGraph } from './components/OpinionGraph';
-import { TableCard } from './components/TableCard';
-import { MultiAgentOutput } from './components/MultiAgentOutput';
-
-const componentRegistry: Record<string, React.FC<any>> = {
-  TextCard: OutputCard,
-  Card: OutputCard,
-  RiskRadar,
-  PolicyMatrix,
-  OpinionGraph,
-  TableCard,
-  MultiAgentOutput,
-};
-
-export const OutputPanel: React.FC = () => {
-  const { theme } = useThemeState();
-  const { isStreaming } = useExecutionState();
-  const { cards } = useOutputState();
-
-  if (cards.length === 0) {
-    return (
-      <div
-        className="output-panel__empty"
-        style={{ color: theme.colors.mutedText }}
-      >
-        <BilingualText zh="暂无输出结果" en="No output available" />
-      </div>
-    );
-  }
+export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
+  const lang = useLanguageStore((s) => s.language);
 
   return (
-    <div
-      className="output-panel"
-      style={{
-        backgroundColor: theme.colors.panelBackground,
-        border: `1px solid ${theme.colors.panelBorder}`,
-        padding: '16px',
-        borderRadius: '8px',
-      }}
-    >
-      {/* --- Header --- */}
-      <h3
-        style={{
-          marginBottom: '12px',
-          color: theme.colors.text,
-        }}
-      >
-        <BilingualText zh="输出结果" en="Output Results" />
-      </h3>
+    <div style={{ marginTop: "20px" }}>
+      {cards.map((card, idx) => {
+        const title = card.title?.[lang] ?? "";
+        const content = card.content?.[lang] ?? "";
 
-      {/* --- Cards --- */}
-      {cards
-        .sort((a, b) => a.order - b.order)
-        .map((card) => {
-          const Component = componentRegistry[card.componentType] || OutputCard;
+        switch (card.type) {
+          case "text":
+            return (
+              <Card key={idx}>
+                <h3>{title}</h3>
+                <p>{content}</p>
+              </Card>
+            );
 
-          return (
-            <div key={card.cardId} style={{ marginBottom: '16px' }}>
-              <Component {...card} />
-            </div>
-          );
-        })}
+          case "table":
+            return (
+              <Card key={idx}>
+                <h3>{title}</h3>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: "10px",
+                  }}
+                >
+                  <tbody>
+                    {card.rows?.map((row, rIdx) => (
+                      <tr key={rIdx}>
+                        {row.map((cell: any, cIdx: number) => (
+                          <td
+                            key={cIdx}
+                            style={{
+                              border: "1px solid var(--border-color)",
+                              padding: "6px 10px",
+                            }}
+                          >
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+            );
 
-      {/* --- Streaming Indicator --- */}
-      {isStreaming && (
-        <div
-          className="output-panel__streaming"
-          style={{
-            marginTop: '12px',
-            color: theme.colors.accent,
-            fontSize: '12px',
-            textAlign: 'center',
-          }}
-        >
-          <BilingualText zh="流式生成中..." en="Streaming..." />
-        </div>
-      )}
+          case "code":
+            return (
+              <Card key={idx}>
+                <h3>{title}</h3>
+                <pre
+                  style={{
+                    background: "var(--bg-secondary)",
+                    padding: "12px",
+                    borderRadius: "6px",
+                    overflowX: "auto",
+                  }}
+                >
+                  {card.code}
+                </pre>
+              </Card>
+            );
+
+          case "chart":
+            return (
+              <Card key={idx}>
+                <h3>{title}</h3>
+                <p>Chart rendering placeholder (chart.js integration optional)</p>
+              </Card>
+            );
+
+          default:
+            return (
+              <Card key={idx}>
+                <h3>{title}</h3>
+                <p>{content}</p>
+              </Card>
+            );
+        }
+      })}
     </div>
   );
 };

@@ -1,18 +1,18 @@
 import React from "react";
 
-export const Panel: React.FC<React.PropsWithChildren> = ({ children }) => {
+export function Panel({ children }: { children: React.ReactNode }) {
   return (
     <div
+      className="panel"
       style={{
         background: "var(--bg-secondary)",
-        padding: "20px",
-        borderRadius: "10px",
-        border: "1px solid var(--border-color)",
-        boxShadow: "var(--shadow)",
-        marginBottom: "20px"
+        padding: "16px",
+        borderRadius: "8px",
+        border: "1px solid var(--border)",
+        marginBottom: "20px",
       }}
     >
       {children}
     </div>
   );
-};
+}
