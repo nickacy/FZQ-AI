@@ -1,5 +1,103 @@
 # FZQ-AI CHANGELOG
 
+## V24.2.0 (2026-07-03) — Pipeline Refactor & Entry Unification
+
+> 紧接 V24.1.0 的业务硬化，本版本聚焦**4 个 zh_tasks Pipeline 真业务化**与**FastAPI 入口统一**。
+
+### Pipeline 真业务化 / Pipeline Refactor
+
+- **抽基类 `pipelines/_zh_pipeline.py:ZhStructuredPipeline`** —— 5 步流程（load prompt → choose model → call_llm → parse JSON → validate schema）下沉到基类
+- **4 个 pipeline 缩成 25 行子类** —— 各自只声明 `task_type`, `prompt_path`，其它都从基类继承：
+  - `zh_policy_brief_pipeline.py`
+  - `zh_risk_scan_pipeline.py`
+  - `zh_opinion_landscape_pipeline.py`
+  - `zh_multisource_merge_pipeline.py`
+- **Pydantic schema 校验** —— `SCHEMA_BY_TASK` 字典在 `schemas/zh_tasks/__init__.py` 注册 4 个 Output 类，pipeline 解析 JSON 后自动 `model_validate`
+- **JSON 解析三级 fallback** —— 直接 parse / 解析 ``` ```json ... ``` ``` 围栏 / 提取第一个 { ... } 块
+- **软失败语义** —— LLM 异常 / JSON 解析失败 / schema 校验失败都不抛错，返回 `status: "error"` / `"partial"` + `warnings` 列表
+- **修复 schema 类名 bug** —— `ZhMultisourceMergeOutput` → `ZhMultiSourceMergeOutput`（实际类名）
+
+### 入口统一 / Entry Unification
+
+- **重大 bug 修复** —— V24 之前 `ui/web_app.py` 是独立 FastAPI app，**只挂载了 1 个 router**（entry_router），README 列的 11 个端点里 80% 没暴露！现在 `ui/web_app.py` 改为 thin re-export 复用 `api/app.py`
+- **`api/app.py` 补挂载**：
+  - `v24_routes` (V24 frontend 契约 `/api/v1/*`)
+  - `zh_endpoints` (V24 中文情报 `/api/zh/*`) ← 之前漏挂
+  - `v23_router` (V23 兼容 `/v23/entry`)
+  - 自定义 `/entry /multi /autonomy /health`
+  - `/metrics` (Prometheus 端点，prometheus_client 可用时)
+- **修复 `v24_routes.py` 错用 V23 service** —— 改用 `EntryServiceV24` 的 `handle_single/multi/autonomy` 方法
+- **修复 `translate_to_v24_contract` 类型 bug** —— `debug_info` 可能是 list / dict / None，统一归一为 dict
+
+### 删除 V19/V23 死代码
+
+- `src/fzq_ai/api/multi.py` (V23 multi router)
+- `src/fzq_ai/api/autonomy.py` (V23 autonomy router)
+- `src/fzq_ai/api/server.py` (V23 独立 server，端口冲突)
+- `src/fzq_ai/entry/entry_service.py` (V19 service stub)
+- `src/fzq_ai/entry/entry_service_v23.py` (V23 service，已无用户)
+- `src/fzq_ai/entry/__init__.py` (空包)
+- `src/fzq_ai/entry/` (空目录)
+
+### 新增测试 / Tests Added
+
+- `tests/test_pipelines_real.py` — 22 个：4 pipeline 实例化 / happy path / fenced JSON / prose-wrapped JSON / 无效 JSON / schema 越界 / LLM 异常 / 5 种输入 kwarg / registry 集成
+- `tests/test_api/test_endpoints_e2e.py` — 16 个：所有 11 个 README 端点可达性 + V24 entry 契约 + main entry 契约
+- **总数：140 → 179 passed**
+
+### 验证 / Verification
+
+```
+$ pytest tests/ -q
+======================= 179 passed, 1 warning in 4.02s ========================
+```
+
+- 4 个 pipeline 真实跑通（mock LLM）：JSON 解析 + Pydantic 校验全过
+- 11 个 README 端点全部 reachable
+- 删 6 个 V19/V23 死代码文件，零功能回归
+
+### 已知问题 / Known Issues (留待 V25)
+
+- **V24 route 的 `multi` 端点** —— `EntryServiceV24.handle_multi` 内部调 `orchestrator.run_multi`，后者直接调 `self.run_single`（stub），所以 `/multi` 实际行为等同 `/entry`；需要真业务
+- **`/metrics` 端点** —— `prometheus_client` 未装时只返回 JSON 状态；生产需要 `pip install prometheus_client`
+- **`/v23/entry` 仍走 V23 path** —— V23 兼容层，V25 应该给出 deprecation 计划
+
+---
+
+## V24.1.0 (2026-07-03) — Business Hardening & Test Depth
+
+> 紧接 V24.0.0 的清理硬化，本版本聚焦**真业务落地与测试深度**。
+
+### 修复 / Fixed
+- **重大 bug**：`BaseAgent` 9 个 `@abstractmethod` 阻止 4 个 zh_tasks 子 agent 实例化 → 改为有默认实现的钩子，子类按需重写
+- **真 bug（3 处）**：`zh_policy_brief / zh_risk_scan / zh_opinion_landscape / zh_multisource_merge` 的 `payload = {**` 双花括号 → 实际是 `Set([Dict])` 而非 dict，导致 `**payload` 在 set 上运行会 `TypeError` → 改为单花括号
+- **真 bug**：`agents/tasks/policy_brief_agent.py` 调用 `LLMRouter.route_and_generate()`，但该方法不存在 → 简化为与另外 3 个 task agent 一致的 pipeline-wrap 模式
+- **真 bug**：`llm/router_v2/router.py:39` `from fzq_ai.llm.router import PROVIDER_MAP` 错误路径（实际在 `fzq_ai.config.global_settings`）→ 改用 `settings.PROVIDER_MAP` + 统一构造 `ModelClient`
+- **小 bug**：`news_center_agent.run()` 在 `get_agent` 返回 None 时没把 `None` 写入 `components` → 改为也写入（保持 schema 完整），trace 标记 `_missing` 区别于 `_error`
+- **小 bug**：`modern_config.ProviderConfig.api_key` 必填导致 `AppConfig()` 默认实例化失败 → 改为默认空串
+
+### 业务实现 / Implemented
+- **`NewsCenterAgent` 真业务**：聚合 `zh_policy_brief` / `zh_risk_scan` / `zh_opinion_landscape` / `zh_multisource_merge` 4 个子 agent，按顺序调度，per-sub-agent 失败隔离（try/except + warning 收集），返回 `view_type: "personal_intel_center"` 的聚合视图
+- **注册 `news_center` 到 registry**（之前未注册，导致 `decomposer.execute_subtasks` 调 `get_agent("news_center")` 会 `ValueError`）
+- **`get_agent(missing)` 改为返回 `None`**（之前 `raise ValueError`），让调用方可以优雅处理
+- **`modern_config` 接入**：`config/__init__.py` 现在同时导出 dict-style（`get_config() -> dict`，向后兼容）和 dataclass-style（`AppConfig, ConfigManager, get_typed_config`，新代码可用）两种 API
+
+### 删除 / Removed
+- **8 个 `civil_federation_*_v2.py`** 副本（与 `civil_federation_stubs.py` 重复，0 外部 import）
+- **`agents/orchestrator.py` 15 行 stub**（被 `news_center_agent.py` 引用，但 stub 缺 `run_task` 方法；news_center 重写后已无引用）
+
+### 新增测试 / Tests Added
+- `tests/test_e2e/test_news_center.py` — 8 个：dispatch / view shape / trace / 隔离失败 / 部分失败 / warning 收集 / 主题透传
+- `tests/test_base_agent.py` — 8 个：subclass instantiable / 默认 run() / 默认钩子 / 子类 run 覆盖 / memory
+- `tests/test_router/test_router_v2_integration.py` — 7 个：select 返回字符串 / 长度规则回退 / 默认池 / get_provider 4 个 provider / 未知 provider 抛错
+- **总数：117 → 140 passed**
+
+### 验证 / Verification
+- `pytest tests/ -q` → **140 passed, 0 failed, 1 warning** in 26.53s
+- 冒烟：news_center 4/4 子 agent 全跑通（4/4 `ok=True`）
+
+---
+
 ## V24.0.0 (2026-07-03) — Cleanup & Hardening Pass / 清理与硬化
 
 > 本版本聚焦**代码质量与工程卫生**硬化，未引入新功能；为 V25 业务迭代铺路。
@@ -29,13 +127,6 @@
 ### 改进 / Improved
 - **Prompt 路径解析**：`utils/prompt_loader.py` 由 `_SRC_DIR.parent.parent.parent` 魔法拼接改为 `importlib.resources` —— 任意工作目录、zipapp、Docker 中均可用
 - **版本号来源**：单一 `VERSION.txt`，`config/__init__.py` 启动时读取，fallback `24.0.0`
-
-### 已知问题 / Known Issues（留待 V25）
-- `agents/orchestrator.py` 仍是 15 行 stub（被 `news_center_agent.py` 引用但未真正运行；安全保留）
-- `llm/router_v2/` 与 `llm/router.py` 并存，待统一
-- `config/modern_config.py`（dataclass 风格）未真正接入 `get_config()`，仅 `tests/test_enhanced_features.py` 使用
-- `civilization/civil_federation_*_v2.py` 18 个 V2 副本无外部 import，待决断
-- 测试 e2e 深度仍较薄（`test_full_pipeline.py` 31 行、`test_json_repairer.py` 12 行）
 
 ### 验证 / Verification
 - `pytest tests/ -v` → **117 passed, 0 failed, 1 warning**

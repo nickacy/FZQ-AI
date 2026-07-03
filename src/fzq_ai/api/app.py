@@ -8,16 +8,25 @@ import os
 import pathlib
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from fzq_ai.api.v24_routes import router as v24_router
 
+# V24 中文情报（zh_risk_scan / zh_policy_brief / zh_opinion_landscape / zh_multisource_merge）
+from fzq_ai.api.zh_endpoints import router as zh_router
+
 # V24 入口层
 from fzq_ai.api.entry_service_v24 import EntryServiceV24
 
-# V23 兼容入口
+# V23 兼容入口（仅 /v23/entry）
 from fzq_ai.api.entry import router as v23_router
+
+# Observability
+try:
+    from fzq_ai.utils.monitoring import get_metrics_response
+except Exception:  # pragma: no cover — monitoring is optional
+    get_metrics_response = None
 
 
 # ============================================================
@@ -155,6 +164,23 @@ async def autonomy_v24(payload: dict):
 # ============================================================
 
 app.include_router(v23_router, prefix="/v23")
+
+
+# ============================================================
+# 7b. V24 中文情报端点（/api/zh/*）
+# ============================================================
+
+app.include_router(zh_router)
+
+
+# ============================================================
+# 7c. Prometheus 指标（如果 prometheus_client 可用）
+# ============================================================
+
+if get_metrics_response is not None:
+    @app.get("/metrics", response_class=PlainTextResponse)
+    def metrics_endpoint():
+        return get_metrics_response()
 
 
 # ============================================================
