@@ -1,17 +1,21 @@
 import React from "react";
-import { Card } from "../../components/ui/Card";
+import { useOutputState } from "../../state/outputState";
 import { useLanguageStore } from "../../state/languageState";
+import { Card } from "../../components/ui/Card";
 
-interface OutputCard {
-  title?: { zh: string; en: string };
-  content?: { zh: string; en: string };
-  type: string;
-  rows?: any[];
-  code?: string;
-}
-
-export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
+export default function OutputPanel() {
+  const { cards } = useOutputState();
   const lang = useLanguageStore((s) => s.language);
+
+  if (!cards || cards.length === 0) {
+    return (
+      <Card>
+        <p style={{ opacity: 0.6 }}>
+          {lang === "zh" ? "暂无输出" : "No output yet"}
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -24,7 +28,7 @@ export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
             return (
               <Card key={idx}>
                 <h3>{title}</h3>
-                <p>{content}</p>
+                <p style={{ lineHeight: "1.6" }}>{content}</p>
               </Card>
             );
 
@@ -46,7 +50,7 @@ export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
                           <td
                             key={cIdx}
                             style={{
-                              border: "1px solid var(--border-color)",
+                              border: "1px solid var(--border)",
                               padding: "6px 10px",
                             }}
                           >
@@ -70,9 +74,10 @@ export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
                     padding: "12px",
                     borderRadius: "6px",
                     overflowX: "auto",
+                    marginTop: "10px",
                   }}
                 >
-                  {card.code}
+                  <code>{card.code}</code>
                 </pre>
               </Card>
             );
@@ -81,7 +86,11 @@ export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
             return (
               <Card key={idx}>
                 <h3>{title}</h3>
-                <p>Chart rendering placeholder (chart.js integration optional)</p>
+                <p style={{ opacity: 0.7 }}>
+                  {lang === "zh"
+                    ? "图表渲染占位符（可选集成 chart.js）"
+                    : "Chart rendering placeholder (chart.js optional)"}
+                </p>
               </Card>
             );
 
@@ -96,4 +105,4 @@ export const OutputPanel: React.FC<{ cards: OutputCard[] }> = ({ cards }) => {
       })}
     </div>
   );
-};
+}
