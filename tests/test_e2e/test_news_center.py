@@ -77,6 +77,9 @@ class TestNewsCenterDispatch:
         assert result.ok is False  # at least one failure
         # The missing agent's failure is captured in warnings, not raised
         assert any("not_a_real_agent" in w for w in result.warnings)
+        # trace records the missing agent as `_missing` (not `_error` —
+        # missing is a different signal from runtime error)
+        assert any("_missing" in t for t in result.trace)
 
     def test_partial_failure_yields_partial_data(self):
         """If only some sub-agents succeed, components still has all keys

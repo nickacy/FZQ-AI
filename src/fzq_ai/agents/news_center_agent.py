@@ -52,7 +52,9 @@ class NewsCenterAgent:
                 agent = get_agent(sub_name)
                 if agent is None:
                     all_warnings.append(f"{sub_name}: not registered")
+                    merged[sub_name] = None
                     any_failed = True
+                    trace.append(f"{sub_name}_missing")
                     continue
                 result = agent.run(ctx)
                 merged[sub_name] = result.data
