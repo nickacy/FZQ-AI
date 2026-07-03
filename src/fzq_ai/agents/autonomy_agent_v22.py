@@ -12,7 +12,7 @@ import logging
 
 from fzq_ai.agents.coop.orchestrator import MultiAgentOrchestrator
 from fzq_ai.agents.coop.protocol import AgentIntent
-from fzq_ai.agents.registry import get_agent
+from fzq_ai.registry.agents import get_agent
 
 logger = logging.getLogger(__name__)
 

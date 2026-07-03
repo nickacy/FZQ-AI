@@ -1,62 +1,97 @@
-import { useLanguageStore } from "../state/languageState";
+/**
+ * schemaAdapter.ts — V24-Final
+ * Maps backend V24 ui_schema → renderable OutputCard[]
+ * Supports all V24 block types: card, text, table, chart, timeline, state_machine
+ */
 
-interface RawCard {
-  type: string;
-  title?: { zh: string; en: string } | string;
-  content?: { zh: string; en: string } | string;
-  rows?: any[];
-  code?: string;
-}
+// ── Types ────────────────────────────────────────────────────
 
-interface OutputCard {
+export interface OutputCard {
+  id: string;
   type: string;
   title?: { zh: string; en: string };
   content?: { zh: string; en: string };
   rows?: any[];
   code?: string;
+  payload: Record<string, any>;
 }
 
-export const schemaAdapter = {
-  toOutputCards(uiSchema: any): OutputCard[] {
-    if (!uiSchema || !Array.isArray(uiSchema.cards)) return [];
+interface RawBlock {
+  type: string;
+  title?: string | { zh: string; en: string };
+  content?: string;
+  items?: any;
+  rows?: any[];
+  data?: any;
+  blocks?: RawBlock[];
+  code?: string;
+  states?: Record<string, any>;
+}
 
-    return uiSchema.cards.map((raw: RawCard) => {
-      const card: OutputCard = {
-        type: raw.type,
-        rows: raw.rows,
-        code: raw.code,
-        title: normalizeBilingual(raw.title),
-        content: normalizeBilingual(raw.content),
-      };
+// ── Main Adapter ────────────────────────────────────────────
 
-      return card;
-    });
+export function schemaAdapter(uiSchema: any): OutputCard[] {
+  if (!uiSchema) return [];
+
+  // Support both { blocks: [...] } (V24) and { cards: [...] } (legacy)
+  const blocks: RawBlock[] = uiSchema.blocks ?? uiSchema.cards ?? [];
+  if (!Array.isArray(blocks)) return [];
+
+  return blocks.map((block: RawBlock, index: number) => {
+    const card: OutputCard = {
+      id: `card-${index}-${block.type}`,
+      type: block.type,
+      title: normalizeBilingual(block.title),
+      content: normalizeBilingual(block.content),
+      rows: block.rows,
+      code: block.code,
+      payload: extractPayload(block),
+    };
+    return card;
+  });
+}
+
+// ── Payload extraction by card type ──────────────────────────
+
+function extractPayload(block: RawBlock): Record<string, any> {
+  switch (block.type) {
+    case "card":
+      return { items: block.items ?? block };
+    case "text":
+      return { content: block.content ?? "" };
+    case "table":
+      return { rows: block.rows ?? [] };
+    case "chart":
+    case "radar":
+    case "line":
+      return { data: block.data ?? block };
+    case "risk_block":
+      return { items: block.items ?? block };
+    case "policy_brief_card":
+      return { summary: block.items ?? block };
+    case "timeline":
+      return { items: block.items ?? block.data ?? [] };
+    case "state_machine":
+      return { states: block.states ?? {} };
+    case "layout":
+      return { blocks: block.blocks ?? [] };
+    default:
+      return { raw: block };
   }
-};
+}
 
-/**
- * 将 title/content 转换为双语结构
- * 支持三种情况：
- * 1. { zh: "...", en: "..." }
- * 2. "纯字符串" → 自动转换为 { zh: str, en: str }
- * 3. undefined → 返回 { zh: "", en: "" }
- */
-function normalizeBilingual(value: any): { zh: string; en: string } {
-  if (!value) {
-    return { zh: "", en: "" };
-  }
+// ── Helpers ──────────────────────────────────────────────────
 
-  if (typeof value === "string") {
-    return { zh: value, en: value };
-  }
+function normalizeBilingual(
+  value?: string | { zh: string; en: string }
+): { zh: string; en: string } {
+  if (!value) return { zh: "", en: "" };
+  if (typeof value === "string") return { zh: value, en: value };
+  return { zh: value.zh ?? "", en: value.en ?? "" };
+}
 
-  if (typeof value === "object" && value.zh && value.en) {
-    return value;
-  }
-
-  // fallback：如果结构不完整，自动补齐
-  return {
-    zh: value.zh ?? "",
-    en: value.en ?? ""
-  };
+/** Quick check: does uiSchema have renderable content? */
+export function hasRenderableCards(uiSchema: any): boolean {
+  const cards = schemaAdapter(uiSchema);
+  return cards.length > 0;
 }

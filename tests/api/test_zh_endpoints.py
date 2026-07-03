@@ -1,95 +1,53 @@
 # -*- coding: utf-8 -*-
-"""
-FZQ-AI API Integration Tests (V15-Final)
-中文情报任务 API 集成测试（V15 最终版）
-
-测试内容：
-- 4 个 zh-intel 端点是否可正常工作
-- TaskRouter 是否正常路由
-- 响应格式是否符合 V15 统一规范
-"""
-
+"""FZQ-AI API Integration Tests (V24 — unified contract)"""
 from fastapi.testclient import TestClient
 from fzq_ai.api.zh_endpoints import router
 from fastapi import FastAPI
 
-# Create test app
 app = FastAPI()
 app.include_router(router)
 client = TestClient(app)
 
 
-# ============================================================
-# 1. Helper: Validate unified response format
-# ============================================================
+def assert_v24_structure(resp_json):
+    """Validate V24 contract fields."""
+    assert "execution" in resp_json, "Missing 'execution'"
+    assert "ui_schema" in resp_json, "Missing 'ui_schema'"
+    assert "output" in resp_json, "Missing 'output'"
+    ex = resp_json["execution"]
+    for field in ["intent", "route", "pipeline", "model", "agent",
+                   "timeline", "state_machine", "trace_id"]:
+        assert field in ex, f"Missing execution.{field}"
 
-def assert_response_structure(resp_json):
-    assert "success" in resp_json
-    assert "task_type" in resp_json
-    assert "pipeline" in resp_json
-    assert "agent" in resp_json
-    assert "model" in resp_json
-    assert "fallback_used" in resp_json
-    assert "error" in resp_json
-    assert "output" in resp_json
-
-
-# ============================================================
-# 2. Test: zh_policy_brief
-# ============================================================
 
 def test_zh_policy_brief():
-    payload = {"text": "请分析国务院最新政策"}
+    payload = {"text": "\u8bf7\u5206\u6790\u56fd\u52a1\u9662\u6700\u65b0\u653f\u7b56"}
     resp = client.post("/api/zh/policy_brief", json=payload)
     assert resp.status_code == 200
-    data = resp.json()
-    assert_response_structure(data)
-    assert data["task_type"] == "zh_policy_brief"
+    assert_v24_structure(resp.json())
 
-
-# ============================================================
-# 3. Test: zh_risk_scan
-# ============================================================
 
 def test_zh_risk_scan():
-    payload = {"text": "请扫描当前地缘政治风险"}
+    payload = {"text": "\u8bf7\u626b\u63cf\u5f53\u524d\u5730\u7f18\u653f\u6cbb\u98ce\u9669"}
     resp = client.post("/api/zh/risk_scan", json=payload)
     assert resp.status_code == 200
-    data = resp.json()
-    assert_response_structure(data)
-    assert data["task_type"] == "zh_risk_scan"
+    assert_v24_structure(resp.json())
 
-
-# ============================================================
-# 4. Test: zh_opinion_landscape
-# ============================================================
 
 def test_zh_opinion_landscape():
-    payload = {"text": "请分析公众舆论"}
+    payload = {"text": "\u8bf7\u5206\u6790\u516c\u4f17\u8206\u8bba"}
     resp = client.post("/api/zh/opinion_landscape", json=payload)
     assert resp.status_code == 200
-    data = resp.json()
-    assert_response_structure(data)
-    assert data["task_type"] == "zh_opinion_landscape"
+    assert_v24_structure(resp.json())
 
-
-# ============================================================
-# 5. Test: zh_multisource_merge
-# ============================================================
 
 def test_zh_multisource_merge():
-    payload = {"text": "请合并多源新闻"}
+    payload = {"text": "\u8bf7\u5408\u5e76\u591a\u6e90\u65b0\u95fb"}
     resp = client.post("/api/zh/multisource_merge", json=payload)
     assert resp.status_code == 200
-    data = resp.json()
-    assert_response_structure(data)
-    assert data["task_type"] == "zh_multisource_merge"
+    assert_v24_structure(resp.json())
 
-
-# ============================================================
-# 6. Test: Error Path (missing text)
-# ============================================================
 
 def test_error_missing_text():
     resp = client.post("/api/zh/policy_brief", json={})
-    assert resp.status_code == 422  # FastAPI validation error
+    assert resp.status_code == 422

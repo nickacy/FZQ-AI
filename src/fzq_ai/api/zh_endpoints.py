@@ -1,19 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-FZQ-AI Chinese Intelligence API (V19-Final)
-中文情报任务 API（V19 最终版）
-
-本模块通过 TaskRouter 执行四大中文情报任务：
-- zh_policy_brief
-- zh_risk_scan
-- zh_opinion_landscape
-- zh_multisource_merge
-
-所有端点返回统一结构化响应格式。
-"""
-
+"""FZQ-AI Chinese Intelligence API (V24 — unified contract)"""
 from __future__ import annotations
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from fzq_ai.core.intent_engine import classify
 from fzq_ai.core.task_router import TaskRouter
@@ -22,100 +10,90 @@ router = APIRouter(prefix="/api/zh", tags=["Chinese Intelligence"])
 task_router = TaskRouter()
 
 
-# ============================================================
-# 1. 请求体 Schema
-# ============================================================
-
 class ZhIntelPayload(BaseModel):
     text: str
     extra: dict | None = None
 
 
-# ============================================================
-# 2. 统一响应包装
-# ============================================================
+# ── V24 contract formatter ──────────────────────────────────
 
-def wrap_response(route_result):
-    """统一 API 响应格式"""
-    if not route_result.success:
-        return {
-            "success": False,
-            "task_type": route_result.task_type,
-            "pipeline": route_result.pipeline_used,
-            "agent": route_result.agent_used,
-            "model": route_result.model_used,
-            "fallback_used": route_result.fallback_used,
-            "error": route_result.error,
-            "output": None,
-        }
-
-    return {
-        "success": True,
-        "task_type": route_result.task_type,
-        "pipeline": route_result.pipeline_used,
-        "agent": route_result.agent_used,
-        "model": route_result.model_used,
+def wrap_response(route_result: Any) -> dict:
+    """Map RouteResult → V24 execution + ui_schema."""
+    import uuid as _uuid
+    execution = {
+        "intent": {},
+        "route": {"task_type": route_result.task_type},
+        "pipeline": route_result.pipeline_used or "unknown",
+        "model": route_result.model_used or "unknown",
+        "agent": route_result.agent_used or "unknown",
+        "timeline": [],
+        "state_machine": {"current": "FINALIZE", "history": []},
+        "trace_id": str(_uuid.uuid4()),
         "fallback_used": route_result.fallback_used,
-        "error": None,
-        "output": route_result.output,
+        "success": route_result.success,
+    }
+    if route_result.error:
+        execution["error"] = {"code": "PIPELINE_ERROR", "message": route_result.error}
+    return {
+        "execution": execution,
+        "ui_schema": {},
+        "output": route_result.output if route_result.success else None,
     }
 
 
-# ============================================================
-# 3. 四大中文情报任务端点
-# ============================================================
+# ── Unified task runner ─────────────────────────────────────
 
-async def _run_task(payload: ZhIntelPayload, expected_task: str):
-    """Unified classify → route → pipeline chain with error guard."""
+async def _run_task(payload: ZhIntelPayload, expected_task: str) -> dict:
+    """classify → route → pipeline with guard."""
     try:
         intent = classify(payload.text)
-        # Preserve intent if clarification is needed
         if intent.task_type == "clarification_required":
             return {
-                "success": False,
-                "task_type": "clarification_required",
-                "pipeline": None,
-                "agent": None,
-                "model": None,
-                "fallback_used": None,
-                "error": intent.reason,
-                "output": None,
-                "clarification_needed": True,
+                "execution": {
+                    "intent": {}, "route": {}, "pipeline": "unknown",
+                    "model": "unknown", "agent": "unknown",
+                    "timeline": [], "state_machine": {"current": "FINALIZE", "history": []},
+                    "trace_id": "clarify",
+                    "error": {"code": "CLARIFY", "message": intent.reason},
+                    "clarification_needed": True, "fallback_used": None, "success": False,
+                },
+                "ui_schema": {}, "output": None,
             }
         intent.task_type = expected_task
         result = await task_router.route(intent, payload.text)
-        response = wrap_response(result)
-        response["clarification_needed"] = False
-        return response
+        return wrap_response(result)
     except Exception as e:
+        import uuid as _uuid
         return {
-            "success": False,
-            "task_type": expected_task,
-            "pipeline": None,
-            "agent": None,
-            "model": None,
-            "fallback_used": "api_error_guard",
-            "error": f"API chain failed: {str(e)}",
-            "output": None,
-            "clarification_needed": False,
+            "execution": {
+                "intent": {}, "route": {}, "pipeline": expected_task,
+                "model": "unknown", "agent": "unknown",
+                "timeline": [], "state_machine": {"current": "FINALIZE", "history": []},
+                "trace_id": str(_uuid.uuid4()),
+                "error": {"code": "CHAIN_FAIL", "message": str(e)},
+                "fallback_used": "api_guard", "success": False, "clarification_needed": False,
+            },
+            "ui_schema": {}, "output": None,
         }
 
 
+# ── Endpoints ───────────────────────────────────────────────
+
 @router.post("/policy_brief")
-async def api_zh_policy_brief(payload: ZhIntelPayload):
+async def api_zh_policy_brief(payload: ZhIntelPayload) -> dict:
     return await _run_task(payload, "zh_policy_brief")
 
 
 @router.post("/risk_scan")
-async def api_zh_risk_scan(payload: ZhIntelPayload):
+async def api_zh_risk_scan(payload: ZhIntelPayload) -> dict:
     return await _run_task(payload, "zh_risk_scan")
 
 
 @router.post("/opinion_landscape")
-async def api_zh_opinion_landscape(payload: ZhIntelPayload):
+async def api_zh_opinion_landscape(payload: ZhIntelPayload) -> dict:
     return await _run_task(payload, "zh_opinion_landscape")
 
 
 @router.post("/multisource_merge")
-async def api_zh_multisource_merge(payload: ZhIntelPayload):
+async def api_zh_multisource_merge(payload: ZhIntelPayload) -> dict:
     return await _run_task(payload, "zh_multisource_merge")

@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 from dataclasses import dataclass
 
 from fzq_ai.agents.base import AgentContext, AgentResult
-from fzq_ai.agents.registry import get_agent
+from fzq_ai.registry.agents import get_agent
 
 @dataclass
 class SubTask:

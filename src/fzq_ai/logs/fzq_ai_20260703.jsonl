@@ -1,0 +1,1 @@
+{"timestamp": "2026-07-03T06:39:41.752298+00:00", "level": "INFO", "logger": "fzq_ai.event", "message": "test.event", "module": "logger", "funcName": "log_event", "trace_id": "abc123", "pipeline": "test", "agent": "deepseek", "model": "gpt-4o"}

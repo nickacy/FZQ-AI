@@ -19,6 +19,10 @@ export interface OutputCard {
 
 interface OutputState {
   cards: OutputCard[];
+  uiSchema: Record<string, any>;
+  timeline: any[];
+  stateMachine: { current: string; history: string[] };
+  traceId: string;
 
   // Actions
   setCards: (cards: OutputCard[]) => void;
@@ -30,6 +34,10 @@ interface OutputState {
 
 export const useOutputState = create<OutputState>((set) => ({
   cards: [],
+  uiSchema: {},
+  timeline: [],
+  stateMachine: { current: "INIT", history: [] },
+  traceId: "",
 
   setCards: (cards) => set({ cards }),
 
@@ -52,5 +60,9 @@ export const useOutputState = create<OutputState>((set) => ({
   resetOutputs: () =>
     set({
       cards: [],
+  uiSchema: {},
+  timeline: [],
+  stateMachine: { current: "INIT", history: [] },
+  traceId: "",
     }),
 }));

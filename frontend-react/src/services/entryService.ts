@@ -1,4 +1,11 @@
+/**
+ * entryService.ts — V24-Final
+ * Unified API client: single / multi / autonomy + streaming
+ * All responses conform to V24Response contract.
+ */
 import { apiClient } from './apiClient';
+import { schemaAdapter } from './schemaAdapter';
+import type { V24Response, OutputCard } from './types';
 
 import { useExecutionState } from '../state/executionState';
 import { useOutputState } from '../state/outputState';
@@ -6,106 +13,113 @@ import { useWorkspaceState } from '../state/workspaceState';
 import { useAgentState } from '../state/agentState';
 import { useSystemState } from '../state/systemState';
 
+// ── Helper ───────────────────────────────────────────────────
+
+function processResponse(data: V24Response): OutputCard[] {
+  const cards = schemaAdapter(data.ui_schema);
+  const { syncExecution, setUiSchema } = useExecutionState.getState();
+  const { setCards } = useOutputState.getState();
+  syncExecution(data.execution as any);
+  setUiSchema(data.ui_schema);
+  setCards(cards as any);
+  return cards;
+}
+
+// ── Entry Service ────────────────────────────────────────────
+
 export const entryService = {
-  // --- 标准执行（非流式） ---
-  async runEntry(text: string) {
+
+  async runEntry(text: string): Promise<V24Response> {
     const { currentAgent } = useAgentState.getState();
-    const { resetExecution, setUiSchema, syncExecution } = useExecutionState.getState();
+    const { resetExecution } = useExecutionState.getState();
     const { resetOutputs } = useOutputState.getState();
     const { setRunning } = useWorkspaceState.getState();
     const { setApiStatus, setSystemHealth } = useSystemState.getState();
 
-    try {
-      // 执行前清空旧状态
-      resetExecution();
-      resetOutputs();
-      setRunning(true);
+    resetExecution();
+    resetOutputs();
+    setRunning(true);
 
-      const data = await apiClient.post('/entry', {
-        text,
+    try {
+      const data: V24Response = await apiClient.post('/entry', {
+        input: text,
         agent: currentAgent,
       });
-
-      syncExecution(data.execution);
-      setUiSchema(data.ui_schema);
-
+      processResponse(data);
       setApiStatus('connected');
       setSystemHealth('healthy');
-      setRunning(false);
-
       return data;
     } catch (err) {
       setApiStatus('error');
       setSystemHealth('degraded');
-      setRunning(false);
       throw err;
+    } finally {
+      setRunning(false);
     }
   },
 
-  // --- 多智能体执行 ---
-  async runMulti(text: string, tasks: any[]) {
-    const { resetExecution, setUiSchema, syncExecution } = useExecutionState.getState();
+  async runMulti(text: string, tasks: any[]): Promise<V24Response> {
+    const { resetExecution } = useExecutionState.getState();
     const { resetOutputs } = useOutputState.getState();
     const { setRunning } = useWorkspaceState.getState();
     const { setApiStatus, setSystemHealth } = useSystemState.getState();
 
+    resetExecution();
+    resetOutputs();
+    setRunning(true);
+
     try {
-      resetExecution();
-      resetOutputs();
-      setRunning(true);
-
-      const data = await apiClient.post('/multi', { text, tasks });
-
-      syncExecution(data.execution);
-      setUiSchema(data.ui_schema);
-
+      const data: V24Response = await apiClient.post('/multi', {
+        input: text,
+        tasks,
+      });
+      processResponse(data);
       setApiStatus('connected');
       setSystemHealth('healthy');
-      setRunning(false);
-
       return data;
     } catch (err) {
       setApiStatus('error');
       setSystemHealth('degraded');
-      setRunning(false);
       throw err;
+    } finally {
+      setRunning(false);
     }
   },
 
-  // --- 自治智能体执行 ---
-  async runAutonomy(text: string) {
-    const { resetExecution, setUiSchema, syncExecution } = useExecutionState.getState();
+  async runAutonomy(text: string): Promise<V24Response> {
+    const { resetExecution } = useExecutionState.getState();
     const { resetOutputs } = useOutputState.getState();
     const { setRunning } = useWorkspaceState.getState();
     const { setApiStatus, setSystemHealth } = useSystemState.getState();
 
+    resetExecution();
+    resetOutputs();
+    setRunning(true);
+
     try {
-      resetExecution();
-      resetOutputs();
-      setRunning(true);
-
-      const data = await apiClient.post('/autonomy', { text });
-
-      syncExecution(data.execution);
-      setUiSchema(data.ui_schema);
-
+      const data: V24Response = await apiClient.post('/autonomy', {
+        input: text,
+      });
+      processResponse(data);
       setApiStatus('connected');
       setSystemHealth('healthy');
-      setRunning(false);
-
       return data;
     } catch (err) {
       setApiStatus('error');
       setSystemHealth('degraded');
-      setRunning(false);
       throw err;
+    } finally {
+      setRunning(false);
     }
   },
 
-  // --- 流式执行（SSE） ---
-  async runEntryStream(text: string, onMessage: (msg: any) => void) {
+  async runEntryStream(
+    text: string,
+    onMessage: (msg: any) => void
+  ): Promise<void> {
     const { currentAgent } = useAgentState.getState();
-    const { resetExecution, startStreaming, endStreaming } = useExecutionState.getState();
+    const { resetExecution, startStreaming, endStreaming } =
+      useExecutionState.getState();
     const { resetOutputs } = useOutputState.getState();
     const { setRunning } = useWorkspaceState.getState();
 
@@ -117,7 +131,7 @@ export const entryService = {
     return apiClient.postStream(
       '/entry/stream',
       { text, agent: currentAgent },
-      (msg) => {
+      (msg: any) => {
         onMessage(msg);
         if (msg.type === 'result') {
           endStreaming();
@@ -125,5 +139,5 @@ export const entryService = {
         }
       }
     );
-  }
+  },
 };

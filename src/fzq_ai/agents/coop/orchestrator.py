@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from fzq_ai.agents.coop.protocol import AgentMessage, AgentIntent
 from fzq_ai.agents.coop.blackboard import Blackboard
-from fzq_ai.agents.registry import get_agent
+from fzq_ai.registry.agents import get_agent
 from fzq_ai.agents.base import AgentContext
 
 

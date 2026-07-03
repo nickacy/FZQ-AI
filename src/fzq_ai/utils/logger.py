@@ -148,5 +148,71 @@ def log_time(func: Callable[..., Any]) -> Callable[..., Any]:
     return wrapper
 
 
+# ── JSON Structured Logging (V24 — Grafana / Loki compatible) ──
+
+import json as _json
+
+
+class JSONFormatter(logging.Formatter):
+    """Output log records as JSON objects.  Compatible with Grafana Loki."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "module": record.module,
+            "funcName": record.funcName,
+        }
+        # Attach all extra fields passed via logger.info("msg", extra={...})
+        for key, val in record.__dict__.items():
+            if key not in ("name", "msg", "args", "created", "filename",
+                           "funcName", "levelname", "levelno", "lineno",
+                           "module", "msecs", "pathname", "process",
+                           "processName", "relativeCreated", "thread",
+                           "threadName", "exc_info", "exc_text",
+                           "stack_info", "message", "asctime"):
+                try:
+                    _json.dumps(val)
+                    payload[key] = val
+                except TypeError:
+                    payload[key] = repr(val)
+        return _json.dumps(payload, ensure_ascii=False, default=str)
+
+
+def init_structlog_json(level: Optional[int] = None) -> None:
+    """
+    Enable JSON-format file logging for external consumers (Grafana / Loki).
+    Does NOT replace the console handler — text logs remain on stdout.
+    """
+    if level is None:
+        level = getattr(logging, getattr(settings, "log_level", "INFO").upper(), logging.INFO)
+
+    project_root = Path(__file__).parent.parent
+    log_dir = str(project_root / "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    json_log = os.path.join(log_dir, f"fzq_ai_{today}.jsonl")
+
+    # Remove any existing file handler to avoid duplicates
+    root_logger = logging.getLogger()
+    root_logger.handlers = [h for h in root_logger.handlers
+                            if not isinstance(h, logging.FileHandler)]
+
+    json_handler = logging.FileHandler(json_log, encoding="utf-8")
+    json_handler.setFormatter(JSONFormatter())
+    json_handler.setLevel(level)
+    root_logger.addHandler(json_handler)
+
+
+# ── Structured log helpers ──────────────────────────────────
+
+def log_event(event: str, **fields: Any) -> None:
+    """Emit a structured JSON event via root logger."""
+    logger = logging.getLogger("fzq_ai.event")
+    logger.info(event, extra=fields)
+
+
 # 不再在 import 时自动调用 setup_logging()
 # 改为在 get_logger() 首次调用时懒初始化
