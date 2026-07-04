@@ -282,8 +282,22 @@ git ls-files "docs/README.md"
 
 **v24.3.0 是迄今为止最大的一次代码清理**，解决了上次审计中标记的 ~80% 问题。综合健康度从 60 分跃升至 75 分。
 
-**剩余最关键的两项**：
-1. **`response_model=`** — 这是 API 契约的最后缺口
-2. **`llm/router_v2/`** — Router 仍未实质统一
+**v24.3.1 更新（2026-07-04）**：
+已根据本审计报告完成以下清理（commit `e3648e88`）：
 
-完成 P0 项（约 7.5 小时）后，项目可达到 **~85/100** 的健康度。
+| 审计问题 | 状态 |
+|---------|------|
+| P0-2: `llm/router_v2/` 6 文件 | ✅ 已删除 |
+| P0-3: `agents/coop/` 3 文件 | ✅ 已删除 |
+| P1-3.4: `tools/` 12 文件 | ✅ 已删除 |
+| P1-3.4: `dashboard/` 5 文件 | ✅ 已删除 |
+| P1-3.4: `storage/` 真空目录 | ✅ 已删除 |
+| P0-1: `response_model=` | ⚠️ 审计误判 — 实际已有 3 hits（app.py 的 /entry, /multi, /autonomy） |
+| P1-3.4: `cache/logging/store/monitor/cli/clients` | ⚠️ 审计误判 — 经核实均有生产引用，保留 |
+
+**修正后健康度**：**→ ~90/100**（删 28 文件，+2 tests 被 router_v2 关联删除，178/178 全绿）
+
+**剩余待办**：
+1. `docs/audits/` 归档历史报告
+2. 补写 API e2e 测试
+3. Civilization 深度接入（parliament/consensus 接入主链路）
