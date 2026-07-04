@@ -83,9 +83,8 @@ app.add_middleware(
 # 3. 静态前端挂载（frontend/index.html）
 # ============================================================
 
-frontend_dir = (
-    pathlib.Path(__file__).parent.parent.parent / "frontend"
-)
+project_root = pathlib.Path(__file__).resolve().parents[3]
+frontend_dir = project_root / "frontend-react" / "dist"
 
 if frontend_dir.exists():
     app.mount(
@@ -103,7 +102,7 @@ def serve_index():
     index_file = frontend_dir / "index.html"
     if index_file.exists():
         return FileResponse(str(index_file))
-    return {"detail": "frontend/index.html not found"}
+    return {"detail": "frontend-react/dist/index.html not found; run frontend build first"}
 
 
 # ============================================================

@@ -15,6 +15,8 @@ venv311/
 dist/
 build/
 *.egg-info/
+frontend-react/node_modules/
+frontend-react/dist/
 
 # ================================
 # Environment / Secrets

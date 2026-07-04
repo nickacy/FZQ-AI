@@ -2,12 +2,19 @@
 # V24 Frontend-facing API Adapter
 # 翻译 V23 内部结构为前端要求书规定的标准契约
 
-from fastapi import APIRouter, Request
-from pydantic import BaseModel, Field
+from __future__ import annotations
+
+import json
+from collections.abc import AsyncIterator
 from typing import Any, Dict, List, Optional
 
+from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+from pydantic import model_validator
+
 from fzq_ai.api.entry_service_v24 import EntryServiceV24
-from fzq_ai.orchestrator.blackboard import Blackboard
+from fzq_ai.registry.agents import global_registry
 from fzq_ai.schemas.route import RouteResult
 
 router = APIRouter(prefix="/api/v1", tags=["V24 Frontend API"])
@@ -34,10 +41,28 @@ class V24EntryRequest(BaseModel):
     session_id: Optional[str] = Field(None, max_length=64)
     agent: Optional[str] = Field(None, description="指定智能体名称")
 
+    @model_validator(mode="before")
+    @classmethod
+    def accept_frontend_aliases(cls, data: Any) -> Any:
+        if isinstance(data, dict) and not data.get("text"):
+            for alias in ("input", "query", "task"):
+                if data.get(alias):
+                    return {**data, "text": data[alias]}
+        return data
+
 class V24MultiRequest(BaseModel):
     text: str = Field(...)
     language: str = Field("zh")
     tasks: List[Dict[str, Any]] = Field(..., description="多智能体任务列表")
+
+    @model_validator(mode="before")
+    @classmethod
+    def accept_frontend_aliases(cls, data: Any) -> Any:
+        if isinstance(data, dict) and not data.get("text"):
+            for alias in ("input", "query", "task"):
+                if data.get(alias):
+                    return {**data, "text": data[alias]}
+        return data
 
 # --- 核心翻译函数 ---
 def translate_to_v24_contract(v23_result) -> Dict[str, Any]:
@@ -71,7 +96,8 @@ def translate_to_v24_contract(v23_result) -> Dict[str, Any]:
             "trace_id": v23_result.trace_id
         },
         # 统一命名为前端要求的 ui_schema
-        "ui_schema": v23_result.ui_layout or {}
+        "ui_schema": v23_result.ui_layout or {},
+        "output": internal_data.get("output"),
     }
 
 # --- 对齐前端要求书的端点 ---
@@ -104,3 +130,37 @@ async def v24_autonomy(req: V24EntryRequest):
     payload = {"task": "autonomy", "input": req.text}
     r24 = await service.handle_autonomy(payload)
     return translate_to_v24_contract(_to_route_result(r24))
+
+
+@router.post("/entry/stream")
+async def v24_entry_stream(req: V24EntryRequest):
+    async def events() -> AsyncIterator[str]:
+        yield _sse({"type": "start", "execution": {"agent": req.agent, "language": req.language}})
+        try:
+            result = await v24_entry(req)
+            yield _sse({"type": "result", "data": result})
+            yield "data: [DONE]\n\n"
+        except Exception as exc:
+            yield _sse({"type": "error", "message": str(exc)})
+            yield "data: [DONE]\n\n"
+
+    return StreamingResponse(events(), media_type="text/event-stream")
+
+
+@router.post("/agents/list")
+async def v24_agents_list():
+    agents = []
+    for agent_id in global_registry.all().keys():
+        display = agent_id.replace("_", " ").title()
+        agents.append({
+            "id": agent_id,
+            "name": {"zh": display, "en": display},
+            "description": {"zh": "FZQ-AI registered agent", "en": "FZQ-AI registered agent"},
+            "capabilities": [agent_id],
+            "category": "analysis",
+        })
+    return {"agents": agents}
+
+
+def _sse(payload: Dict[str, Any]) -> str:
+    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"

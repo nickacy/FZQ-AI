@@ -93,14 +93,14 @@ Response (V24 contract):
 
 ```bash
 python -m pytest tests/ -v
-# 117 passed, 1 warning
+# 182 passed, 1 warning
 ```
 
 ## 📊 Key Metrics
 
 | Metric | Value |
 |--------|-------|
-| Backend tests | 117/117 |
+| Backend tests | 182/182 |
 | TypeScript errors | 0 |
 | Python files | 352 |
 | Classes | 432 |
