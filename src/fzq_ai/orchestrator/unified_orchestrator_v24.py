@@ -123,6 +123,7 @@ class UnifiedOrchestratorV24:
                 **agent_ctx_dict.get("metadata", {}),
                 "civilization": ctx.get("civilization"),
             },
+            civilization=ctx.get("civilization"),  # V24-R2: direct ctx.civilization
         )
 
         # ── Civilization: plan before execution ──
@@ -197,74 +198,38 @@ class UnifiedOrchestratorV24:
         V24 自治智能体（ReAct 状态机）执行流程：
         - DECOMPOSE / ACT / REFLECT / FINALIZE
         - 输出状态机轨迹 + timeline + ui_schema
+        - V24-R2: route through `autonomy_agent.run(agent_ctx)` for civilization integration
         """
-        agent_ctx = ctx.get("agent_ctx", {})
+        agent_ctx_dict = ctx.get("agent_ctx", {})
+
+        # V24-R2: construct proper AgentContext so agent can read ctx.civilization
+        agent_ctx = AgentContext(
+            user_id=agent_ctx_dict.get("user_id"),
+            locale=agent_ctx_dict.get("locale", "zh-CN"),
+            focus_regions=agent_ctx_dict.get("focus_regions", []),
+            languages=agent_ctx_dict.get("languages", ["zh"]),
+            raw_input=agent_ctx_dict.get("raw_input", ""),
+            metadata={
+                **agent_ctx_dict.get("metadata", {}),
+                "civilization": ctx.get("civilization"),
+            },
+            civilization=ctx.get("civilization"),
+        )
 
         try:
-            plan = self.autonomy_agent.plan(agent_ctx)
+            agent_result = await self.autonomy_agent.run(agent_ctx)
         except Exception as e:
             return RouteResult.error(
                 message=str(e),
-                code="AUTONOMY_PLAN_ERROR",
+                code="AUTONOMY_RUN_ERROR",
                 debug_info={
-                    "stage": "DECOMPOSE",
+                    "stage": "RUN",
                     "task": task,
-                    "agent_ctx": agent_ctx,
+                    "agent_ctx": agent_ctx_dict,
                 },
             )
 
-        try:
-            model = self.autonomy_agent.route(plan)
-        except Exception as e:
-            return RouteResult.error(
-                message=str(e),
-                code="AUTONOMY_ROUTE_ERROR",
-                debug_info={
-                    "stage": "ROUTE",
-                    "task": task,
-                    "plan": plan,
-                },
-            )
-
-        try:
-            act_result = await self.autonomy_agent.execute(model, plan)
-        except Exception as e:
-            return RouteResult.error(
-                message=str(e),
-                code="AUTONOMY_EXEC_ERROR",
-                debug_info={
-                    "stage": "ACT",
-                    "task": task,
-                    "model": model,
-                    "plan": plan,
-                },
-            )
-
-        try:
-            reflect_result = self.autonomy_agent.reflect(act_result)
-        except Exception as e:
-            return RouteResult.error(
-                message=str(e),
-                code="AUTONOMY_REFLECT_ERROR",
-                debug_info={
-                    "stage": "REFLECT",
-                    "task": task,
-                    "act_result": act_result,
-                },
-            )
-
-        try:
-            final_result = self.autonomy_agent.heal(reflect_result)
-        except Exception as e:
-            return RouteResult.error(
-                message=str(e),
-                code="AUTONOMY_HEAL_ERROR",
-                debug_info={
-                    "stage": "FINALIZE",
-                    "task": task,
-                    "reflect_result": reflect_result,
-                },
-            )
+        final_result = agent_result.data.get("result", {}) if isinstance(agent_result.data, dict) else agent_result.data
 
         states = {
             "DECOMPOSE": Blackboard.read("autonomy.DECOMPOSE", {}),
@@ -284,9 +249,13 @@ class UnifiedOrchestratorV24:
         return RouteResult.ok(
             data=final_result,
             ui_layout=None,
-            debug_info={"states": states},
+            debug_info={
+                "states": states,
+                "agent_trace": agent_result.trace,
+                "civilization_trace": getattr(self.autonomy_agent, "civ_trace", []),
+            },
             timeline=timeline,
             ui_schema=ui_schema,
-            warnings=[],
-            trace=[],
+            warnings=agent_result.warnings,
+            trace=agent_result.trace,
         )

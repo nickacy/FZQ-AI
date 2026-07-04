@@ -71,7 +71,10 @@ class NewsCenterAgent:
         # 2. Civilization: remember and enrich
         civ_trace: list[str] = []
         try:
-            civ = ctx.metadata.get("civilization") if hasattr(ctx, "metadata") else None
+            # V24-R2: prefer ctx.civilization (set by EntryServiceV24), fallback to metadata
+            civ = getattr(ctx, "civilization", None)
+            if civ is None and hasattr(ctx, "metadata"):
+                civ = ctx.metadata.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("news_query", str(ctx.raw_input))
                 civ.remember("news_result_count", str(len(merged)))

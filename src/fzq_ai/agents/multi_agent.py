@@ -21,7 +21,12 @@ from fzq_ai.utils.loop import run_agent_loop
 
 
 class MultiAgentEngine:
-    """Coordinates multiple agents for a shared task."""
+    """Coordinates multiple agents for a shared task.
+
+    V24-R2: accepts an optional `civilization` handle. When provided, each
+    per-agent run writes a `multi_agent.<agent>` memory key, and the engine
+    remembers the final collaboration chain.
+    """
 
     def __init__(self):
         self._agents: List[str] = []
@@ -47,14 +52,18 @@ class MultiAgentEngine:
 
     # ── Execution ────────────────────────────────────────────
 
-    def run(self, intent: str, shared_memory: bool = False) -> List[Dict[str, Any]]:
-        """Execute task across all agents. Returns per-agent results."""
+    def run(self, intent: str, shared_memory: bool = False, civilization: Any = None) -> List[Dict[str, Any]]:
+        """Execute task across all agents. Returns per-agent results.
+
+        V24-R2: `civilization` is optional; when provided, per-agent outputs
+        are mirrored to civilization memory and the chain is recorded.
+        """
         self._results = []
         self._collaboration_chain = []
         started = time.time()
 
         for agent_name in self._agents:
-            agent_result = self._run_one(agent_name, intent, shared_memory)
+            agent_result = self._run_one(agent_name, intent, shared_memory, civilization)
             self._results.append(agent_result)
             self._collaboration_chain.append(agent_name)
 
@@ -62,9 +71,17 @@ class MultiAgentEngine:
             agents=self._agents, duration_ms=(time.time() - started) * 1000,
             chain=self._collaboration_chain)
 
+        # V24-R2: post-run civilization snapshot
+        if civilization and hasattr(civilization, "remember"):
+            try:
+                civilization.remember("multi_agent_last_chain", list(self._collaboration_chain))
+                civilization.remember("multi_agent_last_count", len(self._results))
+            except Exception:
+                pass
+
         return self._results
 
-    def _run_one(self, agent_name: str, intent: str, shared: bool) -> Dict[str, Any]:
+    def _run_one(self, agent_name: str, intent: str, shared: bool, civilization: Any = None) -> Dict[str, Any]:
         t0 = time.time()
         try:
             cycle = run_agent_loop(agent_name, intent)
@@ -72,6 +89,13 @@ class MultiAgentEngine:
                 # Share output with other agents via memory
                 global_memory.remember(
                     f"shared_{agent_name}", "last_output", cycle.get("output"))
+            # V24-R2: mirror per-agent output to civilization (best-effort)
+            if civilization and hasattr(civilization, "remember"):
+                try:
+                    civilization.remember(
+                        f"multi_agent.{agent_name}", "last_output", cycle.get("output"))
+                except Exception:
+                    pass
         except Exception as e:
             cycle = {"error": str(e), "trace": ["error"]}
 

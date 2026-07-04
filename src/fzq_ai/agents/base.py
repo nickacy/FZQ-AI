@@ -19,6 +19,7 @@ class AgentContext(BaseModel):
     languages: list[str] = Field(default_factory=list)
     raw_input: Any = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    civilization: Optional[Any] = None  # V24-R2: civilization layer handle (set by EntryService)
 
 
 # ============================================================

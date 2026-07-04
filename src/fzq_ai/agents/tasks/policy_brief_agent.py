@@ -18,27 +18,55 @@ class PolicyBriefAgent(BaseAgent):
         self._pipeline_name = "zh_policy_brief"
 
     async def run(self, ctx: AgentContext) -> AgentResult:
-        """Execute the zh_policy_brief pipeline with the agent context."""
+        """Execute the zh_policy_brief pipeline with the agent context.
+
+        V24-R2: civilization layer integration — remember input pre-call,
+        snapshot + remember post-call, append civ trace to result.
+        """
         from fzq_ai.pipelines.registry import PipelineRegistry
 
         trace: list[str] = []
+        civ_trace: list[str] = []
         pipeline = PipelineRegistry.get(self._pipeline_name)
         trace.append("pipeline_loaded")
+
+        # V24-R2: pre-civ remember
+        civ = getattr(ctx, "civilization", None)
+        if civ is None and hasattr(ctx, "metadata"):
+            civ = ctx.metadata.get("civilization")
+        if civ and hasattr(civ, "remember"):
+            try:
+                civ.remember("policy_brief_input", repr(ctx.raw_input)[:200])
+                civ_trace.append("civilization.remember.policy_brief")
+            except Exception:
+                pass
 
         # Build payload from context
         payload = {
             "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
             "sources": ctx.metadata.get("sources", []),
         }
+        # V24-R2: forward civilization into pipeline via ctx-shaped payload
+        if civ is not None:
+            payload["civilization"] = civ
 
         try:
             result = await pipeline.run_async(**payload)
             trace.append("pipeline_executed")
+
+            # V24-R2: post-civ remember + snapshot
+            if civ and hasattr(civ, "remember"):
+                try:
+                    civ.remember("policy_brief_status", str(result.get("status", "ok")) if isinstance(result, dict) else "ok")
+                    civ_trace.append("civilization.remember.policy_brief_output")
+                except Exception:
+                    pass
+
             return AgentResult(
                 ok=True,
                 data=result.model_dump() if hasattr(result, "model_dump") else result,
                 warnings=[],
-                trace=trace,
+                trace=trace + civ_trace,
             )
         except Exception as e:
             trace.append(f"error: {e}")
@@ -46,5 +74,5 @@ class PolicyBriefAgent(BaseAgent):
                 ok=False,
                 data=None,
                 warnings=[str(e)],
-                trace=trace,
+                trace=trace + civ_trace,
             )

@@ -62,14 +62,26 @@ class BasePipeline(Generic[T]):
 
         logger = get_logger(__name__)
         trace_id = kwargs.pop("trace_id", str(uuid.uuid4()))
+        # V24-R2: pop civilization from kwargs (forwarded by task agents via payload)
+        civilization = kwargs.pop("civilization", None)
+        civ_trace: list[str] = []
         t_start = time.perf_counter()
 
         logger.info(f"pipeline_start name={self.name} trace_id={trace_id}")
 
+        # V24-R2: pre-civ remember
+        if civilization and hasattr(civilization, "remember"):
+            try:
+                civilization.remember(f"pipeline.{self.name}.input", repr(kwargs)[:200])
+                civ_trace.append(f"civilization.remember.pipeline.{self.name}")
+            except Exception:
+                pass
+
         try:
             # 0. Delegate to run_async if the subclass defines it
             if "run_async" in type(self).__dict__:
-                result = await self.run_async(**kwargs)
+                # Forward civilization into subclass run_async as keyword
+                result = await self.run_async(civilization=civilization, **kwargs)
                 # Convert pydantic model or dataclass to dict
                 if hasattr(result, "model_dump"):
                     output = result.model_dump()
@@ -83,6 +95,14 @@ class BasePipeline(Generic[T]):
                 output["trace_id"] = trace_id
                 output["duration_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
                 output.setdefault("status", "success")
+                # V24-R2: post-civ snapshot
+                if civilization and hasattr(civilization, "snapshot"):
+                    try:
+                        output["civilization_snapshot"] = civilization.snapshot()
+                        civ_trace.append(f"civilization.snapshot.pipeline.{self.name}")
+                    except Exception:
+                        output["civilization_snapshot"] = None
+                output["civilization_trace"] = civ_trace
                 logger.info(f"pipeline_done name={self.name} trace_id={trace_id} duration_ms={output['duration_ms']}")
                 return output
 
@@ -93,6 +113,7 @@ class BasePipeline(Generic[T]):
                     "status": "error",
                     "errors": errors,
                     "trace_id": trace_id,
+                    "civilization_trace": civ_trace,
                 }
 
             # 2. Preprocess
@@ -112,6 +133,15 @@ class BasePipeline(Generic[T]):
             output["duration_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
             output.setdefault("status", "success")
 
+            # V24-R2: post-civ snapshot
+            if civilization and hasattr(civilization, "snapshot"):
+                try:
+                    output["civilization_snapshot"] = civilization.snapshot()
+                    civ_trace.append(f"civilization.snapshot.pipeline.{self.name}")
+                except Exception:
+                    output["civilization_snapshot"] = None
+            output["civilization_trace"] = civ_trace
+
             logger.info(f"pipeline_done name={self.name} trace_id={trace_id} duration_ms={output['duration_ms']}")
 
             return output
@@ -122,6 +152,7 @@ class BasePipeline(Generic[T]):
                 "status": "error",
                 "errors": [str(e)],
                 "trace_id": trace_id,
+                "civilization_trace": civ_trace,
             }
 
     # ----------------------------------------------------------------------

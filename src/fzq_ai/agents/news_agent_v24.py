@@ -1,13 +1,18 @@
 # src/fzq_ai/agents/news_agent_v24.py
-# V24 — NewsAgent (sync version — compatible with BaseAgent.run())
+# V24 — NewsAgent (async, with civilization integration)
 
 from __future__ import annotations
-from typing import Any, Dict
+from typing import Any, Dict, List
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
 
 
 class NewsAgentV24(BaseAgent):
-    """V24 NewsAgent — all methods sync for BaseAgent compatibility."""
+    """V24 NewsAgent — async run() with civilization integration.
+
+    V24-R2: uses async `run()` (inherits BaseAgent) and writes to
+    civilization memory on entry/exit. Compatible with `BaseAgent.run()`
+    default plan→execute→reflect→heal flow.
+    """
 
     def __init__(self):
         super().__init__(name="NewsAgentV24")
@@ -59,3 +64,38 @@ class NewsAgentV24(BaseAgent):
 
     def auto_select_model(self, plan: Dict[str, Any]) -> str:
         return self.route(plan)
+
+    # ============================================================
+    # V24-R2: async run() override with civilization integration
+    # ============================================================
+    async def run(self, ctx: AgentContext) -> AgentResult:
+        civ_trace: List[str] = []
+
+        # 1. Pre-civ: remember input
+        civ = getattr(ctx, "civilization", None)
+        if civ is None and hasattr(ctx, "metadata"):
+            civ = ctx.metadata.get("civilization")
+        if civ and hasattr(civ, "remember"):
+            try:
+                # V24-R2: store raw_input as-is (string-friendly), cap at 200 chars
+                _inp = ctx.raw_input if isinstance(ctx.raw_input, str) else str(ctx.raw_input)
+                civ.remember("news_agent_input", _inp[:200])
+                civ_trace.append("civilization.remember.news_agent")
+            except Exception:
+                pass
+
+        # 2. Default BaseAgent run (plan → route → execute → reflect → heal)
+        result = await super().run(ctx)
+
+        # 3. Post-civ: remember output + trace
+        if civ and hasattr(civ, "remember"):
+            try:
+                _out = result.data if isinstance(result.data, str) else str(result.data) if result.data else ""
+                civ.remember("news_agent_output", _out[:200])
+                civ_trace.append("civilization.remember.news_agent_output")
+            except Exception:
+                pass
+
+        # 4. Append civ trace to result
+        result.trace = (result.trace or []) + civ_trace
+        return result

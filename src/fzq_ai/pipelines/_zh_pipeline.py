@@ -182,13 +182,38 @@ class ZhStructuredPipeline(BasePipeline):
         }
 
     async def run_async(self, **kwargs: Any) -> Dict[str, Any]:
+        # V24-R2: civilization integration (kwargs shape, see agent task wrappers)
         civilization = kwargs.pop("civilization", None)
+        civ_trace: list[str] = []
+
+        # 1. Pre-civ: remember pipeline task + input
+        if civilization and hasattr(civilization, "remember"):
+            try:
+                civilization.remember(f"pipeline.{self.task_type}.input",
+                                       repr(kwargs)[:200])
+                civ_trace.append(f"civilization.remember.pipeline.{self.task_type}")
+            except Exception:
+                pass
+
         result = await self.run(**kwargs)
+
+        # 2. Post-civ: snapshot + status remember
         if civilization and hasattr(civilization, "snapshot"):
             try:
                 result["civilization_snapshot"] = civilization.snapshot()
+                civ_trace.append(f"civilization.snapshot.pipeline.{self.task_type}")
             except Exception:
                 result["civilization_snapshot"] = None
+
+        if civilization and hasattr(civilization, "remember"):
+            try:
+                status = str(result.get("status", "ok"))
+                civilization.remember(f"pipeline.{self.task_type}.status", status)
+                civ_trace.append(f"civilization.remember.pipeline.{self.task_type}.status")
+            except Exception:
+                pass
+
+        result["civilization_trace"] = civ_trace
         return result
 
     def _fail(self, error: str, trace_id: str, t0: float, user_input: str,
@@ -205,4 +230,5 @@ class ZhStructuredPipeline(BasePipeline):
             "duration_ms": round((time.perf_counter() - t0) * 1000, 2),
             "status": "error",
             "error": error,
+            "civilization_trace": [],  # V24-R2: error path also carries empty trace
         }

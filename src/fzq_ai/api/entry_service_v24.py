@@ -26,6 +26,7 @@ class EntryServiceV24:
                 "languages": languages,
                 "focus_regions": focus_regions,
                 "metadata": metadata,
+                "civilization": self.civilization,  # V24-R2: agents can read ctx.civilization directly
             },
             "civilization": self.civilization,
         }

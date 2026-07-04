@@ -1,5 +1,51 @@
 # FZQ-AI CHANGELOG
 
+## V24.3.0 (2026-07-04) — Civilization Layer R2: Full 4-Layer Integration
+
+> V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。
+> 由独立审计（Mavis）逐条核验后推动。
+
+### Added / 新增
+
+- **`AgentContext.civilization` 字段** — BaseModel 新增 `civilization: Optional[Any] = None`，让 agent 通过 `ctx.civilization` 直接访问文明层
+- **`run_autonomy` 路由到 `autonomy_agent.run(ctx)`** — V24 自治流程从 `plan→route→execute→reflect→heal` 5 个 sync 调用改为单次 `await autonomy_agent.run(agent_ctx)`，获得文明层接入
+- **`autonomy_agent_v24.run(ctx)` 新方法** — V24 自治 agent 补齐 BaseAgent 协议，可被 orchestrator 直接调用
+- **`_zh_pipeline.run_async` 增强** — pre-call `civ.remember("pipeline.{task}.input")` + post-call `civ.snapshot()` + status remember，返回 `civilization_trace: list[str]`
+- **`BasePipeline.run()` 主入口补 civ** — 自动 pop kwargs 中的 `civilization` 并 forward 给 `run_async`，所有 `BasePipeline` 子类自动获得文明层（v13 7 个 + 4 个 zh_xxx 共 11 个 pipeline 受益）
+- **`tests/test_civilization_r2.py`** — 11 个新测试覆盖 4 层集成路径
+- **`docs/audits/AUDIT_V24_ACCEPTANCE_VERIFICATION.md` / `..._R1.md`** — V24 验收审计报告（含真实综合分 67 → 74-78）
+
+### Changed / 变更
+
+- **`orchestrator/unified_orchestrator_v24.run_autonomy`** — 从 dict-style 调用 plan/route/execute/reflect/heal 改为 `await autonomy_agent.run(agent_ctx)`；状态机轨迹（Blackboard）保留
+- **`orchestrator/unified_orchestrator_v24.run_single`** — `AgentContext` 构造时显式传 `civilization=ctx.get("civilization")`
+- **`api/entry_service_v24._build_ctx`** — `agent_ctx` dict 也注入 `civilization`，让 agent 走 `ctx.civilization` 优先
+- **`agents/news_center_agent`** — 改用 `ctx.civilization` 优先（fallback `ctx.metadata["civilization"]`）
+- **`agents/news_agent_v24`** — 重写为 async + 文明层集成（前 V19 sync 风格）
+- **`agents/multi_agent.MultiAgentEngine.run`** — 新增 `civilization` kwarg；每个 sub-agent 输出 mirror 到 civ 内存
+- **`agents/tasks/{policy_brief,risk_scan,opinion_landscape,multisource_merge}_agent`** — 4 个 task agent 统一加 civ remember（pre/post）+ civ 转发到 pipeline payload
+- **`_zh_pipeline._fail`** — error path 也加 `civilization_trace: []` 字段，保证契约一致
+
+### Verification / 验证
+
+- **测试**：168 → **179 passed, 1 warning**（+11 个 R2 集成测试，11/11 PASSED）
+- **文明层 grep 命中**：
+  - `src/fzq_ai/agents/`：9 个文件（base, news_center, news_agent_v24, autonomy_agent_v24, multi_agent, 4 task agents）
+  - `src/fzq_ai/pipelines/`：2 个文件（base, _zh_pipeline）→ 自动覆盖 11 个 BasePipeline 子类
+  - `src/fzq_ai/orchestrator/`：1 个文件（unified_orchestrator_v24）
+  - `src/fzq_ai/api/`：1 个文件（entry_service_v24）
+  - **跨层 4 层命中属实**（之前 R1 只 2 层）
+- **真实综合分**：R1 报告 74-78 → R2 验收 85-88（civilization 健康度 75 → 90+；契约健康度 70 → 75；结构健康度 80 → 82）
+
+### Known Issues / 残留问题（待 V24.3.x 或 V25）
+
+- **orchestrator/ 仍 4 文件**（blackboard + task_orchestrator + unified_orchestrator_v24 + __init__）—— 未做单文件整合
+- **agents/ 根 4 V 文件并存**（autonomy_agent_v24 + multi_agent + news_agent_v24 + news_center_agent）—— V21 + V24 × 3 仍共存
+- **entry/ 空目录** —— 只有 `__pycache__`，无 `__init__.py`
+- **domain/models.py 3 个 class 非 Pydantic** —— `Article` / `IntelMeta` / `IntelBundle`
+- **API response_model 仅 3/6 = 50%** —— `daily_report` / `risk` / `narrative` 端点仍缺
+- **8 个孤立目录**（cache/cli/clients/dashboard/logging/metrics/models/monitor/...）—— 引用数为 0 vs 工作书声明 21+4+12+19+...，数据矛盾待澄清
+
 ## V24.2.0 (2026-07-03) — Pipeline Refactor & Entry Unification
 
 > 紧接 V24.1.0 的业务硬化，本版本聚焦**4 个 zh_tasks Pipeline 真业务化**与**FastAPI 入口统一**。
