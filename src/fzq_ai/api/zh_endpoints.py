@@ -3,7 +3,7 @@
 from __future__ import annotations
 from fastapi import APIRouter
 from pydantic import BaseModel
-from fzq_ai.core.intent_engine import classify
+from fzq_ai.core.intent_engine import classify, classify_async
 from fzq_ai.core.task_router import TaskRouter
 
 router = APIRouter(prefix="/api/zh", tags=["Chinese Intelligence"])
@@ -46,7 +46,7 @@ def wrap_response(route_result: Any) -> dict:
 async def _run_task(payload: ZhIntelPayload, expected_task: str) -> dict:
     """classify → route → pipeline with guard."""
     try:
-        intent = classify(payload.text)
+        intent = await classify_async(payload.text)
         if intent.task_type == "clarification_required":
             return {
                 "execution": {

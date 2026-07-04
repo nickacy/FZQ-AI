@@ -1,6 +1,6 @@
 # FZQ‑AI V24 Architecture Overview
 
-> **Version**: V24 · **Status**: Production-Ready · **Tests**: 117/117
+> **Version**: V24 · **Status**: Production-Ready · **Tests**: 162/162
 
 ---
 
@@ -93,21 +93,13 @@ deepseek-chat → deepseek-reasoner (same-family)
 
 ```
 CivilizationEngine
-├── Memory           CivilMemoryEngine (events, knowledge, goals, consensus)
-├── KnowledgeGraph   CivilizationKnowledgeGraph (nodes, edges, weights, propagation)
-├── Parliament       CivilizationParliament (debate, vote, decide, bills)
-├── Consensus        CivilizationConsensusEngine (weighted voting, majority, unanimity)
-├── Evolution        CivilizationEvolutionEngine (evolve, mutate, expand, optimize)
-├── MetaController   CivilizationMetaController (analyze, prioritize, direct, govern)
-├── Superstructure   CivilizationSuperstructure (unified snapshot, structure tree)
-├── API Gateway      CivilizationAPIGateway (8 external endpoints)
-├── ExternalBridge   CivilizationExternalBridge (connect, sync)
-├── Interconnect     CivilizationInterconnect (cross-civ network)
-├── Federation       CivilizationFederation (multi-civ governance)
-├── FederationCouncil Federation Council + CouncilV2
-├── FederationLoop   Federation Loop + LoopV2
-└── Healing + Personality + Goals + State + Reflection + Protocol + Bridge V2
+├── civilization_builder.py    # build_default_civilization(), build_parliament()
+├── civilization_engine.py     # CivilizationEngine — shared state, snapshot, lifecycle
+└── __init__.py                # public exports
 ```
+
+> The civilization layer has been simplified from 28 modules to 3 core modules (P0-3 cleanup).
+> The deleted modules (parliament, consensus, evolution, federation, etc.) are archived in git history.
 
 ---
 
@@ -144,7 +136,7 @@ All endpoints return:
 | Logging | `utils/logger.py` (JSONFormatter) | `logs/fzq_ai_*.jsonl` |
 | Tracing | `utils/tracing.py` (Tracer) | In-memory + optional LangFuse |
 | Metrics | `utils/monitoring.py` (11 Prometheus metrics) | `GET /metrics` |
-| Health | `GET /health` | `{"status":"ok","version":"19.0.0"}` |
+| Health | `GET /health` | `{"status":"ok","version":"24.0.0"}` |
 
 ---
 

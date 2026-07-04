@@ -22,6 +22,9 @@ from fzq_ai.api.entry_service_v24 import EntryServiceV24
 # V23 兼容入口（仅 /v23/entry）
 from fzq_ai.api.entry import router as v23_router
 
+# Metrics API（/api/metrics, /api/pipelines）
+from fzq_ai.api.metrics_endpoints import router as metrics_router
+
 # Observability
 try:
     from fzq_ai.utils.monitoring import get_metrics_response
@@ -174,7 +177,14 @@ app.include_router(zh_router)
 
 
 # ============================================================
-# 7c. Prometheus 指标（如果 prometheus_client 可用）
+# 7c. Metrics API（/api/metrics, /api/pipelines）
+# ============================================================
+
+app.include_router(metrics_router)
+
+
+# ============================================================
+# 7d. Prometheus 指标（如果 prometheus_client 可用）
 # ============================================================
 
 if get_metrics_response is not None:

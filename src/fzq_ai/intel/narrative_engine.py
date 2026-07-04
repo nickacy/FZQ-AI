@@ -6,7 +6,7 @@ from textwrap import dedent
 import warnings
 
 from fzq_ai.intel.models import Article, Narrative
-from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.llm.router import LLMRouter
 
 
 class NarrativeEngine:

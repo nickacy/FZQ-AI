@@ -4,7 +4,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from fzq_ai.config.global_settings import settings
-from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.llm.router import LLMRouter
 
 logger = logging.getLogger(__name__)
 

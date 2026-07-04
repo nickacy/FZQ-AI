@@ -160,3 +160,9 @@ def classify(text: str) -> IntentResult:
         alternative=None,
         reason=None,
     )
+
+
+async def classify_async(text: str) -> IntentResult:
+    """Async wrapper for classify().  Prefer this in async contexts to avoid thread switching."""
+    import asyncio
+    return await asyncio.to_thread(classify, text)

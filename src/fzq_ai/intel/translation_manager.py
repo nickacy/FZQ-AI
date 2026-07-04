@@ -3,7 +3,7 @@ from typing import Optional, Dict
 import asyncio
 import langdetect
 
-from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.llm.router import LLMRouter
 
 
 class TranslationManager:

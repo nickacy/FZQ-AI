@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """FZQ-AI API Integration Tests (V24 — unified contract)"""
 from fastapi.testclient import TestClient
-from fzq_ai.api.zh_endpoints import router
-from fastapi import FastAPI
+from fzq_ai.api.app import app
 
-app = FastAPI()
-app.include_router(router)
 client = TestClient(app)
 
 

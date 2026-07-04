@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import asyncio
 
-from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.llm.router import LLMRouter
 from fzq_ai.prompts.template import PromptTemplate
 from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.domain.models import ServiceResult

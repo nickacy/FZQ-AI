@@ -51,7 +51,7 @@ class AutonomyAgent:
         )
 
         try:
-            from fzq_ai.llm.llm_router import LLMRouter
+            from fzq_ai.llm.router import LLMRouter
             router = LLMRouter()
 
             # LLMRouter.call(provider, prompt, model, api_key)

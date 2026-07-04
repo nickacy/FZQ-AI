@@ -4,7 +4,7 @@
 import asyncio
 from typing import Dict, List
 
-from fzq_ai.llm.llm_router import LLMRouter
+from fzq_ai.llm.router import LLMRouter
 from fzq_ai.llm.cache_redis import redis_llm_cache
 from fzq_ai.llm.cache import llm_cache
 
