@@ -95,10 +95,23 @@ class UnifiedOrchestratorV24:
         """
         V24 单智能体执行：
         - 使用 NewsAgentV24
-        - 输出 timeline + ui_schema
+        - 使用 CivilizationEngine 做计划/共识增强
+        - 输出 timeline + ui_schema + civilization_trace
         - 返回 RouteResult（兼容 V23 + V24）
         """
+        # Extract civilization from context
+        civilization = ctx.get("civilization")
         agent_ctx_dict = ctx.get("agent_ctx", {})
+
+        # ── Civilization: remember the task ──
+        civ_trace: list[dict] = []
+        if civilization:
+            try:
+                civilization.remember("last_task", task)
+                civilization.remember("last_input", agent_ctx_dict.get("raw_input", "")[:200])
+                civ_trace.append({"stage": "civilization.remember", "key": "last_task"})
+            except Exception:
+                pass
 
         agent_ctx = AgentContext(
             user_id=agent_ctx_dict.get("user_id"),
@@ -106,11 +119,22 @@ class UnifiedOrchestratorV24:
             focus_regions=agent_ctx_dict.get("focus_regions", []),
             languages=agent_ctx_dict.get("languages", ["zh"]),
             raw_input=agent_ctx_dict.get("raw_input", ""),
-            metadata=agent_ctx_dict.get("metadata", {}),
+            metadata={
+                **agent_ctx_dict.get("metadata", {}),
+                "civilization": ctx.get("civilization"),
+            },
         )
 
+        # ── Civilization: plan before execution ──
+        if civilization:
+            try:
+                civ_snapshot = civilization.snapshot()
+                civ_trace.append({"stage": "civilization.snapshot", "agents": civ_snapshot.get("agents", [])})
+            except Exception:
+                pass
+
         try:
-            result = self.news_agent.run(agent_ctx)
+            result = await self.news_agent.run(agent_ctx)
         except Exception as e:
             return RouteResult.error(
                 message=str(e),
@@ -122,6 +146,16 @@ class UnifiedOrchestratorV24:
                 },
             )
 
+        # ── Civilization: generate consensus after execution ──
+        civ_consensus = None
+        if civilization:
+            try:
+                civilization.remember("last_result", repr(result.data)[:500])
+                civ_consensus = civilization._generate_consensus() if hasattr(civilization, "_generate_consensus") else None
+                civ_trace.append({"stage": "civilization.consensus", "consensus": civ_consensus})
+            except Exception:
+                pass
+
         timeline = Blackboard.read("sys.timeline", [])
 
         ui_schema = UISchema.layout([
@@ -132,7 +166,11 @@ class UnifiedOrchestratorV24:
         return RouteResult.ok(
             data=result.data,
             ui_layout=None,
-            debug_info=result.trace,
+            debug_info={
+                "agent_trace": result.trace,
+                "civilization_trace": civ_trace,
+                "civilization_consensus": civ_consensus,
+            },
             timeline=timeline,
             ui_schema=ui_schema,
             warnings=result.warnings,

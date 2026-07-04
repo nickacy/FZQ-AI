@@ -5,6 +5,7 @@ from typing import Any, Dict
 
 from fzq_ai.orchestrator.unified_orchestrator_v24 import UnifiedOrchestratorV24
 from fzq_ai.schemas.route import RouteResult
+from fzq_ai.civilization.civilization_builder import build_default_civilization
 
 
 class EntryServiceV24:
@@ -12,6 +13,7 @@ class EntryServiceV24:
 
     def __init__(self):
         self.orchestrator = UnifiedOrchestratorV24()
+        self.civilization = build_default_civilization()
 
     def _build_ctx(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         raw_input = payload.get("input", "")
@@ -24,7 +26,8 @@ class EntryServiceV24:
                 "languages": languages,
                 "focus_regions": focus_regions,
                 "metadata": metadata,
-            }
+            },
+            "civilization": self.civilization,
         }
 
     async def handle_single(self, payload: Dict[str, Any]) -> RouteResult:

@@ -9,9 +9,8 @@ class OpinionLandscapeAgent(BaseAgent):
         from fzq_ai.pipelines.registry import PipelineRegistry
         self._pipeline_name = "zh_opinion_landscape"
 
-    def run(self, ctx: AgentContext) -> AgentResult:
+    async def run(self, ctx: AgentContext) -> AgentResult:
         """Execute the zh_opinion_landscape pipeline with the agent context."""
-        import asyncio
         from fzq_ai.pipelines.registry import PipelineRegistry
 
         trace: list[str] = []
@@ -25,7 +24,7 @@ class OpinionLandscapeAgent(BaseAgent):
         }
 
         try:
-            result = asyncio.run(pipeline.run_async(**payload))
+            result = await pipeline.run_async(**payload)
             trace.append("pipeline_executed")
             return AgentResult(
                 ok=True,

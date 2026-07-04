@@ -21,6 +21,7 @@ from fzq_ai.api.entry_service_v24 import EntryServiceV24
 
 # V23 兼容入口（仅 /v23/entry）
 from fzq_ai.api.entry import router as v23_router
+from fzq_ai.schemas.route import RouteResult
 
 # Metrics API（/api/metrics, /api/pipelines）
 from fzq_ai.api.metrics_endpoints import router as metrics_router
@@ -135,31 +136,31 @@ app.include_router(v24_router)
 entry_service = EntryServiceV24()
 
 
-@app.post("/entry")
+@app.post("/entry", response_model=RouteResult)
 async def entry_v24(payload: dict):
     """
     单智能体入口（V24）
     """
     result = await entry_service.handle_single(payload)
-    return result.to_dict()
+    return result
 
 
-@app.post("/multi")
+@app.post("/multi", response_model=RouteResult)
 async def multi_v24(payload: dict):
     """
     多智能体入口（V24）
     """
     result = await entry_service.handle_multi(payload)
-    return result.to_dict()
+    return result
 
 
-@app.post("/autonomy")
+@app.post("/autonomy", response_model=RouteResult)
 async def autonomy_v24(payload: dict):
     """
     自治智能体入口（V24）
     """
     result = await entry_service.handle_autonomy(payload)
-    return result.to_dict()
+    return result
 
 
 # ============================================================

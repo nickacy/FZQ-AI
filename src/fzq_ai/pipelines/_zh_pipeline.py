@@ -182,7 +182,14 @@ class ZhStructuredPipeline(BasePipeline):
         }
 
     async def run_async(self, **kwargs: Any) -> Dict[str, Any]:
-        return await self.run(**kwargs)
+        civilization = kwargs.pop("civilization", None)
+        result = await self.run(**kwargs)
+        if civilization and hasattr(civilization, "snapshot"):
+            try:
+                result["civilization_snapshot"] = civilization.snapshot()
+            except Exception:
+                result["civilization_snapshot"] = None
+        return result
 
     def _fail(self, error: str, trace_id: str, t0: float, user_input: str,
               warning: str = "", model: str = "") -> Dict[str, Any]:

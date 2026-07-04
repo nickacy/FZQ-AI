@@ -22,7 +22,7 @@ class _MinimalAgent(BaseAgent):
 
 class _RunOnlyAgent(BaseAgent):
     name = "run_only"
-    def run(self, ctx: AgentContext) -> AgentResult:
+    async def run(self, ctx: AgentContext) -> AgentResult:
         return AgentResult(ok=True, data={"overridden": True}, warnings=[], trace=["custom"])
 
 
@@ -40,9 +40,9 @@ class TestBaseAgentDefaults:
         assert a.name == "m"
         assert isinstance(a, BaseAgent)
 
-    def test_default_run_executes_plan_execute_loop(self):
+    async def test_default_run_executes_plan_execute_loop(self):
         a = _MinimalAgent(name="m")
-        r = a.run(_ctx())
+        r = await a.run(_ctx())
         # Default run() walks the plan→execute→reflect→heal pipeline
         assert r.ok
         # Default plan() returns raw_input + metadata; default execute() returns {}
@@ -74,9 +74,9 @@ class TestBaseAgentDefaults:
         assert a.route({}) == ""
         assert a.auto_select_model({}) == ""
 
-    def test_subclass_run_override_takes_precedence(self):
+    async def test_subclass_run_override_takes_precedence(self):
         a = _RunOnlyAgent(name="r")
-        r = a.run(_ctx())
+        r = await a.run(_ctx())
         assert r.data == {"overridden": True}
         # The default "Step 1: Planning" trace should NOT appear since
         # the subclass replaced run() entirely.

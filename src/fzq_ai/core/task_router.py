@@ -11,13 +11,14 @@ from typing import Any, Optional, Dict
 from fzq_ai.core.intent_engine import IntentResult
 from fzq_ai.pipelines.registry import PipelineRegistry
 
+from pydantic import BaseModel
 
-@dataclass
-class RouteResult:
-    success: bool
-    task_type: str
-    pipeline_used: Optional[str]
-    output: Optional[Any]
+
+class RouteResult(BaseModel):
+    success: bool = False
+    task_type: str = ""
+    pipeline_used: Optional[str] = None
+    output: Optional[Any] = None
     error: Optional[str] = None
     fallback_used: Optional[str] = None
     agent_used: Optional[str] = None

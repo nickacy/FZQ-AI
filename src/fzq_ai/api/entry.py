@@ -4,11 +4,11 @@
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-from fzq_ai.orchestrator.unified_orchestrator import UnifiedOrchestrator
+from fzq_ai.orchestrator.unified_orchestrator_v24 import UnifiedOrchestratorV24
 from typing import Dict, Any
 
 router = APIRouter()
-orchestrator = UnifiedOrchestrator()
+orchestrator = UnifiedOrchestratorV24()
 
 
 class EntryRequest(BaseModel):

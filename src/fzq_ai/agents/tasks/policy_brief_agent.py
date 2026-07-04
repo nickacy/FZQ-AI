@@ -17,9 +17,8 @@ class PolicyBriefAgent(BaseAgent):
         from fzq_ai.pipelines.registry import PipelineRegistry
         self._pipeline_name = "zh_policy_brief"
 
-    def run(self, ctx: AgentContext) -> AgentResult:
+    async def run(self, ctx: AgentContext) -> AgentResult:
         """Execute the zh_policy_brief pipeline with the agent context."""
-        import asyncio
         from fzq_ai.pipelines.registry import PipelineRegistry
 
         trace: list[str] = []
@@ -33,7 +32,7 @@ class PolicyBriefAgent(BaseAgent):
         }
 
         try:
-            result = asyncio.run(pipeline.run_async(**payload))
+            result = await pipeline.run_async(**payload)
             trace.append("pipeline_executed")
             return AgentResult(
                 ok=True,

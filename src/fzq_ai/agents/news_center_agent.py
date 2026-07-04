@@ -34,7 +34,7 @@ class NewsCenterAgent:
     def __init__(self, sub_agents: Optional[List[str]] = None) -> None:
         self._sub_agents = sub_agents or DEFAULT_SUB_AGENTS
 
-    def run(self, ctx: AgentContext) -> AgentResult:
+    async def run(self, ctx: AgentContext) -> AgentResult:
         # Lazy import to avoid circular dependency with fzq_ai.registry.agents
         from fzq_ai.registry.agents import get_agent
 
@@ -56,7 +56,7 @@ class NewsCenterAgent:
                     any_failed = True
                     trace.append(f"{sub_name}_missing")
                     continue
-                result = agent.run(ctx)
+                result = await agent.run(ctx)
                 merged[sub_name] = result.data
                 trace.append(f"{sub_name}_done")
                 all_warnings.extend(result.warnings)
@@ -68,7 +68,18 @@ class NewsCenterAgent:
                 any_failed = True
                 trace.append(f"{sub_name}_error")
 
-        # 2. Aggregate into a personal-intel view
+        # 2. Civilization: remember and enrich
+        civ_trace: list[str] = []
+        try:
+            civ = ctx.metadata.get("civilization") if hasattr(ctx, "metadata") else None
+            if civ and hasattr(civ, "remember"):
+                civ.remember("news_query", str(ctx.raw_input))
+                civ.remember("news_result_count", str(len(merged)))
+                civ_trace.append("civilization.remember")
+        except Exception:
+            pass
+
+        # 3. Aggregate into a personal-intel view
         return AgentResult(
             ok=not any_failed,
             data={
@@ -77,7 +88,8 @@ class NewsCenterAgent:
                 "languages": ctx.languages,
                 "focus_regions": ctx.focus_regions,
                 "components": merged,
+                "civilization_trace": civ_trace,
             },
             warnings=all_warnings,
-            trace=trace,
+            trace=trace + civ_trace,
         )

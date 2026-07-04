@@ -6,32 +6,30 @@
 
 from __future__ import annotations
 from typing import Any, Dict, Optional, List
-from dataclasses import dataclass
+from pydantic import BaseModel, Field
 
 # ============================================================
 # AgentContext — 智能体输入上下文
 # ============================================================
 
-@dataclass
-class AgentContext:
-    user_id: Optional[str]
-    locale: str              # 如 "zh-CN"
-    focus_regions: list[str] # 如 ["Global South", "Middle East"]
-    languages: list[str]     # 如 ["zh", "en", "ar", "es"]
-    raw_input: Any           # 原始新闻/链接/文本
-    metadata: Dict[str, Any] # 任务元信息（来源、时间等）
+class AgentContext(BaseModel):
+    user_id: Optional[str] = None
+    locale: str = "zh-CN"
+    focus_regions: list[str] = Field(default_factory=list)
+    languages: list[str] = Field(default_factory=list)
+    raw_input: Any = None
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 # ============================================================
 # AgentResult — 智能体输出结果
 # ============================================================
 
-@dataclass
-class AgentResult:
-    ok: bool
-    data: Any
-    warnings: list[str]
-    trace: list[str]         # 执行链路记录（便于调试与评估）
+class AgentResult(BaseModel):
+    ok: bool = True
+    data: Any = None
+    warnings: list[str] = Field(default_factory=list)
+    trace: list[str] = Field(default_factory=list)
 
 
 # ============================================================
@@ -70,7 +68,7 @@ class BaseAgent:
     # 子类可重写此方法完全替换默认流程（如 zh_tasks/*_agent.py）
     # ============================================================
 
-    def run(self, ctx: AgentContext) -> AgentResult:
+    async def run(self, ctx: AgentContext) -> AgentResult:
         trace: List[str] = []
 
         trace.append("Step 1: Planning")

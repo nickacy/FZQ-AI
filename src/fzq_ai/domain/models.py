@@ -1,5 +1,6 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
+from pydantic import BaseModel, Field
+from dataclasses import field
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
 
@@ -8,22 +9,21 @@ from typing import List, Dict, Optional, Any
 # ServiceResult
 # ============================
 
-@dataclass
-class ServiceResult:
-    success: bool
+class ServiceResult(BaseModel):
+    success: bool = False
     data: Optional[Any] = None
     error: Optional[str] = None
 
-    @staticmethod
-    def ok(data: Any) -> "ServiceResult":
-        return ServiceResult(success=True, data=data)
+    @classmethod
+    def ok(cls, data: Any) -> "ServiceResult":
+        return cls(success=True, data=data)
 
-    @staticmethod
-    def fail(error: str) -> "ServiceResult":
-        return ServiceResult(success=False, error=error)
+    @classmethod
+    def fail(cls, error: str) -> "ServiceResult":
+        return cls(success=False, error=error)
 
     def to_dict(self):
-        return {"success": self.success, "data": self.data, "error": self.error}
+        return self.model_dump()
 
     def __bool__(self):
         return self.success
@@ -33,14 +33,13 @@ class ServiceResult:
 # Article
 # ============================
 
-@dataclass
-class Article:
+class Article(BaseModel):
     """
     通用新闻文章结构（tests + pipelines + intel_store 全部依赖）
     """
 
     # ---- tests 必填 ----
-    title_original: str
+    title_original: str = ""
     content_original: str = ""
 
     # ---- tests + pipelines ----
@@ -52,10 +51,10 @@ class Article:
     credibility: float = 0.0  # tests 要求默认 0.0
 
     # ---- propaganda tags（tests 要求） ----
-    propaganda_tags: List[str] = field(default_factory=list)
+    propaganda_tags: List[str] = Field(default_factory=list)
 
     # ---- 时间字段 ----
-    fetched_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    fetched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # ---- 风险字段 ----
     risk_level: Optional[int] = None
@@ -70,10 +69,9 @@ class Article:
 # IntelMeta
 # ============================
 
-@dataclass
-class IntelMeta:
-    topics: List[str] = field(default_factory=list)
-    regions: List[str] = field(default_factory=list)
+class IntelMeta(BaseModel):
+    topics: List[str] = Field(default_factory=list)
+    regions: List[str] = Field(default_factory=list)
     depth: str = "normal"
 
 
@@ -81,20 +79,19 @@ class IntelMeta:
 # IntelBundle
 # ============================
 
-@dataclass
-class IntelBundle:
+class IntelBundle(BaseModel):
     """
     单次情报运行的完整结果（tests + pipelines + intel_store 全部依赖）
     """
 
-    meta: IntelMeta = field(default_factory=IntelMeta)
-    articles: List[Article] = field(default_factory=list)
+    meta: IntelMeta = Field(default_factory=IntelMeta)
+    articles: List[Article] = Field(default_factory=list)
 
     # ---- tests 需要这些字段 ----
-    events: List[Dict[str, Any]] = field(default_factory=list)
+    events: List[Dict[str, Any]] = Field(default_factory=list)
     summary: str = ""
-    risk_summary: Dict[str, Any] = field(default_factory=dict)
-    narrative_summary: Dict[str, Any] = field(default_factory=dict)
-    sentiment_summary: Dict[str, Any] = field(default_factory=dict)
+    risk_summary: Dict[str, Any] = Field(default_factory=dict)
+    narrative_summary: Dict[str, Any] = Field(default_factory=dict)
+    sentiment_summary: Dict[str, Any] = Field(default_factory=dict)
 
-    fetched_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    fetched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

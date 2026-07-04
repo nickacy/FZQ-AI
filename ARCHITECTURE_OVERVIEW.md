@@ -1,6 +1,6 @@
 # FZQ‑AI V24 Architecture Overview
 
-> **Version**: V24 · **Status**: Production-Ready · **Tests**: 162/162
+> **Version**: V24 · **Status**: Production-Ready · **Tests**: 165/165
 
 ---
 
@@ -14,7 +14,7 @@ Layer 5 ▐  AGENT DECA       Loop, StateMachine, Healing, Reflection, Planning,
          ▐  SYSTEM           Goals, Personality, Memory (+ MultiAgent)
 Layer 4 ▐  LLM INTELLIGENCE Router (choose_model), Failover (3-tier), PromptEngine (13)
 Layer 3 ▐  PROVIDERS        DeepSeek, GLM, Qwen, OpenAI, Gemini, Kimi, Moonshot
-Layer 2 ▐  CIVILIZATION     Parliament, Consensus, KnowledgeGraph, Evolution, Federation
+Layer 2 ▐  CIVILIZATION     Memory, Graph, Consensus (integrated in Entry→Orchestrator→Agent chain)
 Layer 1 ▐  OBSERVABILITY    Structlog JSON, Tracing, Prometheus /metrics
 Layer 0 ▐  INFRASTRUCTURE   Pydantic v2, Registry, Config, Schemas
 ```
@@ -100,6 +100,33 @@ CivilizationEngine
 
 > The civilization layer has been simplified from 28 modules to 3 core modules (P0-3 cleanup).
 > The deleted modules (parliament, consensus, evolution, federation, etc.) are archived in git history.
+
+### Integration (P2)
+
+The civilization layer is now **actively integrated** into the main production chain:
+
+```
+EntryServiceV24
+  └── build_default_civilization()    # 3 agents: risk_analyst, policy_analyst, intelligence_officer
+  └── passes civilization to ctx
+      └── UnifiedOrchestratorV24.run_single()
+            ├── civilization.remember(task, input)    # pre-execution memory
+            ├── civilization.snapshot()               # plan awareness
+            ├── NewsAgentV24.run()                    # agent execution
+            └── civilization.remember(result)         # post-execution memory
+            └── civilization._generate_consensus()    # decision consensus
+      └── RouteResult.debug_info includes:
+            └── civilization_trace[]   # per-stage trace
+            └── civilization_consensus # voting result
+```
+
+**Imports** (`git grep -l "fzq_ai.civilization" src/`):
+- `api/entry_service_v24.py` — initializes & injects CivilizationEngine
+- `civilization/civilization_engine.py` — core engine
+- `civilization/civilization_builder.py` — factory functions
+- `civilization/__init__.py` — public API
+
+**Tests**: `tests/test_civilization.py` (8 tests, covers engine + integration)
 
 ---
 
