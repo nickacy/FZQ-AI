@@ -14,11 +14,13 @@ FZQ-AI Task Orchestrator (V19-Final)
 """
 
 from __future__ import annotations
+import logging
 from typing import Dict, Any
 
 from fzq_ai.core.intent_engine import classify
 from fzq_ai.pipelines.base import BasePipeline
 from fzq_ai.core.task_router import TaskRouter
+_logger = logging.getLogger("fzq_ai.task_orchestrator")
 
 
 class TaskOrchestrator:

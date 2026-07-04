@@ -1,8 +1,10 @@
 from __future__ import annotations
+import logging
 import uuid
 import time
 from typing import Any, Dict, List, Optional, Generic, TypeVar
 from dataclasses import dataclass
+_logger = logging.getLogger("fzq_ai.base")
 
 T = TypeVar("T")
 
@@ -75,7 +77,7 @@ class BasePipeline(Generic[T]):
                 civilization.remember(f"pipeline.{self.name}.input", repr(kwargs)[:200])
                 civ_trace.append(f"civilization.remember.pipeline.{self.name}")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         try:
             # 0. Delegate to run_async if the subclass defines it
@@ -187,6 +189,6 @@ class BasePipeline(Generic[T]):
             from fzq_ai.metrics.metrics_writer import write_metrics_jsonl
             write_metrics_jsonl(metrics)
         except Exception:
-            pass
+            _logger.warning("Suppressed error", exc_info=True)
 
         return output

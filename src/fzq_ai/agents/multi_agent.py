@@ -12,12 +12,14 @@ Features:
 Integrated with: Orchestrator, Loop, StateMachine, Tracing, Monitoring.
 """
 from __future__ import annotations
+import logging
 import time
 from typing import Any, Dict, List, Optional
 
 from fzq_ai.utils.logger import log_event
 from fzq_ai.utils.memory import global_memory
 from fzq_ai.utils.loop import run_agent_loop
+_logger = logging.getLogger("fzq_ai.multi_agent")
 
 
 class MultiAgentEngine:
@@ -77,7 +79,7 @@ class MultiAgentEngine:
                 civilization.remember("multi_agent_last_chain", list(self._collaboration_chain))
                 civilization.remember("multi_agent_last_count", len(self._results))
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         return self._results
 
@@ -95,7 +97,7 @@ class MultiAgentEngine:
                     civilization.remember(
                         f"multi_agent.{agent_name}", "last_output", cycle.get("output"))
                 except Exception:
-                    pass
+                    _logger.warning("Suppressed error", exc_info=True)
         except Exception as e:
             cycle = {"error": str(e), "trace": ["error"]}
 

@@ -1,5 +1,7 @@
+import logging
 """Agent for zh_opinion_landscape — wraps the pipeline for autonomous task execution."""
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.opinion_landscape_agent")
 
 
 class OpinionLandscapeAgent(BaseAgent):
@@ -27,7 +29,7 @@ class OpinionLandscapeAgent(BaseAgent):
                 civ.remember("zh_opinion_landscape_input", repr(ctx.raw_input)[:200])
                 civ_trace.append("civilization.remember.zh_opinion_landscape")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         payload = {
             "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
@@ -45,7 +47,7 @@ class OpinionLandscapeAgent(BaseAgent):
                     civ.remember("zh_opinion_landscape_status", str(result.get("status", "ok")) if isinstance(result, dict) else "ok")
                     civ_trace.append("civilization.remember.zh_opinion_landscape_output")
                 except Exception:
-                    pass
+                    _logger.warning("Suppressed error", exc_info=True)
 
             return AgentResult(
                 ok=True,

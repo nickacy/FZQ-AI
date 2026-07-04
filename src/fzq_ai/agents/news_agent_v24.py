@@ -2,8 +2,10 @@
 # V24 — NewsAgent (async, with civilization integration)
 
 from __future__ import annotations
+import logging
 from typing import Any, Dict, List
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.news_agent_v24")
 
 
 class NewsAgentV24(BaseAgent):
@@ -82,7 +84,7 @@ class NewsAgentV24(BaseAgent):
                 civ.remember("news_agent_input", _inp[:200])
                 civ_trace.append("civilization.remember.news_agent")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         # 2. Default BaseAgent run (plan → route → execute → reflect → heal)
         result = await super().run(ctx)
@@ -94,7 +96,7 @@ class NewsAgentV24(BaseAgent):
                 civ.remember("news_agent_output", _out[:200])
                 civ_trace.append("civilization.remember.news_agent_output")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         # 4. Append civ trace to result
         result.trace = (result.trace or []) + civ_trace

@@ -6,9 +6,11 @@
 - 聚合成"广泛、平衡、尽量无偏"的个人情报视图
 """
 from __future__ import annotations
+import logging
 from typing import Any, Dict, List, Optional
 
 from fzq_ai.agents.base import AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.news_center_agent")
 
 
 # Default 4 sub-agents composing the "news center" view
@@ -80,7 +82,7 @@ class NewsCenterAgent:
                 civ.remember("news_result_count", str(len(merged)))
                 civ_trace.append("civilization.remember")
         except Exception:
-            pass
+            _logger.warning("Suppressed error", exc_info=True)
 
         # 3. Aggregate into a personal-intel view
         return AgentResult(

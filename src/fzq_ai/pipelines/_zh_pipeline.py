@@ -12,6 +12,7 @@ Subclasses just declare `task_type`, `prompt_path`, and (optionally) override
 `_extract_user_input()` for prompt variable substitution.
 """
 from __future__ import annotations
+import logging
 import json
 import re
 import time
@@ -23,6 +24,7 @@ from fzq_ai.llm.router import choose_model, call_llm
 from fzq_ai.llm.failover import get_failover_chain
 from fzq_ai.schemas.zh_tasks import SCHEMA_BY_TASK
 from fzq_ai.utils.prompt_loader import load_prompt_template
+_logger = logging.getLogger("fzq_ai._zh_pipeline")
 
 
 # JSON code-fence pattern: ```json ... ``` or ``` ... ```
@@ -79,7 +81,7 @@ class ZhStructuredPipeline(BasePipeline):
             if isinstance(v, dict):
                 return v
         except Exception:
-            pass
+            _logger.warning("Suppressed error", exc_info=True)
         # 2. Try fenced code block (```json ... ```)
         m = _FENCE_RE.search(text)
         if m:
@@ -88,7 +90,7 @@ class ZhStructuredPipeline(BasePipeline):
                 if isinstance(v, dict):
                     return v
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
         # 3. Try the first { ... } or [ ... ] block
         m = _JSON_BLOCK_RE.search(text)
         if m:
@@ -97,7 +99,7 @@ class ZhStructuredPipeline(BasePipeline):
                 if isinstance(v, dict):
                     return v
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
         return None
 
     # ============================================================
@@ -193,7 +195,7 @@ class ZhStructuredPipeline(BasePipeline):
                                        repr(kwargs)[:200])
                 civ_trace.append(f"civilization.remember.pipeline.{self.task_type}")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         result = await self.run(**kwargs)
 
@@ -211,7 +213,7 @@ class ZhStructuredPipeline(BasePipeline):
                 civilization.remember(f"pipeline.{self.task_type}.status", status)
                 civ_trace.append(f"civilization.remember.pipeline.{self.task_type}.status")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         result["civilization_trace"] = civ_trace
         return result

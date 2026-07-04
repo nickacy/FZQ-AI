@@ -1,5 +1,7 @@
+import logging
 """Agent for zh_risk_scan — wraps the pipeline for autonomous task execution."""
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.risk_scan_agent")
 
 
 class RiskScanAgent(BaseAgent):
@@ -31,7 +33,7 @@ class RiskScanAgent(BaseAgent):
                 civ.remember("risk_scan_input", repr(ctx.raw_input)[:200])
                 civ_trace.append("civilization.remember.risk_scan")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         payload = {
             "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
@@ -49,7 +51,7 @@ class RiskScanAgent(BaseAgent):
                     civ.remember("risk_scan_status", str(result.get("status", "ok")) if isinstance(result, dict) else "ok")
                     civ_trace.append("civilization.remember.risk_scan_output")
                 except Exception:
-                    pass
+                    _logger.warning("Suppressed error", exc_info=True)
 
             return AgentResult(
                 ok=True,

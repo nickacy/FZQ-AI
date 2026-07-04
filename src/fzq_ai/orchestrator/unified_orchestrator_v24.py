@@ -3,6 +3,7 @@
 # 保留 V23 全部功能 + 增量增强（timeline + ui_schema + autonomy）
 
 from __future__ import annotations
+import logging
 from typing import Any, Dict
 
 from fzq_ai.orchestrator.blackboard import Blackboard
@@ -13,6 +14,7 @@ from fzq_ai.ui.ui_schema import UISchema
 from fzq_ai.agents.news_agent_v24 import NewsAgentV24
 from fzq_ai.agents.autonomy_agent_v24 import AutonomyAgentV24
 from fzq_ai.agents.base import AgentContext
+_logger = logging.getLogger("fzq_ai.unified_orchestrator_v24")
 
 
 class UnifiedOrchestratorV24:
@@ -111,7 +113,7 @@ class UnifiedOrchestratorV24:
                 civilization.remember("last_input", agent_ctx_dict.get("raw_input", "")[:200])
                 civ_trace.append({"stage": "civilization.remember", "key": "last_task"})
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         agent_ctx = AgentContext(
             user_id=agent_ctx_dict.get("user_id"),
@@ -132,7 +134,7 @@ class UnifiedOrchestratorV24:
                 civ_snapshot = civilization.snapshot()
                 civ_trace.append({"stage": "civilization.snapshot", "agents": civ_snapshot.get("agents", [])})
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         try:
             result = await self.news_agent.run(agent_ctx)
@@ -155,7 +157,7 @@ class UnifiedOrchestratorV24:
                 civ_consensus = civilization._generate_consensus() if hasattr(civilization, "_generate_consensus") else None
                 civ_trace.append({"stage": "civilization.consensus", "consensus": civ_consensus})
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         timeline = Blackboard.read("sys.timeline", [])
 

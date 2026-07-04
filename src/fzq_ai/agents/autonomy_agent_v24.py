@@ -2,9 +2,11 @@
 # V24 — AutonomyAgent (wired into unified_orchestrator_v24)
 
 from __future__ import annotations
+import logging
 from typing import Any, Dict, List
 
 from fzq_ai.agents.base import AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.autonomy_agent_v24")
 
 
 class AutonomyAgentV24:
@@ -65,7 +67,7 @@ class AutonomyAgentV24:
                 civ.remember("autonomy_model", model)
                 self.civ_trace.append("civilization.remember.autonomy")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         return AgentResult(
             ok=True,

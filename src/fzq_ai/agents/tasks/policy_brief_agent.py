@@ -1,3 +1,4 @@
+import logging
 # src/fzq_ai/agents/tasks/policy_brief_agent.py
 """Agent for zh_policy_brief — wraps the pipeline for autonomous task execution.
 
@@ -8,6 +9,7 @@ pattern as the other 3 task agents, deferring the full multi-model pipeline
 to a follow-up iteration.
 """
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.policy_brief_agent")
 
 
 class PolicyBriefAgent(BaseAgent):
@@ -39,7 +41,7 @@ class PolicyBriefAgent(BaseAgent):
                 civ.remember("policy_brief_input", repr(ctx.raw_input)[:200])
                 civ_trace.append("civilization.remember.policy_brief")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         # Build payload from context
         payload = {
@@ -60,7 +62,7 @@ class PolicyBriefAgent(BaseAgent):
                     civ.remember("policy_brief_status", str(result.get("status", "ok")) if isinstance(result, dict) else "ok")
                     civ_trace.append("civilization.remember.policy_brief_output")
                 except Exception:
-                    pass
+                    _logger.warning("Suppressed error", exc_info=True)
 
             return AgentResult(
                 ok=True,

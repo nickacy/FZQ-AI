@@ -1,5 +1,7 @@
+import logging
 """Agent for zh_multisource_merge — wraps the pipeline for autonomous task execution."""
 from fzq_ai.agents.base import BaseAgent, AgentContext, AgentResult
+_logger = logging.getLogger("fzq_ai.multisource_merge_agent")
 
 
 class MultisourceMergeAgent(BaseAgent):
@@ -27,7 +29,7 @@ class MultisourceMergeAgent(BaseAgent):
                 civ.remember("zh_multisource_merge_input", repr(ctx.raw_input)[:200])
                 civ_trace.append("civilization.remember.zh_multisource_merge")
             except Exception:
-                pass
+                _logger.warning("Suppressed error", exc_info=True)
 
         payload = {
             "event_topic": str(ctx.raw_input) if ctx.raw_input else "",
@@ -45,7 +47,7 @@ class MultisourceMergeAgent(BaseAgent):
                     civ.remember("zh_multisource_merge_status", str(result.get("status", "ok")) if isinstance(result, dict) else "ok")
                     civ_trace.append("civilization.remember.zh_multisource_merge_output")
                 except Exception:
-                    pass
+                    _logger.warning("Suppressed error", exc_info=True)
 
             return AgentResult(
                 ok=True,
