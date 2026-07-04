@@ -1,6 +1,6 @@
 # FZQ-AI CHANGELOG
 
-## V24.3.0 (2026-07-04) — Civilization Layer R2: Full 4-Layer Integration
+## V24.3.0 (2026-07-04) — Civilization Layer R2+R3: Full Integration + Final Polish
 
 > V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。
 > 由独立审计（Mavis）逐条核验后推动。
