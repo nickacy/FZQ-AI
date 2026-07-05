@@ -196,8 +196,20 @@ class ZhStructuredPipeline(BasePipeline):
             "duration_ms": duration_ms,
             "status": "ok" if validated is not None else "partial",
         }
-        # V25: Minimax strict schema validation (default-on, even on sync run() path)
+        # V25: Minimax strict schema validation
         result["minimax"] = self._minimax_pass(result, civ=None)
+
+        # V25: Doubao formatting (Minimax → clean JSON for Kimi/Qwen)
+        try:
+            from fzq_ai.doubao.formatter import DoubaoFormatter
+            fmt = DoubaoFormatter()
+            result["doubao_formatted"] = fmt.format(result.get("validated") or result.get("parsed") or {})
+            civ = kwargs.get("civilization")
+            if civ and hasattr(civ, "remember"):
+                civ.remember("doubao_formatted", str(result["doubao_formatted"])[:1000])
+        except Exception:
+            _logger.warning("Doubao formatting skipped", exc_info=True)
+
         return result
 
     async def run_async(self, **kwargs: Any) -> Dict[str, Any]:
