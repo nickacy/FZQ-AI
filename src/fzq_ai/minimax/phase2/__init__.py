@@ -23,9 +23,11 @@ from __future__ import annotations
 from .feedback_models import StructuralFeedback
 from .feedback_engine import MinimaxFeedbackEngine
 from .feedback_router import MinimaxFeedbackRouter
+from .feedback_loop import MinimaxFeedbackLoop
 
 __all__ = [
     "StructuralFeedback",
     "MinimaxFeedbackEngine",
     "MinimaxFeedbackRouter",
+    "MinimaxFeedbackLoop",
 ]

@@ -221,6 +221,111 @@ minimax_feedback_risk_repair_count  → len(risk_repairs)
 - 4 个 zh_tasks pipeline（policy_brief / risk_scan / opinion_landscape / multisource_merge）自动继承
 
 
+## V24.3.5 (2026-07-05) — MinimaxFeedbackLoop: Close the Structural Loop
+
+> V24.3.4 引入 Minimax Phase 2（结构反馈层）—— 生成 6-路路由报告但**未真正闭环**。
+> V24.3.5 引入 **MinimaxFeedbackLoop** —— 把 Phase 2 反馈持久化到 civilization memory，让 GLM/Doubao/Kimi/Qwen **下次调用时可读取**，形成自我修正的反馈闭环。
+
+### Added / 新增
+
+- **`src/fzq_ai/minimax/phase2/feedback_loop.py`** —— `MinimaxFeedbackLoop`
+  - `record(routed_feedback, civ, phase2_feedback)` —— 持久化 Phase 2 输出到 civ（target-prefixed keys）
+  - `build_context(civ, target)` —— 读取指定 target 的累积反馈
+  - `format_prompt_fragment(civ, target, max_suggestions)` —— 格式化为 LLM prompt fragment
+- **`tests/test_minimax_feedback_loop.py`** —— 17 个单元测试覆盖 record/build_context/format_prompt_fragment + 集成路径
+- **`_zh_pipeline.py` 集成 `_minimax_feedback_loop_pass()`** —— 在 Phase 2 输出后立即调 loop.record()，result 加 `minimax_feedback_loop_ok: bool`
+
+### Storage Convention / 存储约定
+
+**MinimaxFeedbackLoop** 在 civ 中写入以下 key（target-prefixed）：
+
+```
+feedback._global.consistency_score    str(consistency_score)
+feedback._global.risk_score           str(risk_score)
+feedback._global.trace_id             feedback.trace_id
+feedback._global.generated_at         feedback.generated_at
+feedback._global.missing_fields       list[str]
+feedback._global.type_repairs         list[str]
+feedback._global.risk_repairs         list[str]
+feedback._global.last_loop_write_at   ISO timestamp
+
+feedback.glm.issues                   list[str]
+feedback.glm.issue_count              str(N)
+feedback.glm.suggestions              list[str]
+feedback.glm.priority                 low|medium|high
+feedback.glm.requires_action          bool
+
+feedback.deepseek.issues / .suggestions / .priority / ...
+feedback.doubao.issues / .suggestions / .priority / ...
+feedback.kimi.issues / .suggestions / .priority / ...
+feedback.qwen.issues / .suggestions / .priority / ...
+
+feedback.ds.ds_tasks                  list[str]
+feedback.ds.requires_execution_book   bool
+```
+
+**下游模块下次调用时可读**：
+```python
+from fzq_ai.minimax.phase2 import MinimaxFeedbackLoop
+loop = MinimaxFeedbackLoop()
+ctx = loop.build_context(civ=civ, target="glm")
+prompt_fragment = loop.format_prompt_fragment(civ=civ, target="glm")
+# 注入到 GLMExtractor / DoubaoFormatter / KimiInterpreter 的 prompt/system
+```
+
+### Design Constraints / 设计约束
+
+- **不修改 GLM/Doubao/Kimi/Qwen 签名** —— loop 是 opt-in，每个模块决定是否读 feedback
+- **Civ 写入 best-effort** —— 失败不阻塞 pipeline（log warning + 设置 `minimax_feedback_loop_ok=False`）
+- **无 Pydantic 依赖** —— 纯 Python dict 操作，性能开销 < 1ms
+- **R1-R6 合规继承** —— 反馈内容来自 Phase 2，本身就是结构化（无代码、无推测）
+
+### Verification / 验证
+
+- **测试**：316 → **333 passed, 1 warning**（+17 feedback_loop tests，17/17 PASSED）
+- **现有测试**：`test_pipelines_real.py` (22) + `test_minimax.py` (32) + `test_minimax_integration.py` (26) + `test_minimax_phase2.py` (22) + 4 个 wrapper modules 的 tests (54) 全部仍绿
+- **关键集成点**：`_zh_pipeline.run_async()` 现在调用顺序：
+  1. Pre-civ remember
+  2. `ZhStructuredPipeline.run()` (GLM 抽取 + LLM + JSON + schema validate + Minimax Phase 1 + Doubao + Kimi)
+  3. Post-civ snapshot
+  4. **Minimax Phase 1 (`_minimax_pass`)** —— 校验结构
+  5. **Minimax Phase 2 (`_minimax_phase2_pass`)** —— 生成结构反馈 + 6-路路由
+  6. **Minimax Feedback Loop (`_minimax_feedback_loop_pass`)** —— 持久化反馈到 civ（NEW）
+  7. Return result
+
+### Closed Loop Architecture / 闭环架构
+
+```
+GLMExtractor (extract raw)
+   ↓
+DeepSeek-style LLM structuring
+   ↓
+Minimax Phase 1 (strict schema validation)
+   ↓
+Minimax Phase 2 (structural feedback generation + 6-way routing)
+   ↓
+Minimax Feedback Loop (persist to civ with target-prefixed keys)
+   ↓
+[ next pipeline run ]
+   ↓
+GLMExtractor can OPTIONALLY read feedback.glm.* from civ
+DoubaoFormatter can OPTIONALLY read feedback.doubao.* from civ
+KimiInterpreter can OPTIONALLY read feedback.kimi.* from civ
+```
+
+### Known Limitations / 已知局限
+
+- **GLM/Doubao/Kimi/Qwen 模块尚未实现 `feedback_context` 注入** —— V24.3.5 只提供存储 + 读取接口，模块侧集成留给 V25+
+- **DS 执行书未自动触发** —— `feedback.ds.ds_tasks` 已写入，但无自动调度机制（V25+）
+- **跨调用累积 vs 单次反馈** —— 当前 loop 每次 run 都覆盖同 key，不累积历史模式（V25+ 可加 feedback aggregator）
+
+### Integration Points / 接入点
+
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline.run_async()` — V25 默认启用（自动调 feedback loop）
+- `minimax/phase2/__init__.py` — 公开导出 `MinimaxFeedbackLoop`
+- 未来 V25+：`registry/agents.py` 的 governance 层可读取 `feedback.qwen.*` 触发工程治理
+
+
 ## V24.3.0 (2026-07-04) — Civilization Layer R2+R3: Full Integration + Final Polish
 
 > V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。

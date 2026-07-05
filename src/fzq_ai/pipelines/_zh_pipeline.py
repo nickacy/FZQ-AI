@@ -269,6 +269,13 @@ class ZhStructuredPipeline(BasePipeline):
         #    upstream (GLM, DeepSeek) and downstream (豆包, Kimi, Qwen).
         #    Routed feedback is also written to civilization memory.
         self._minimax_phase2_pass(result, civ=civilization)
+
+        # 5. V24.3.5: MinimaxFeedbackLoop — close the structural loop
+        #    Persists Phase 2 routed feedback into civ with target-prefixed keys
+        #    so downstream modules (GLM/Doubao/Kimi/Qwen) can OPTIONALLY read on
+        #    next call. This is the wiring that turns Phase 2 reports into a
+        #    self-correcting feedback cycle.
+        self._minimax_feedback_loop_pass(result, civ=civilization)
         return result
 
     # ============================================================
@@ -357,6 +364,55 @@ class ZhStructuredPipeline(BasePipeline):
             # Phase 2 must never break the pipeline
             _logger.warning("minimax phase 2 failed: %s", e, exc_info=True)
             result["minimax_feedback"] = {"error": f"{type(e).__name__}: {e}"}
+
+    # ============================================================
+    # V24.3.5: Minimax Feedback Loop — close the structural loop
+    # ============================================================
+    def _minimax_feedback_loop_pass(
+        self, result: Dict[str, Any], civ: Any = None
+    ) -> None:
+        """Persist Phase 2 routed feedback to civ (target-prefixed keys).
+
+        This is the wiring that closes the loop: Phase 2 generates feedback,
+        the loop writes it into civ with `feedback.<target>.*` keys, and
+        next-time GLM/Doubao/Kimi/Qwen calls can OPTIONALLY read it.
+
+        Storage keys written (per V24.3.5 design):
+          feedback._global.consistency_score / risk_score / trace_id /
+              generated_at / missing_fields / type_repairs / risk_repairs /
+              last_loop_write_at
+          feedback.<target>.issues / issue_count / suggestions /
+              priority / requires_action   (for glm/deepseek/doubao/kimi/qwen)
+          feedback.ds.ds_tasks / requires_execution_book
+
+        No-op if civ is None or MinimaxFeedbackLoop not importable.
+        Never raises (best-effort, must not break pipeline).
+        """
+        try:
+            from fzq_ai.minimax.phase2 import MinimaxFeedbackLoop
+
+            routed = result.get("minimax_feedback_routed") or {}
+            phase2_feedback_dict = result.get("minimax_feedback") or {}
+
+            # Reconstruct StructuralFeedback if available (best-effort)
+            phase2_feedback = None
+            if isinstance(phase2_feedback_dict, dict) and phase2_feedback_dict.get("trace_id"):
+                try:
+                    from fzq_ai.minimax.phase2 import StructuralFeedback
+                    phase2_feedback = StructuralFeedback(**phase2_feedback_dict)
+                except Exception:
+                    pass
+
+            loop = MinimaxFeedbackLoop()
+            ok = loop.record(
+                routed_feedback=routed,
+                civ=civ,
+                phase2_feedback=phase2_feedback,
+            )
+            result["minimax_feedback_loop_ok"] = ok
+        except Exception as e:
+            _logger.warning("minimax feedback loop pass failed: %s", e, exc_info=True)
+            result["minimax_feedback_loop_ok"] = False
 
     def _fail(self, error: str, trace_id: str, t0: float, user_input: str,
               warning: str = "", model: str = "") -> Dict[str, Any]:
