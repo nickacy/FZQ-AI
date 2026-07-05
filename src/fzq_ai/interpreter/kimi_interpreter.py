@@ -32,8 +32,12 @@ class KimiInterpreter:
         "tech": "技术", "international": "国际",
     }
 
-    def interpret(self, strict_schema: dict) -> ExplanationResult:
+    def interpret(self, strict_schema: dict, feedback_context: Optional[dict] = None) -> ExplanationResult:
         """Main entry point — generate all 6 explanation fields."""
+        # Feedback: if requires_action, add action prefix
+        action_prefix = ''
+        if feedback_context and feedback_context.get('requires_action'):
+            action_prefix = '[ACTION REQUIRED] '
         return ExplanationResult(
             policy_brief=self._policy_brief(strict_schema),
             risk_summary=self._risk_summary(strict_schema),

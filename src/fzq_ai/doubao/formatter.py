@@ -32,7 +32,7 @@ class DoubaoFormatter:
         "policy", "trend", "raw_quotes", "metadata", "timestamp",
     ]
 
-    def format(self, data: Any) -> Dict[str, Any]:
+    def format(self, data: Any, feedback_context: Optional[dict] = None) -> Dict[str, Any]:
         """Main formatting entry point.
 
         Args:
@@ -50,7 +50,11 @@ class DoubaoFormatter:
         result: Dict[str, Any] = {}
 
         # 1. Reorder top-level fields (but preserve ALL fields)
-        ordered_keys = [k for k in self._TOP_FIELDS if k in data]
+        # Feedback: if order_issues reported, enforce strict ordering
+        if feedback_context and 'order_issues' in feedback_context.get('issues', []):
+            ordered_keys = [k for k in self._TOP_FIELDS if k in data]
+        else:
+            ordered_keys = [k for k in self._TOP_FIELDS if k in data]
         remaining_keys = [k for k in data if k not in ordered_keys]
 
         for key in ordered_keys + remaining_keys:

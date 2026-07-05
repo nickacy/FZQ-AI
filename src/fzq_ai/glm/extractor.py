@@ -62,9 +62,13 @@ class GLMExtractor:
         r"[\u4e00-\u9fff]{2,8}(?:政府|部|委员会|局|组织|机构|公司|集团)",  # Chinese entities
     ]
 
-    def extract(self, text: str) -> GLMRawMaterial:
+    def extract(self, text: str, feedback_context: Optional[dict] = None) -> GLMRawMaterial:
         """Main extraction entry point. Returns fully structured GLMRawMaterial."""
         language = self._detect_language(text)
+
+        # Feedback: if priority=high, expand extraction
+        if feedback_context and feedback_context.get('priority') == 'high':
+            text = text + ' ' + text[:500]  # double-signal important content
 
         return GLMRawMaterial(
             source_text=text,

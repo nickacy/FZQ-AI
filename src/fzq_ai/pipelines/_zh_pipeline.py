@@ -202,8 +202,13 @@ class ZhStructuredPipeline(BasePipeline):
         # V25: Doubao formatting (Minimax → clean JSON for Kimi/Qwen)
         try:
             from fzq_ai.doubao.formatter import DoubaoFormatter
+            from fzq_ai.pipeline.feedback_loop import FeedbackLoop
+            fb_doubao = FeedbackLoop.build_context(civ=civ, target="doubao")
             fmt = DoubaoFormatter()
-            result["doubao_formatted"] = fmt.format(result.get("validated") or result.get("parsed") or {})
+            result["doubao_formatted"] = fmt.format(
+                result.get("validated") or result.get("parsed") or {},
+                feedback_context=fb_doubao,
+            )
             civ = kwargs.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("doubao_formatted", str(result["doubao_formatted"])[:1000])
@@ -213,9 +218,14 @@ class ZhStructuredPipeline(BasePipeline):
         # V25: Kimi interpretation (structured → human-readable explanations)
         try:
             from fzq_ai.interpreter.kimi_interpreter import KimiInterpreter
+            from fzq_ai.pipeline.feedback_loop import FeedbackLoop
+            fb_kimi = FeedbackLoop.build_context(civ=civ, target="kimi")
             interpreter = KimiInterpreter()
             doubao = result.get("doubao_formatted") or {}
-            result["kimi_interpreted"] = interpreter.interpret(doubao).model_dump()
+            result["kimi_interpreted"] = interpreter.interpret(
+                doubao,
+                feedback_context=fb_kimi,
+            ).model_dump()
             civ = kwargs.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("kimi_interpreted", str(result["kimi_interpreted"].get("policy_brief", ""))[:1000])
