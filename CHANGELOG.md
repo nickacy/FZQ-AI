@@ -1,5 +1,54 @@
 # FZQ-AI CHANGELOG
 
+## V24.3.1 (2026-07-05) — Minimax: Strict Schema Validator Skeleton
+
+> V24.3.0 完成文明层 4 层集成。V24.3.1 引入 **Minimax 结构守门人**（Python validator 骨架 + System Prompt），为 V25/V30 的 GLM→DeepSeek→**Minimax**→豆包→Kimi→Qwen 链路预留接入点。
+
+### Added / 新增
+
+- **`src/fzq_ai/minimax/` 子包**（5 文件）
+  - `__init__.py` — 导出 `StrictSchema`, `StrictSchemaValidator`, `SchemaRepairError`, `repair_structure`, `repair_types`, `parse_json_text`
+  - `schema.py` — `StrictSchema` Pydantic 模型（13 字段：8 顶层 + 5 嵌套 risks 子分类）+ `StrictRisks` 嵌套模型 + `STRICT_SCHEMA_FIELD_ORDER` 规范字段顺序
+  - `validator.py` — `StrictSchemaValidator.validate(raw) -> StrictSchema` 主入口；strict/lenient 两种模式；可选 `validate_with_civ(civ=...)` 接入文明层
+  - `repair.py` — 修复原语：`repair_structure` (R3 补字段)、`repair_types` (R4 类型修复)、`parse_json_text` (3-tier JSON 解析)
+  - `prompts/minimax_system.txt` — System Prompt（备用 LLM 通道）
+- **`tests/test_minimax.py`** — 32 个单元测试覆盖 R1-R6 + JSON 文本输入路径 + 修复原语 + 文明层集成 + 端到端混沌输入
+- **`docs/MINIMAX_STRICT_SCHEMA_VALIDATOR.md`** — Minimax 完整工作书（含 V24.3.1 实现说明 + V25 集成路径）
+
+### Design Choices / 设计取舍
+
+- **首选 Python validator 而非 LLM**：消除幻觉风险；执行快（< 1ms）；保证 R1-R6 严格遵守
+- **Pydantic 强制**：违反 R3/R4 直接抛 ValidationError，无法绕过
+- **零侵入集成**：`StrictSchemaValidator.validate(raw_dict)` 单函数调用
+- **字段顺序规范化**：所有输出都按 `STRICT_SCHEMA_FIELD_ORDER` 排列，便于下游 diff/缓存
+- **JSON 3-tier 解析**：直接 / 围栏 / 首块 — 复用 `_zh_pipeline._parse_json` 同款逻辑
+- **文明层正交**：`validate_with_civ()` 是可选方法；Minimax 失败不阻塞主流程
+
+### Verification / 验证
+
+- **测试**：179 → **214 passed, 1 warning**（+32 个 Minimax 测试，32/32 PASSED）
+- **R1-R6 覆盖**：每条强制规则至少 3 个测试用例
+- **端到端**：`test_chaotic_input_full_repair` 验证 7 种典型异常输入全部正确修复
+
+### Known Limitations / 已知局限
+
+- **未集成到 `_zh_pipeline.py`**：Minimax 骨架就绪，但未在主链路调用；V25 默认启用
+- **LLM 通道未实现**：System Prompt 已存盘但 `validate()` 走纯 Python 路径
+- **修复策略**：dict 序列化为 JSON string 而非展开（保守选择，避免 R2 推测）
+
+### Integration Path (V25) / 集成路径
+
+```python
+# _zh_pipeline.py (V25 draft)
+# 5. Pydantic 校验（zh_tasks 专用 schema）
+validated = self._validate(parsed)
+
+# 6. Minimax 严格校验（V25 默认启用）
+if self._minimax_enabled and validated is not None:
+    from fzq_ai.minimax import StrictSchemaValidator
+    validated = StrictSchemaValidator().validate_with_civ(validated, civ=civilization)
+```
+
 ## V24.3.0 (2026-07-04) — Civilization Layer R2+R3: Full Integration + Final Polish
 
 > V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。
