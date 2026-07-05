@@ -49,6 +49,74 @@ if self._minimax_enabled and validated is not None:
     validated = StrictSchemaValidator().validate_with_civ(validated, civ=civilization)
 ```
 
+## V24.3.3 (2026-07-05) — Minimax Integration into zh_tasks Pipelines
+
+> V24.3.2 引入 Minimax 骨架（`src/fzq_ai/minimax/`）。V24.3.3 把 Minimax 接入 `_zh_pipeline` 主链路——4 个 zh_tasks pipeline 现在每次执行都跑严格 schema 校验。
+
+### Added / 新增
+
+- **`ZhStructuredPipeline._minimax_pass()` 方法** —— 把 result dict 喂给 `StrictSchemaValidator.validate_with_civ()`，输出 `{valid: bool, strict: dict, errors: list}` 子字典
+- **`ZhStructuredPipeline.run()` 末尾 + `run_async()` 末尾 + `_fail()` 错误路径** —— 都加 `result["minimax"] = self._minimax_pass(...)`，确保任何返回路径都有 minimax 字段
+- **`tests/test_minimax_integration.py`** —— 26 个集成测试覆盖 4 个 pipeline 的 minimax 行为
+
+### Key Bug Fix / 关键 bug 修复
+
+- **`ZhStructuredPipeline.run()` 覆盖了 `BasePipeline.run()` 主入口**——子类 run() 直接走自身实现，**不经过 BasePipeline delegate 逻辑**，导致 minimax 字段在 sync run() 路径下缺失。修复：直接在 ZhStructuredPipeline.run() 末尾调 `_minimax_pass()`
+
+### Design Notes / 设计要点
+
+- **Minimax 总是启用**（V25 默认 on，无 flag）
+- **不修改 validated** —— Minimax 是 R1/R2/R5 合规守门人，只读 + 补全 StrictSchema 字段，不动原 validated 内容
+- **同步/异步入口都接入** —— `p.run()` 和 `p.run_async()` 都加 minimax；`_fail()` 错误路径也加
+- **失败不阻塞** —— Minimax 抛异常被捕获，存到 `minimax.errors`，pipeline 不因 minimax 失败而失败
+
+### Result Dict 新契约
+
+```python
+{
+    # V24.2.0 原有字段
+    "task": "zh_policy_brief",
+    "input": "...",
+    "output": "...",  # raw LLM text
+    "parsed": {...} | None,
+    "validated": {...} | None,  # task-specific Pydantic (unchanged by minimax)
+    "model": "glm-4-flash",
+    "fallback_chain": [...],
+    "warnings": [...],
+    "trace_id": "...",
+    "duration_ms": 123.45,
+    "status": "ok" | "partial" | "error",
+    # V24.3.0 R2 字段（仅 run_async）
+    "civilization_trace": [...],
+    # V24.3.3 新字段
+    "minimax": {
+        "valid": True,
+        "strict": {  # StrictSchema.model_dump() — 8 顶层 + 5 嵌套
+            "facts": [...], "events": [...], "actors": [...],
+            "narratives": [...], "risks": {...},
+            "policy": [...], "trend": [...], "raw_quotes": [...]
+        },
+        "errors": []
+    }
+}
+```
+
+### Verification / 验证
+
+- **测试**：214 → **240 passed, 1 warning**（+26 个 minimax integration 测试，26/26 PASSED）
+- **Pipeline 不破坏**：`test_pipelines_real.py` 22/22 仍全绿
+- **同步路径**：`p.run()` 现在返回 12 keys（含 minimax）
+- **异步路径**：`p.run_async()` 现在返回 13 keys（含 civilization_trace + minimax）
+- **错误路径**：`_fail()` 也带 minimax（验证错误 result 自身的结构完整性）
+
+### Integration Points / 接入点
+
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline.run()` —— sync 入口
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline.run_async()` —— async 入口
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline._fail()` —— 错误路径
+- 4 个 zh_tasks 子类（policy_brief / risk_scan / opinion_landscape / multisource_merge）**自动继承** minimax 接入
+
+
 ## V24.3.0 (2026-07-04) — Civilization Layer R2+R3: Full Integration + Final Polish
 
 > V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。

@@ -169,7 +169,7 @@ class ZhStructuredPipeline(BasePipeline):
 
         duration_ms = round((time.perf_counter() - t0) * 1000, 2)
 
-        return {
+        result = {
             "task": self.task_type,
             "input": user_input,
             "output": llm_text,           # raw LLM text (always)
@@ -182,6 +182,9 @@ class ZhStructuredPipeline(BasePipeline):
             "duration_ms": duration_ms,
             "status": "ok" if validated is not None else "partial",
         }
+        # V25: Minimax strict schema validation (default-on, even on sync run() path)
+        result["minimax"] = self._minimax_pass(result, civ=None)
+        return result
 
     async def run_async(self, **kwargs: Any) -> Dict[str, Any]:
         # V24-R2: civilization integration (kwargs shape, see agent task wrappers)
@@ -216,11 +219,51 @@ class ZhStructuredPipeline(BasePipeline):
                 _logger.warning("Suppressed error", exc_info=True)
 
         result["civilization_trace"] = civ_trace
+
+        # 3. V25: Minimax strict schema validation (default-on)
+        #    Validates the result dict's structure against StrictSchema (13 fields).
+        #    Never modifies the input result (R1, R2, R5 compliance).
+        #    On failure: sets minimax.valid=False with errors captured; pipeline still succeeds.
+        result["minimax"] = self._minimax_pass(result, civ=civilization)
         return result
+
+    # ============================================================
+    # V25: Minimax strict schema validation pass
+    # ============================================================
+    def _minimax_pass(self, result: Dict[str, Any], civ: Any = None) -> Dict[str, Any]:
+        """Validate pipeline result through Minimax (StrictSchemaValidator).
+
+        Minimax guarantees:
+          - R1: Never fabricates facts (preserves all input keys with non-None values)
+          - R2: Never infers content (no semantic expansion)
+          - R3: Fills missing fields with empty defaults
+          - R4: Repairs types (str -> list, dict -> list, etc.)
+          - R5: Maintains canonical field order
+          - R6: Output is always a Pydantic model (no natural language)
+
+        Returns a sub-dict: {valid: bool, strict: dict | None, errors: list[str]}
+        Pipeline never fails on Minimax errors — they're captured in the sub-dict.
+        """
+        try:
+            from fzq_ai.minimax import StrictSchemaValidator
+            validator = StrictSchemaValidator()
+            strict = validator.validate_with_civ(result, civ=civ)
+            return {
+                "valid": True,
+                "strict": strict.model_dump(),
+                "errors": [],
+            }
+        except Exception as e:
+            _logger.warning("minimax validation failed: %s", e, exc_info=True)
+            return {
+                "valid": False,
+                "strict": None,
+                "errors": [f"{type(e).__name__}: {e}"],
+            }
 
     def _fail(self, error: str, trace_id: str, t0: float, user_input: str,
               warning: str = "", model: str = "") -> Dict[str, Any]:
-        return {
+        result = {
             "task": self.task_type,
             "input": user_input,
             "output": "",
@@ -234,3 +277,7 @@ class ZhStructuredPipeline(BasePipeline):
             "error": error,
             "civilization_trace": [],  # V24-R2: error path also carries empty trace
         }
+        # V25: Minimax still runs on error path (validates structural completeness
+        # of the error result itself — empty schema is also a valid StrictSchema).
+        result["minimax"] = self._minimax_pass(result, civ=None)
+        return result
