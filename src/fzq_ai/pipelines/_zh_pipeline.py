@@ -123,6 +123,20 @@ class ZhStructuredPipeline(BasePipeline):
         user_input = self._extract_user_input(**kwargs)
         warnings: list[str] = []
 
+        # 0. GLM extraction (content extraction before LLM structuring)
+        glm_material = None
+        try:
+            from fzq_ai.glm.extractor import GLMExtractor
+            extractor = GLMExtractor()
+            glm_material = extractor.extract(user_input)
+            civ = kwargs.get("civilization")
+            if civ and hasattr(civ, "remember"):
+                civ.remember("glm_raw", glm_material.model_dump())
+                civ.remember("glm_quotes", [q.text for q in glm_material.raw_quotes])
+                civ.remember("glm_events", [e.summary for e in glm_material.event_chain])
+        except Exception:
+            _logger.warning("GLM extraction skipped", exc_info=True)
+
         # 1. Load prompt
         try:
             prompt_template = self._load_prompt()
