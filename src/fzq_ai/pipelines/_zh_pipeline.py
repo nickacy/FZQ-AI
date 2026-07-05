@@ -210,6 +210,18 @@ class ZhStructuredPipeline(BasePipeline):
         except Exception:
             _logger.warning("Doubao formatting skipped", exc_info=True)
 
+        # V25: Kimi interpretation (structured → human-readable explanations)
+        try:
+            from fzq_ai.interpreter.kimi_interpreter import KimiInterpreter
+            interpreter = KimiInterpreter()
+            doubao = result.get("doubao_formatted") or {}
+            result["kimi_interpreted"] = interpreter.interpret(doubao).model_dump()
+            civ = kwargs.get("civilization")
+            if civ and hasattr(civ, "remember"):
+                civ.remember("kimi_interpreted", str(result["kimi_interpreted"].get("policy_brief", ""))[:1000])
+        except Exception:
+            _logger.warning("Kimi interpretation skipped", exc_info=True)
+
         return result
 
     async def run_async(self, **kwargs: Any) -> Dict[str, Any]:
