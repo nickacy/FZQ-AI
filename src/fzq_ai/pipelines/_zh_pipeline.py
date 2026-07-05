@@ -263,6 +263,12 @@ class ZhStructuredPipeline(BasePipeline):
         #    Never modifies the input result (R1, R2, R5 compliance).
         #    On failure: sets minimax.valid=False with errors captured; pipeline still succeeds.
         result["minimax"] = self._minimax_pass(result, civ=civilization)
+
+        # 4. V25: Minimax Phase 2 — Structural Feedback Layer
+        #    Generates structural feedback (no code, no schema changes) for
+        #    upstream (GLM, DeepSeek) and downstream (豆包, Kimi, Qwen).
+        #    Routed feedback is also written to civilization memory.
+        self._minimax_phase2_pass(result, civ=civilization)
         return result
 
     # ============================================================
@@ -298,6 +304,59 @@ class ZhStructuredPipeline(BasePipeline):
                 "strict": None,
                 "errors": [f"{type(e).__name__}: {e}"],
             }
+
+    # ============================================================
+    # V25: Minimax Phase 2 — Structural Feedback Layer
+    # ============================================================
+    def _minimax_phase2_pass(self, result: Dict[str, Any], civ: Any = None) -> None:
+        """Generate and route Phase 2 structural feedback.
+
+        Phase 2 produces read-only structural feedback (no code, no schema changes).
+        Result dict gets two new keys:
+          - minimax_feedback: StructuralFeedback.model_dump()
+          - minimax_feedback_routed: dict[str, RoutedFeedback] (6-target routing)
+
+        If civ provided: writes 3 memory keys (consistency_score, risk_score,
+        feedback trace_id) — best-effort, never blocks pipeline.
+        """
+        try:
+            from fzq_ai.minimax.phase2 import (
+                MinimaxFeedbackEngine,
+                MinimaxFeedbackRouter,
+            )
+            minimax = result.get("minimax") or {}
+            strict_schema = minimax.get("strict") if isinstance(minimax, dict) else None
+            if not strict_schema:
+                # Phase 1 failed or strict is None — skip Phase 2
+                return
+
+            engine = MinimaxFeedbackEngine()
+            router = MinimaxFeedbackRouter()
+            feedback = engine.generate(
+                strict_schema=strict_schema,
+                original_input=result,
+                trace_id=result.get("trace_id"),
+            )
+            routed = router.route(feedback)
+
+            result["minimax_feedback"] = feedback.model_dump()
+            result["minimax_feedback_routed"] = routed
+
+            # Civ memory (best-effort)
+            if civ is not None and hasattr(civ, "remember"):
+                try:
+                    civ.remember("minimax_feedback_consistency", str(feedback.consistency_score))
+                    civ.remember("minimax_feedback_risk", str(feedback.risk_score))
+                    civ.remember("minimax_feedback_trace_id", feedback.trace_id)
+                    civ.remember("minimax_feedback_missing_count", str(len(feedback.missing_fields)))
+                    civ.remember("minimax_feedback_type_repair_count", str(len(feedback.type_repairs)))
+                    civ.remember("minimax_feedback_risk_repair_count", str(len(feedback.risk_repairs)))
+                except Exception:
+                    pass
+        except Exception as e:
+            # Phase 2 must never break the pipeline
+            _logger.warning("minimax phase 2 failed: %s", e, exc_info=True)
+            result["minimax_feedback"] = {"error": f"{type(e).__name__}: {e}"}
 
     def _fail(self, error: str, trace_id: str, t0: float, user_input: str,
               warning: str = "", model: str = "") -> Dict[str, Any]:

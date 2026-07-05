@@ -117,6 +117,110 @@ if self._minimax_enabled and validated is not None:
 - 4 个 zh_tasks 子类（policy_brief / risk_scan / opinion_landscape / multisource_merge）**自动继承** minimax 接入
 
 
+## V24.3.4 (2026-07-05) — Minimax Phase 2: Structural Feedback Layer
+
+> V24.3.3 把 Minimax Phase 1（结构修复）接入 _zh_pipeline。V24.3.4 引入 **Minimax Phase 2（结构反馈层）**——生成 structural feedback 反馈给 GLM/DeepSeek/豆包/Kimi/Qwen + Copilot commit decision。
+
+### Added / 新增
+
+- **`src/fzq_ai/minimax/phase2/` 子包**（5 文件）
+  - `__init__.py` — 导出 `StructuralFeedback`, `MinimaxFeedbackEngine`, `MinimaxFeedbackRouter`
+  - `feedback_models.py` — `StructuralFeedback` (Pydantic, 10 字段) + `RoutedFeedback` (per-target slice) + `CommitDecision` (Copilot 决策)
+  - `feedback_engine.py` — `MinimaxFeedbackEngine.generate(strict_schema, original_input, trace_id)` — 找出 missing/type/risk/order repairs + 计算 consistency/risk scores + 生成 structural suggestions
+  - `feedback_router.py` — `MinimaxFeedbackRouter.route(feedback)` — 6 路分发（glm/deepseek/doubao/kimi/qwen/ds_commit_decision）+ Copilot 决策
+  - `prompts/system_minimax_phase2.txt` — System Prompt（备用 LLM 通道）
+- **`tests/test_minimax_phase2.py`** — 22 个单元测试覆盖 R1-R6 + 6-路分发 + Copilot 决策
+- **`docs/MINIMAX_PHASE2_STRUCTURAL_FEEDBACK.md`** — Phase 2 完整工作书
+- **`_zh_pipeline.py` 集成 `_minimax_phase2_pass()`** — Phase 1 strict_schema 出来后调 Phase 2 engine + router，结果写入 `result["minimax_feedback"]` + `result["minimax_feedback_routed"]` + 6 个 civ 记忆 key
+
+### Mandatory Rules Enforced / 强制规则
+
+- **R1**：suggestions 不含代码（grep 验证：`def` / `class` / `import` / `lambda` 都不出现）
+- **R2**：engine 永不修改 strict_schema 或 original_input（copy 对比测试）
+- **R3**：missing_fields 只报告 canonical 字段，不发明新字段
+- **R4**：strict_schema 视为不可变（只读）
+- **R5**：suggestions 全部为结构性散文（不上代码）
+- **R6**：所有输出 JSON 可序列化（feedback.model_dump() + routed dict）
+
+### Result Dict 新契约（V24.3.4）
+
+```python
+{
+    # V24.2.0 / V24.3.0 / V24.3.3 字段
+    ...,
+    "minimax": {  # Phase 1
+        "valid": True,
+        "strict": {...},
+        "errors": []
+    },
+    # V24.3.4 新字段
+    "minimax_feedback": {  # Phase 2 — StructuralFeedback.model_dump()
+        "source": "minimax_phase2",
+        "missing_fields": [...],
+        "type_repairs": [...],
+        "risk_repairs": [...],
+        "order_repairs": [...],
+        "consistency_score": 75.0,
+        "risk_score": 60.0,
+        "suggestions": [...],  # 结构散文，不含代码
+        "trace_id": "...",
+        "generated_at": "..."
+    },
+    "minimax_feedback_routed": {  # Phase 2 — 6-路分发
+        "glm": {"issues": [...], "suggestions": [...], "priority": "high"},
+        "deepseek": {"issues": [...], "suggestions": [...], "priority": "medium"},
+        "doubao": {"issues": [...], "suggestions": [...], "priority": "low"},
+        "kimi": {"issues": [...], "suggestions": [...], "priority": "medium"},
+        "qwen": {"issues": [...], "suggestions": [...], "priority": "high"},
+        "ds_commit_decision": {
+            "minimax_can_commit": True,
+            "reason": "...",
+            "requires_ds_execution_book": False,
+            "ds_tasks": []
+        }
+    }
+}
+```
+
+### Copilot Commit Decision / Copilot 决策
+
+- **Minimax self-commit**（结构反馈 + scores + suggestions）→ ✔
+- **DS 执行书**（schema/pipeline/agent/civ/code/test 变更）→ ✘
+- 触发 DS 执行书条件：`consistency_score < 30.0` 或 `risk_score < 40.0` 或 suggestions 含 "schema" 关键词
+
+### Verification / 验证
+
+- **测试**：240 → **316 passed, 1 warning**（+22 phase2 tests，22/22 PASSED + 既有测试全部仍绿）
+- **现有 pipeline 测试**：`test_pipelines_real.py` 22/22 仍 PASSED
+- **现有 minimax 测试**：`test_minimax_integration.py` 26/26 仍 PASSED
+- **现有 phase1 测试**：`test_minimax.py` 32/32 仍 PASSED
+
+### Civil Integration / 文明层集成
+
+`_minimax_phase2_pass` 在 civ 非 None 时写入 6 个记忆 key（best-effort）：
+
+```
+minimax_feedback_consistency    → str(consistency_score)
+minimax_feedback_risk           → str(risk_score)
+minimax_feedback_trace_id       → feedback.trace_id
+minimax_feedback_missing_count  → len(missing_fields)
+minimax_feedback_type_repair_count → len(type_repairs)
+minimax_feedback_risk_repair_count  → len(risk_repairs)
+```
+
+### Known Limitations / 已知局限
+
+- **Phase 2 输入要求 `original_input`**：缺失时 `missing/type/risk/order` 字段为空（只生成 scores + 兜底 suggestions）
+- **LLM 通道未实现**：System Prompt 已存盘但 engine 走纯 Python 路径
+- **6-路分发是关键词过滤**：suggestion 含目标关键词才分发给该目标，V25+ 可加更智能路由
+
+### Integration Points / 接入点
+
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline.run_async()` — V25 默认启用
+- `pipelines/_zh_pipeline.py:ZhStructuredPipeline.run()` — 也启用（同步入口）
+- 4 个 zh_tasks pipeline（policy_brief / risk_scan / opinion_landscape / multisource_merge）自动继承
+
+
 ## V24.3.0 (2026-07-04) — Civilization Layer R2+R3: Full Integration + Final Polish
 
 > V24.2.0 接入文明层但只覆盖 Entry + Orchestrator 两层。R2 补完 Agent + Pipeline 两层，并清理 R1 验收遗留问题。
