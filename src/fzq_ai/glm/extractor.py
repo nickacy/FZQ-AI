@@ -63,24 +63,89 @@ class GLMExtractor:
     ]
 
     def extract(self, text: str, feedback_context: Optional[dict] = None) -> GLMRawMaterial:
-        """Main extraction entry point. Returns fully structured GLMRawMaterial."""
+        """Main extraction entry point. Returns fully structured GLMRawMaterial.
+
+        feedback_context (optional) supports lightweight consumption of Minimax Phase 2:
+        - 'priority' == 'high' -> expand extraction scope (more sentences, more events)
+        - 'missing_fields' -> bias extraction to search for those fields more aggressively
+        - 'type_issues' -> defensive normalization to ensure lists where expected
+        """
         language = self._detect_language(text)
 
-        # Feedback: if priority=high, expand extraction
-        if feedback_context and feedback_context.get('priority') == 'high':
-            text = text + ' ' + text[:500]  # double-signal important content
+        # ---- Feedback-driven lightweight behaviors (non-destructive) ----
+        # Default extraction parameters
+        sentence_limit = 10
+        event_sentence_limit = 15
+        actor_limit = 20
+
+        if feedback_context:
+            # Priority high: expand extraction scope (still rule-based, no inference)
+            if feedback_context.get("priority") == "high":
+                sentence_limit = max(sentence_limit, 20)
+                event_sentence_limit = max(event_sentence_limit, 30)
+
+            # If missing_fields contains specific keys, bias heuristics:
+            missing = feedback_context.get("missing_fields", [])
+            if missing:
+                # If facts missing previously, allow scanning more sentences for facts
+                if "facts" in missing:
+                    sentence_limit = max(sentence_limit, 30)
+                # If actors missing previously, increase actor search scope
+                if "actors" in missing:
+                    actor_limit = max(actor_limit, 40)
+
+            # Defensive: if type issues reported, we will normalize outputs later
+            type_issues = feedback_context.get("type_issues", [])
+            # normalization happens after extraction
+
+        # If priority high, duplicate a short prefix to increase signal for heuristics
+        # (keeps R1-R6: no fabrication, only repeats existing text)
+        if feedback_context and feedback_context.get("priority") == "high":
+            text = text + " " + text[:500]
+
+        # Run extraction with possibly adjusted limits
+        core_facts = self._extract_facts(text, limit=sentence_limit)
+        events = self._extract_events(text, limit=event_sentence_limit)
+        actors = self._extract_actors(text, limit=actor_limit)
+        narratives = self._extract_narratives(text)
+        risks = self._extract_risks(text)
+        policy_signals = self._extract_policy_signals(text)
+        trend_signals = self._extract_trend_signals(text)
+        raw_quotes = self._extract_quotes(text, language)
+
+        # Defensive normalization based on reported type issues
+        if feedback_context and feedback_context.get("type_issues"):
+            core_facts = list(core_facts) if not isinstance(core_facts, list) else core_facts
+            events = list(events) if not isinstance(events, list) else events
+            actors = list(actors) if not isinstance(actors, list) else actors
+            narratives = list(narratives) if not isinstance(narratives, list) else narratives
+            # risks expected to be list of GLMRisk; ensure list
+            if not isinstance(risks, list):
+                risks = list(risks) if risks is not None else []
+            else:
+                risks = [r for r in risks]
+
+        # Ensure we never return None for list fields (R6)
+        core_facts = core_facts or []
+        events = events or []
+        actors = actors or []
+        narratives = narratives or []
+        policy_signals = policy_signals or []
+        trend_signals = trend_signals or []
+        raw_quotes = raw_quotes or []
+        risks = risks or []
 
         return GLMRawMaterial(
             source_text=text,
             detected_language=language,
-            core_facts=self._extract_facts(text),
-            event_chain=self._extract_events(text),
-            actors=self._extract_actors(text),
-            narratives=self._extract_narratives(text),
-            risks=self._extract_risks(text),
-            policy_signals=self._extract_policy_signals(text),
-            trend_signals=self._extract_trend_signals(text),
-            raw_quotes=self._extract_quotes(text, language),
+            core_facts=core_facts,
+            event_chain=events,
+            actors=actors,
+            narratives=narratives,
+            risks=risks,
+            policy_signals=policy_signals,
+            trend_signals=trend_signals,
+            raw_quotes=raw_quotes,
         )
 
     # ── Language detection ──
@@ -98,12 +163,12 @@ class GLMExtractor:
         return "en"
 
     # ── Fact extraction ──
-    def _extract_facts(self, text: str) -> list[GLMCoreFact]:
+    def _extract_facts(self, text: str, limit: int = 10) -> list[GLMCoreFact]:
         """Extract 5W1H facts using sentence-level heuristics."""
         sentences = self._split_sentences(text)
         facts: list[GLMCoreFact] = []
 
-        for sent in sentences[:10]:  # Limit to avoid noise
+        for sent in sentences[:limit]:
             who_match = re.search(
                 r"(?:President|Prime Minister|Minister|Chairman|leader|official|spokesperson|"
                 r"[\u4e00-\u9fff]{2,4}(?:主席|总理|部长|总统|发言人|领导人))",
@@ -133,7 +198,7 @@ class GLMExtractor:
         return facts
 
     # ── Event extraction ──
-    def _extract_events(self, text: str) -> list[GLMEvent]:
+    def _extract_events(self, text: str, limit: int = 15) -> list[GLMEvent]:
         """Extract events with basic event-chain numbering."""
         sentences = self._split_sentences(text)
         events: list[GLMEvent] = []
@@ -144,7 +209,7 @@ class GLMExtractor:
         ]
 
         level = 1
-        for sent in sentences[:15]:
+        for sent in sentences[:limit]:
             if any(v in sent.lower() for v in event_verbs):
                 actors = []
                 for pattern in self.ACTOR_PATTERNS:
@@ -160,7 +225,7 @@ class GLMExtractor:
         return events
 
     # ── Actor extraction ──
-    def _extract_actors(self, text: str) -> list[GLMActor]:
+    def _extract_actors(self, text: str, limit: int = 20) -> list[GLMActor]:
         """Extract named entities and organizations."""
         actors: list[GLMActor] = []
         seen: set[str] = set()
@@ -176,7 +241,7 @@ class GLMExtractor:
                         mentions=min(mentions, 20),
                     ))
 
-        return actors[:20]
+        return actors[:limit]
 
     # ── Narrative extraction ──
     def _extract_narratives(self, text: str) -> list[GLMNarrative]:

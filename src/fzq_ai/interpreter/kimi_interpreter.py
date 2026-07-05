@@ -33,17 +33,62 @@ class KimiInterpreter:
     }
 
     def interpret(self, strict_schema: dict, feedback_context: Optional[dict] = None) -> ExplanationResult:
-        """Main entry point — generate all 6 explanation fields."""
-        # Feedback: if requires_action, add action prefix
-        action_prefix = ''
-        if feedback_context and feedback_context.get('requires_action'):
-            action_prefix = '[ACTION REQUIRED] '
+        """Main entry point — generate all 6 explanation fields.
+
+        feedback_context (optional) supports lightweight consumption of Minimax Phase 2:
+        - 'requires_action' (bool): when true, emphasize action in top-level briefs.
+        - 'consistency_score' (int 0-100): when low, add explicit structure warning.
+        - 'suggestions' (list[str]): structural suggestions from Minimax; included as a short '结构建议摘要' section.
+        """
+        # Feedback-driven flags (non-destructive, only affect wording)
+        action_prefix = ""
+        structure_warning = ""
+        structure_suggestions_text = ""
+
+        if feedback_context:
+            if feedback_context.get("requires_action"):
+                action_prefix = "[ACTION REQUIRED] "
+
+            consistency = feedback_context.get("consistency_score")
+            if isinstance(consistency, (int, float)) and consistency < 80:
+                structure_warning = (
+                    f"\n\n[结构一致性提醒] 当前结构一致性评分较低（{consistency}），"
+                    "请注意以下可能不稳定或缺失的字段。"
+                )
+
+            suggestions = feedback_context.get("suggestions", [])
+            if suggestions:
+                # Build a concise structure suggestions summary (no fabrication)
+                lines = []
+                for s in suggestions[:6]:
+                    # ensure each suggestion is short and safe to include
+                    lines.append(f"  · {str(s)[:200]}")
+                structure_suggestions_text = "\n\n[结构建议摘要]\n" + "\n".join(lines)
+
+        # Build explanation parts
+        policy_brief = action_prefix + self._policy_brief(strict_schema)
+        risk_summary = action_prefix + self._risk_summary(strict_schema)
+        narrative_analysis = self._narrative_analysis(strict_schema)
+        trend_insights = self._trend_insights(strict_schema)
+        quotes_analysis = self._quotes_analysis(strict_schema)
+
+        # Append structure-aware notes to one or more explanation fields.
+        # We choose to append to narrative_analysis and risk_summary to surface structure issues
+        # without changing the ExplanationResult schema.
+        if structure_warning:
+            # Put the warning into risk_summary (structure risk is relevant to risk section)
+            risk_summary = risk_summary + structure_warning
+
+        if structure_suggestions_text:
+            # Add suggestions to narrative_analysis as a separate small section
+            narrative_analysis = narrative_analysis + structure_suggestions_text
+
         return ExplanationResult(
-            policy_brief=self._policy_brief(strict_schema),
-            risk_summary=self._risk_summary(strict_schema),
-            narrative_analysis=self._narrative_analysis(strict_schema),
-            trend_insights=self._trend_insights(strict_schema),
-            quotes_analysis=self._quotes_analysis(strict_schema),
+            policy_brief=policy_brief,
+            risk_summary=risk_summary,
+            narrative_analysis=narrative_analysis,
+            trend_insights=trend_insights,
+            quotes_analysis=quotes_analysis,
             structured_explanation=strict_schema,
         )
 

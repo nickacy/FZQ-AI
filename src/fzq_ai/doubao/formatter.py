@@ -37,7 +37,9 @@ class DoubaoFormatter:
 
         Args:
             data: Minimax-validated schema (dict or Pydantic model).
-
+            feedback_context: optional dict produced by FeedbackLoop.build_context.
+                - If feedback_context contains 'issues' with 'order_issues', enable strict ordering.
+                - If feedback_context contains 'risk_structure' or 'risk_issues', enable defensive normalization for risks.
         Returns:
             Clean, ordered dict ready for downstream consumption.
         """
@@ -47,20 +49,63 @@ class DoubaoFormatter:
         if not isinstance(data, dict):
             return {"_error": "invalid_input", "_data": str(data)[:500]}
 
+        # Defensive copy to avoid mutating caller data
+        src = dict(data)
+
+        # If feedback requests risk normalization, apply defensive normalization
+        if feedback_context:
+            # risk_issues may be a list of keys or a flag
+            risk_issues = feedback_context.get("risk_structure") or feedback_context.get("risk_issues") or []
+            if risk_issues:
+                src = self._ensure_risks_list_inplace(src)
+
         result: Dict[str, Any] = {}
 
         # 1. Reorder top-level fields (but preserve ALL fields)
-        # Feedback: if order_issues reported, enforce strict ordering
-        if feedback_context and 'order_issues' in feedback_context.get('issues', []):
-            ordered_keys = [k for k in self._TOP_FIELDS if k in data]
+        # If feedback indicates order_issues, we enforce strict ordering for top fields.
+        strict_order = False
+        if feedback_context:
+            issues = feedback_context.get("issues", [])
+            if isinstance(issues, list) and "order_issues" in issues:
+                strict_order = True
+
+        if strict_order:
+            # Only include top fields that exist in source, in the canonical order,
+            # then append remaining keys in original source order.
+            ordered_keys = [k for k in self._TOP_FIELDS if k in src]
+            remaining_keys = [k for k in src.keys() if k not in ordered_keys]
         else:
-            ordered_keys = [k for k in self._TOP_FIELDS if k in data]
-        remaining_keys = [k for k in data if k not in ordered_keys]
+            # Preserve original input order as much as possible:
+            ordered_keys = [k for k in self._TOP_FIELDS if k in src]
+            remaining_keys = [k for k in src.keys() if k not in ordered_keys]
 
         for key in ordered_keys + remaining_keys:
-            result[key] = self._format_field(key, data[key])
+            result[key] = self._format_field(key, src.get(key))
 
         return result
+
+    def _ensure_risks_list_inplace(self, src: Dict[str, Any]) -> Dict[str, Any]:
+        """Ensure risks field is normalized: risks -> dict[str, list]. Non-destructive to values."""
+        if "risks" not in src:
+            return src
+        risks_val = src.get("risks")
+        # If risks is a dict mapping category -> item(s), normalize each to list
+        if isinstance(risks_val, dict):
+            normalized = {}
+            for k, v in risks_val.items():
+                if v is None:
+                    normalized[k] = []
+                elif isinstance(v, list):
+                    normalized[k] = v
+                else:
+                    # wrap scalar into list; do not fabricate content
+                    normalized[k] = [v]
+            src["risks"] = normalized
+        else:
+            # If risks is not a dict, fallback to preserving original but wrap into a single-entry dict
+            # This is defensive: we do not invent categories, just keep original under 'unknown'
+            src["risks"] = {"unknown": risks_val if isinstance(risks_val, list) else [risks_val]}
+        return src
 
     def _format_field(self, key: str, value: Any) -> Any:
         """Format a single field, preserving its type."""
@@ -69,6 +114,7 @@ class DoubaoFormatter:
         if isinstance(value, list):
             return [self._format_item(key, v) for v in value]
         if isinstance(value, dict):
+            # Preserve dict key order; format nested fields recursively
             return {k: self._format_field(k, v) for k, v in value.items()}
         if isinstance(value, (int, float, bool, str)):
             return value
@@ -86,9 +132,9 @@ class DoubaoFormatter:
             return item
         return str(item)[:1000]
 
-    def format_to_json(self, data: Any, indent: int = 2) -> str:
+    def format_to_json(self, data: Any, feedback_context: Optional[dict] = None, indent: int = 2) -> str:
         """Format and serialize to JSON string."""
-        formatted = self.format(data)
+        formatted = self.format(data, feedback_context=feedback_context)
         return json.dumps(formatted, indent=indent, ensure_ascii=False)
 
     @staticmethod
