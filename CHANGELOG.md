@@ -1,5 +1,49 @@
 # FZQ-AI CHANGELOG
 
+## V24.3.6 (2026-07-17) — 全文专业审计 + P0 阻断项修复（Batch A）
+
+> 10 名专项审计员并行只读审计（安全/结构/LLM/流水线/基础设施/Schema/测试/文档/前端/入口部署），产出 `docs/FZQ_AI_FULL_AUDIT_REPORT.md`（健康评分 42/100，P0×26 / P1×47 / P2×90+）。本版本完成 **Batch A：P0 无争议修复**（纯代码/配置修复，不含删除类清理）。剩余 Batch B（死代码删除）、Batch C（git 历史密钥根治）、Batch D（文档写实）待确认后执行。
+
+### Fixed / 修复（P0，26 项中的 24 项；2 项安全项待用户行动）
+
+- **GLM 包复活**：删除 `glm/extractor.py:21-22` 幻影 `GlobalSettings` + 非法 `src.` 前缀死导入 → `fzq_ai.glm` 恢复可导入，zh 管线 GLM/Doubao/Kimi 三阶段首次真正运行，16 个被阻断测试恢复
+- **LLM 路由契约**：`llm/router.py` 删除对所有 Provider 均不存在的 `run_sync` 调用，统一 `await provider.run(req)`；修复 provider 循环首轮即返回的死循环；收窄 OpenAI 前缀过宽匹配
+- **OpenAI/Gemini Provider**：构造器内自建默认 client（对齐 DeepSeekProvider 模式），消除 `client=None` 必败；标注改 `Optional[str]`
+- **假数据兜底清除**：`core/llm_executor.py` 删除 `"[Fake LLM output...]"` 伪造输出分支，改为抛出含原始错误的 `RuntimeError`；同模块 import 期 AttributeError 修复（getattr 兜底）
+- **/api/zh/\* 四端点复活**：`task_router._call_pipeline` 兜底改 `run_async(text=...)` 关键字调用（修复必 TypeError）；zh 端点测试补 `execution.success is True` 断言
+- **TaskOrchestrator 复活**：`asdict(intent)` 替换不存在的 `.model_dump()`；`run` 改 async 并 await 路由；删除恒 None 死桩 `_resolve_pipeline`
+- **/v23/entry 复活**：handler 改 async + await，按 orchestrator 实际返回 dict 重写响应（不再永远 UNKNOWN）
+- **CLI 复活**：`cli/agent.py` 改调存在的 `orch.run(text=...)`；sys.path 插入方向修正
+- **NewsPipeline**：补 `await fetch_all_news(...)`；入参/元素类型最小适配
+- **zh 输入注入**：4 个 `prompts/zh/*.txt` 末尾追加【待分析输入】`$content` 区块，`_zh_pipeline` 改 `string.Template.safe_substitute` —— 用户输入首次真正进入 LLM prompt（此前 `.format()` 必 KeyError 被吞，LLM 只收到静态说明书）
+- **Minimax 校验去假阳性**：校验对象从流水线包装 dict 改为 `result["parsed"]`；parsed 非 dict 时跳过校验并记录 warning（不再产出"全空 Schema 且 valid=True"）；删除 run/run_async 重复执行的 `_minimax_pass`；`run()` 正常路径在 civ 存在时补齐 `civilization_trace` 契约
+- **持久化层**：`intel_store.save_bundle` 改 `model_dump(mode="json")`（修复 asdict 必 TypeError 静默数据丢失），失败默认抛错；`:memory:` 模式持有单一持久连接；`_dict_to_bundle` 改 `model_validate` 全字段往返
+- **打包修复**：补 `pipeline/`、`ui/`、`llm/clients/` 三个缺失的 `__init__.py`；`pyproject.toml` 增加 `[tool.setuptools.package-data]`（yaml/txt/j2/json 运行时资源）
+- **Docker**：根 `.dockerignore` + `frontend-react/.dockerignore` 新建（阻断 .env/.git/data 烤进镜像）；Dockerfile 增加 `pip install -e . --no-deps`（修复容器启动必崩）
+- **CI**：两个 workflow 的 Install 步骤补 `pip install -e .`（修复干净 runner 收集必挂）
+- **Makefile**：recipe 空格改 TAB、CRLF 转 LF，新增 `install` 目标（修复完全不可用）
+- **入门**：README Quick Start 补 `pip install -e .`；`pytest.ini` 增加 `pythonpath = src`（收集不再依赖 editable 安装，负向验证通过）
+- **前端**：`agentState.ts` 泛型修复（tsc 0 错误，构建/Docker 解锁）；`main.tsx` 接线 `AppRoutes`（9 个页面恢复可达）+ 导航 `<a>` 改 `<Link>`；`vite.config.ts` 设 `base: '/static/'`（修复生产静态资源 404 白屏）；`apiClient` 改读 `VITE_API_BASE_URL`
+
+### Security / 安全（待用户行动）
+
+- ⚠️ **git 历史中发现真实 OpenAI 密钥明文**（历史审计报告粘贴，29+ 提交可恢复）：需立即吊销/轮换 + `git filter-repo` 重写历史（Batch C，待确认）
+- 已建 `.dockerignore` 阻断后续镜像泄露面；当前 `.env` 全部为占位符、从未入 git
+
+### Verification / 验证
+
+- **pytest**：320 passed + 1 collection error（16 测试被阻断）→ **336 passed, 0 failed, 0 error**（1 条环境性 starlette 警告，非项目代码）
+- `import fzq_ai.glm` / `import fzq_ai.pipeline, fzq_ai.ui, fzq_ai.llm.clients` 冒烟通过
+- TestClient 打 4 个 `/api/zh/*` 与 `/v23/entry`：`execution.success is True`
+- `npx tsc --noEmit` 0 错误；`npm run build` 成功，产物引用与后端 `/static` 挂载一致
+- 负向验证：移除 editable 安装文件后 pytest 收集仍 336（`pythonpath = src` 生效）
+
+### Known Issues / 遗留（Batch B/C/D 待确认）
+
+- glm/qwen/kimi Provider 仍会把 HTTP 错误体冒充正常 output 返回（P1，错误处理契约统一）
+- 约 59 个孤儿模块与多个死代码包（logging/、cache/、quality/、store/ 等，约占 30%）待删除清理
+- 版本元数据本版本已对齐 24.3.6；README 指标失真、docs/ 悬空索引等文档写实项待 Batch D
+
 ## V24.3.1 (2026-07-05) — Minimax: Strict Schema Validator Skeleton
 
 > V24.3.0 完成文明层 4 层集成。V24.3.1 引入 **Minimax 结构守门人**（Python validator 骨架 + System Prompt），为 V25/V30 的 GLM→DeepSeek→**Minimax**→豆包→Kimi→Qwen 链路预留接入点。

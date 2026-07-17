@@ -1,3 +1,7 @@
+"""FZQ-AI — multi-LLM content intelligence pipeline."""
+
+__version__ = "24.3.6"
+
 from .schemas import (
     LanguageCode,
     RegionCode,

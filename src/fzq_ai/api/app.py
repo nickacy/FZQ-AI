@@ -37,7 +37,7 @@ except Exception:  # pragma: no cover — monitoring is optional
 # 1. FastAPI 初始化
 # ============================================================
 
-app = FastAPI(title="FZQ-AI API", version="24.0.0")
+app = FastAPI(title="FZQ-AI API", version="24.3.6")
 
 
 # ============================================================
@@ -199,4 +199,4 @@ if get_metrics_response is not None:
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "version": "24.0.0"}
+    return {"status": "ok", "version": "24.3.6"}

@@ -1,6 +1,6 @@
 {
   "name": "fzq-ai-frontend",
-  "version": "24.0.0",
+  "version": "24.3.6",
   "private": true,
   "type": "module",
   "scripts": {
