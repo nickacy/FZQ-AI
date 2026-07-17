@@ -1,12 +1,13 @@
 import { useLanguageStore } from '../state/languageState';
 import { useSystemState } from '../state/systemState';
+import { V24Response, ApiError } from './types';
 
 const BASE_URL = '/api/v1';
 
 export const apiClient = {
   // ---------------------- Standard POST ----------------------
-  async post(endpoint: string, payload: any) {
-    const { language } = useLanguageStore.getState();   // ← 正确字段名
+  async post<T = V24Response>(endpoint: string, payload: Record<string, unknown>): Promise<T> {
+    const { language } = useLanguageStore.getState();
     const {
       setApiStatus,
       setBackendVersion,
@@ -29,10 +30,10 @@ export const apiClient = {
 
       // --- Update system status ---
       setApiStatus('connected');
-      if (data.backend_version) setBackendVersion(data.backend_version);
+      if (data.version) setBackendVersion(data.version);
       setHeartbeat(Date.now());
 
-      return data;
+      return data as T;
     } catch (err) {
       useSystemState.getState().setApiStatus('error');
       throw err;
@@ -40,8 +41,12 @@ export const apiClient = {
   },
 
   // ---------------------- SSE Streaming ----------------------
-  async postStream(endpoint: string, payload: any, onMessage: (msg: any) => void) {
-    const { language } = useLanguageStore.getState();   // ← 正确字段名
+  async postStream(
+    endpoint: string,
+    payload: Record<string, unknown>,
+    onMessage: (msg: V24Response) => void
+  ): Promise<void> {
+    const { language } = useLanguageStore.getState();
     const { setSseStatus } = useSystemState.getState();
 
     const url = `${BASE_URL}${endpoint}`;
@@ -84,7 +89,7 @@ export const apiClient = {
             }
 
             try {
-              const parsed = JSON.parse(data);
+              const parsed: V24Response = JSON.parse(data);
               onMessage(parsed);
             } catch {
               console.warn('Invalid SSE message:', data);

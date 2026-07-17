@@ -3,11 +3,18 @@
  * Must match backend DTOs exactly.
  */
 
+// ── Error ────────────────────────────────────────────────────
+
+export interface ApiError {
+  code: string;
+  message: string;
+}
+
 // ── Execution ────────────────────────────────────────────────
 
 export interface ExecutionResultV24 {
-  intent: Record<string, any>;
-  route: Record<string, any>;
+  intent: Record<string, unknown>;
+  route: Record<string, unknown>;
   pipeline: string;
   model: string;
   agent: string;
@@ -16,7 +23,7 @@ export interface ExecutionResultV24 {
   trace_id: string;
   fallback_used?: string;
   success?: boolean;
-  error?: { code: string; message: string };
+  error?: ApiError;
   clarification_needed?: boolean;
 }
 
@@ -42,31 +49,31 @@ export interface UiSchemaV24 {
 export interface UiBlock {
   type: string;
   title?: string | { zh: string; en: string };
-  items?: any;
+  items?: unknown;
   content?: string;
-  rows?: any[];
-  data?: any;
+  rows?: unknown[];
+  data?: unknown;
   blocks?: UiBlock[];
-  states?: Record<string, any>;
+  states?: Record<string, unknown>;
   code?: string;
 }
 
-// ── OutputCard ───────────────────────────────────────────────
+// ── OutputCard ─────────────────────────────────────────────────
 
 export interface OutputCard {
   id: string;
   type: string;
   title?: { zh: string; en: string };
   content?: { zh: string; en: string };
-  rows?: any[];
+  rows?: unknown[];
   code?: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
 }
 
-// ── API Response ─────────────────────────────────────────────
+// ── API Response ───────────────────────────────────────────────
 
 export interface V24Response {
   execution: ExecutionResultV24;
   ui_schema: UiSchemaV24;
-  output: any;
+  output: unknown;
 }

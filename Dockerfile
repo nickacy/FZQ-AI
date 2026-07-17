@@ -16,8 +16,11 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Create log directory
+RUN mkdir -p /app/data/logs
+
 # Expose API port
 EXPOSE 8000
 
 # Start FastAPI (Entry Layer V24)
-CMD ["uvicorn", "src.fzq_ai.ui.web_app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.fzq_ai.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
