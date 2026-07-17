@@ -50,6 +50,7 @@
 git clone https://github.com/nickacy/FZQ-AI
 cd FZQ-AI
 pip install -r requirements.txt
+pip install -e .            # install the fzq_ai package (src layout)
 cp .env.example .env       # edit with your API keys
 python main.py              # starts FastAPI on :8000
 ```

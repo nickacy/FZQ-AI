@@ -146,11 +146,12 @@ class TestMinimaxOnErrorPaths:
         p = ZhPolicyBriefPipeline()
         with _patch_call_llm("zh_policy_brief", return_text="not json {broken"):
             result = await p.run(event_topic="x")
-        # Pipeline soft-fails; minimax still runs
+        # Pipeline soft-fails; minimax pass is present
         assert "minimax" in result
-        # StrictSchema accepts the partial error result as input
-        # (validated=None is valid input — minimax fills all empty)
-        assert result["minimax"]["valid"] is True
+        # parsed=None (unparseable JSON) → validation is SKIPPED, not fabricated
+        # (P0-C12: no false-positive valid=True on a non-dict payload)
+        assert result["minimax"]["valid"] is False
+        assert result["minimax"]["skipped"] is True
 
     @pytest.mark.asyncio
     async def test_minimax_runs_on_schema_validation_fail(self):
@@ -179,9 +180,11 @@ class TestMinimaxOnErrorPaths:
                    side_effect=RuntimeError("LLM down")):
             result = await p.run(event_topic="x")
         assert result["status"] == "error"
-        # Minimax still runs on error path (V25: error path carries minimax too)
+        # Error path carries minimax too, but parsed is None → validation is
+        # SKIPPED (P0-C12: no fabricated valid=True on an empty error result)
         assert "minimax" in result
-        assert result["minimax"]["valid"] is True
+        assert result["minimax"]["valid"] is False
+        assert result["minimax"]["skipped"] is True
 
 
 # ============================================================

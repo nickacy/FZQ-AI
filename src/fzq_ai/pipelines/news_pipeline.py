@@ -21,7 +21,9 @@ class NewsPipeline(BasePipeline):
 
     def __init__(self):
         self.router = Router()
-        self._articles: List[Article] = []
+        # fetch_all_news 实际返回 List[str]（离线 mock）；生产路径可能是 List[Article]。
+        # 运行期以属性探测兼容两者，故标注为 List[Any]。
+        self._articles: List[Any] = []
 
     # ---------------------------------------------------------
     # v13 preprocess锛氭瀯閫?prompt + 璁剧疆 task_type
@@ -29,8 +31,9 @@ class NewsPipeline(BasePipeline):
     async def preprocess(self, req: Dict[str, Any]) -> Dict[str, Any]:
         query = req.get("query") or req.get("topic") or req.get("input", "")
 
-        # 1. 鎷夊彇鏂伴椈
-        articles = fetch_all_news(query)
+        # 1. 拉取新闻（fetch_all_news 为 async，签名 List[str] -> List[str]；
+        #    query 是 str，需包装成列表入参）
+        articles = await fetch_all_news([query])
         self._articles = articles
 
         if not articles:
@@ -38,10 +41,12 @@ class NewsPipeline(BasePipeline):
             req["task_type"] = "analysis"
             return req
 
-        # 2. 鏋勯€犳柊闂绘爣棰樹笂涓嬫枃
+        # 2. 构造新闻标题上下文（兼容 str 条目与 Article 对象）
         context_lines = []
         for i, a in enumerate(articles[:30], 1):
-            context_lines.append(f"{i}. [{a.source_name}] {a.title_original}")
+            source = getattr(a, "source_name", None) or "Unknown source"
+            title = getattr(a, "title_original", None) or str(a)
+            context_lines.append(f"{i}. [{source}] {title}")
         context = "\n".join(context_lines)
 
         # 3. 鏋勯€?prompt锛堜繚鐣欎綘鍘熸潵鐨勪笟鍔￠€昏緫锛?
@@ -102,13 +107,14 @@ class NewsPipeline(BasePipeline):
     # ---------------------------------------------------------
     # 淇濈暀浣犲師鏉ョ殑涓氬姟閫昏緫锛堟枃绔犲垪琛?級
     # ---------------------------------------------------------
-    def _build_article_list(self, articles: List[Article], max_items: int = 30) -> str:
+    def _build_article_list(self, articles: List[Any], max_items: int = 30) -> str:
         lines = ["## 馃摪 Original News List\n"]
         lines.append(f"*{len(articles)} articles fetched, showing top {min(len(articles), max_items)}*\n")
         for i, a in enumerate(articles[:max_items], 1):
-            title = a.title_original or "(No title)"
-            source = a.source_name or "Unknown source"
-            url = a.url or ""
+            # 兼容 str 条目（fetch_all_news 返回 List[str]）与 Article 对象
+            title = getattr(a, "title_original", None) or str(a) or "(No title)"
+            source = getattr(a, "source_name", None) or "Unknown source"
+            url = getattr(a, "url", None) or ""
             if url:
                 lines.append(f"{i}. **[{source}]** [{title}]({url})")
             else:

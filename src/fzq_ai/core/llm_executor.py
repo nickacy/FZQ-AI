@@ -15,13 +15,13 @@ class LLMExecutor:
     - Auto-select provider
     - Auto-read settings.llm_models
     - Auto retry / fallback
-    - Auto Fake output (when all providers fail)
+    - Raises RuntimeError when all providers fail (no fake output)
     """
 
     def __init__(self):
         self.router = LLMRouter()
-        self.retries = settings.llm_executor_retries
-        self.timeout = settings.llm_request_timeout
+        self.retries = getattr(settings, "llm_executor_retries", 1)
+        self.timeout = getattr(settings, "llm_request_timeout", 60)
 
     async def call(
         self,
@@ -31,7 +31,7 @@ class LLMExecutor:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ) -> str:
-        model_cfg = settings.llm_models.get(provider)
+        model_cfg = getattr(settings, "llm_models", {}).get(provider)
         if not model_cfg:
             raise ValueError(f"No config for provider={provider}")
 
@@ -42,8 +42,8 @@ class LLMExecutor:
         if not api_key:
             raise ValueError(f"No API key for provider={provider}")
 
-        temperature = temperature or settings.default_temperature
-        max_tokens = max_tokens or settings.default_max_tokens
+        temperature = temperature or getattr(settings, "default_temperature", 0.7)
+        max_tokens = max_tokens or getattr(settings, "default_max_tokens", 4096)
 
         last_error = None
         for attempt in range(1, self.retries + 2):
@@ -66,14 +66,11 @@ class LLMExecutor:
                     f"Attempt {attempt}/{self.retries + 1} for provider={provider} failed: {e}"
                 )
 
-        logger.error(f"Real LLM call failed, fallback to Fake: {last_error}")
-        return self.fake_llm_output(prompt, provider, model_name)
-
-    def fake_llm_output(self, prompt: str, provider: str, model: str) -> str:
-        return (
-            f"[Fake LLM output using provider={provider}, model={model}]\n"
-            f"Prompt was:\n{prompt[:500]}"
-        )
+        logger.error(f"Real LLM call failed after all retries: {last_error}")
+        raise RuntimeError(
+            f"LLM call failed for provider={provider}, model={model_name} "
+            f"after {self.retries + 1} attempts: {last_error}"
+        ) from last_error
 
 
 _executor = LLMExecutor()

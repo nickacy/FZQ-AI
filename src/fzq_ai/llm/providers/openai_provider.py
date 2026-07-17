@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fzq_ai.metrics.metrics import metrics
 from fzq_ai.monitor.token_monitor import token_monitor
+from fzq_ai.llm.clients.openai_api import OpenAIAPI
 
 
 class OpenAIProvider:
@@ -19,9 +20,9 @@ class OpenAIProvider:
     - 完整异常处理
     """
 
-    def __init__(self, model: str = None, client=None):
-        self.client = client
+    def __init__(self, model: Optional[str] = None, client=None):
         self.model = model or "gpt-4o"
+        self.client = client or OpenAIAPI(self.model)
 
     async def run(self, req: Dict[str, Any]) -> Dict[str, Any]:
         start = time.time()

@@ -190,42 +190,50 @@ async def _dispatch_with_failover(
 async def _call_one_model(
     model: str, prompt: str, max_tokens: int, temperature: float, **kwargs: Any
 ) -> str:
-    """Try a single model via its provider."""
-    import asyncio
+    """Try a single model via its provider (all providers expose async run())."""
     providers = _resolve_provider(model)
-    for provider_func, provider_model in providers:
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
-            None,
-            lambda: provider_func(provider_model, prompt, max_tokens, temperature, **kwargs)
-        )
-    raise RuntimeError("No provider found for model=%s" % model)
+    last_error = None
+    for provider, provider_model in providers:
+        req = {
+            "prompt": prompt,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+            **kwargs,
+        }
+        result = await provider.run(req)
+        if isinstance(result, dict) and "error" in result:
+            last_error = result["error"]
+            logger.warning("Provider for model=%s returned error: %s", provider_model, last_error)
+            continue
+        return result.get("output", "") if isinstance(result, dict) else str(result)
+    raise RuntimeError("No provider succeeded for model=%s. Last: %s" % (model, last_error))
 
 
 def _resolve_provider(model: str) -> list:
-    """Map model name → [(func, model_name), ...]."""
+    """Map model name → [(provider_instance, model_name), ...]."""
     if model.startswith("deepseek"):
         from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
-        return [(DeepSeekProvider(model=model).run_sync, model)]
+        return [(DeepSeekProvider(model=model), model)]
     elif model.startswith("glm"):
         from fzq_ai.llm.providers.glm_provider import GLMProvider
-        return [(GLMProvider(model=model).run_sync, model)]
+        return [(GLMProvider(model=model), model)]
     elif model.startswith("qwen"):
         from fzq_ai.llm.providers.qwen_provider import QwenProvider
-        return [(QwenProvider(model=model).run_sync, model)]
-    elif model.startswith("gpt") or model.startswith("o") or model.startswith("openai"):
+        return [(QwenProvider(model=model), model)]
+    elif model.startswith(("gpt", "o1", "o3", "o4", "openai")):
         from fzq_ai.llm.providers.openai_provider import OpenAIProvider
-        return [(OpenAIProvider(model=model).run_sync, model)]
+        return [(OpenAIProvider(model=model), model)]
     elif model.startswith("gemini"):
         from fzq_ai.llm.providers.gemini_provider import GeminiProvider
-        return [(GeminiProvider(model=model).run_sync, model)]
+        return [(GeminiProvider(model=model), model)]
     else:
         # Default: try deepseek first, then glm
         from fzq_ai.llm.providers.deepseek_provider import DeepSeekProvider
         from fzq_ai.llm.providers.glm_provider import GLMProvider
         return [
-            (DeepSeekProvider(model="deepseek-chat").run_sync, "deepseek-chat"),
-            (GLMProvider(model="glm-4-flash").run_sync, "glm-4-flash"),
+            (DeepSeekProvider(model="deepseek-chat"), "deepseek-chat"),
+            (GLMProvider(model="glm-4-flash"), "glm-4-flash"),
         ]
 
 

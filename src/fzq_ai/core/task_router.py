@@ -145,7 +145,11 @@ async def _call_pipeline(pipeline, user_input: str):
             return await pipeline.run_async(**{"input": user_input, "prompt": user_input})
         if "req" in params:
             return await pipeline.run_async(req={"query": user_input})
-        return await pipeline.run_async(user_input)
+        # Fallback: keyword-only pipelines (e.g. zh run_async(self, **kwargs))
+        # can't take a positional arg. `_extract_user_input` accepts
+        # event_topic/content/input/text/query/req — "text" is the most
+        # compatible neutral key.
+        return await pipeline.run_async(text=user_input)
 
     # 2. Fallback to run()
     if hasattr(pipeline, "run"):

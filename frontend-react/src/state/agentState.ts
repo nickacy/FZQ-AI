@@ -38,7 +38,7 @@ export const useAgentState = create<AgentState>((set) => ({
   loadAgents: async () => {
     set({ isLoadingAgents: true });
     try {
-      const data = await apiClient.post('/agents/list', {});
+      const data = await apiClient.post<{ agents: Agent[] }>('/agents/list', {});
       set({ agents: data.agents || [] });
     } finally {
       set({ isLoadingAgents: false });

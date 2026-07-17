@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { t } from "../i18n";
 import { useLanguageStore } from "../state/languageState";
 
@@ -13,13 +13,13 @@ export function AppShell() {
       </header>
 
       <nav className="app-nav">
-        <a href="/workspace">{t("nav.workspace", lang)}</a>
-        <a href="/history">{t("nav.history", lang)}</a>
-        <a href="/favorites">{t("nav.favorites", lang)}</a>
-        <a href="/agents">{t("nav.agents", lang)}</a>
-        <a href="/settings">{t("nav.settings", lang)}</a>
-        <a href="/debug">{t("nav.debug", lang)}</a>
-        <a href="/diagnostics">{t("nav.diagnostics", lang)}</a>
+        <Link to="/workspace">{t("nav.workspace", lang)}</Link>
+        <Link to="/history">{t("nav.history", lang)}</Link>
+        <Link to="/favorites">{t("nav.favorites", lang)}</Link>
+        <Link to="/agents">{t("nav.agents", lang)}</Link>
+        <Link to="/settings">{t("nav.settings", lang)}</Link>
+        <Link to="/debug">{t("nav.debug", lang)}</Link>
+        <Link to="/diagnostics">{t("nav.diagnostics", lang)}</Link>
       </nav>
 
       <main className="app-main">

@@ -1,0 +1,23 @@
+# Secrets & local env
+.env
+.env.*
+!.env.example
+
+# VCS
+.git/
+
+# Local data & runtime artifacts
+data/
+*.sqlite
+
+# Python caches & virtualenvs
+**/__pycache__/
+.venv*/
+.pytest_cache/
+
+# Frontend build artifacts
+frontend-react/node_modules/
+frontend-react/dist/
+
+# Legacy archive
+archive/

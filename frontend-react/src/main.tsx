@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { AppShell } from './app/AppShell';
+import { AppRoutes } from './app/routes';
 
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AppShell />
+      <AppRoutes />
     </BrowserRouter>
   </React.StrictMode>
 );

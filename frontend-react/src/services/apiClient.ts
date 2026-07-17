@@ -1,8 +1,9 @@
+/// <reference types="vite/client" />
 import { useLanguageStore } from '../state/languageState';
 import { useSystemState } from '../state/systemState';
 import { V24Response, ApiError } from './types';
 
-const BASE_URL = '/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
 export const apiClient = {
   // ---------------------- Standard POST ----------------------

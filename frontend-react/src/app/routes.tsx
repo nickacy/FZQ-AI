@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import { ErrorBoundary } from "../components/layout/ErrorBoundary";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { AppShell } from "./AppShell";
 
 // Lazy-loaded pages (must have default export)
 const WorkspacePage = React.lazy(() => import("../pages/WorkspacePage"));
@@ -19,6 +20,7 @@ export const AppRoutes: React.FC = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
+        <Route element={<AppShell />}>
         {/* Redirect root → /workspace */}
         <Route path="/" element={<Navigate to="/workspace" replace />} />
 
@@ -104,6 +106,7 @@ export const AppRoutes: React.FC = () => {
             </ErrorBoundary>
           }
         />
+        </Route>
       </Routes>
     </Suspense>
   );

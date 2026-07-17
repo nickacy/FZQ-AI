@@ -18,11 +18,6 @@ from fzq_ai.glm.schema import (
     GLMRisk, GLMPolicySignal, GLMTrendSignal, GLMRawQuote,
 )
 
-from src.fzq_ai.config import GlobalSettings
-settings = GlobalSettings()
-
-
-
 
 class GLMExtractor:
     """Extracts structured information from raw multilingual text using rules only.

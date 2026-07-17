@@ -17,6 +17,7 @@ import json
 import re
 import time
 import uuid
+from string import Template
 from typing import Any, Dict, Optional, Type
 
 from fzq_ai.pipelines.base import BasePipeline
@@ -123,13 +124,30 @@ class ZhStructuredPipeline(BasePipeline):
         user_input = self._extract_user_input(**kwargs)
         warnings: list[str] = []
 
+        # V24-R2: civilization handle — bound BEFORE any stage try-block so a
+        # failing GLM import can never leave `civ` unbound (the NameError at the
+        # Doubao/Kimi stages below was being swallowed by their except clauses,
+        # silently disabling both stages).
+        civ = kwargs.get("civilization")
+
+        # V24-R2: when civ is provided, run() (the main entry) also records the
+        # pipeline input and attaches civilization_trace to the result — the
+        # same contract run_async() already honors (BasePipeline does likewise).
+        civ_trace: list[str] = []
+        if civ and hasattr(civ, "remember"):
+            try:
+                safe_kwargs = {k: v for k, v in kwargs.items() if k != "civilization"}
+                civ.remember(f"pipeline.{self.task_type}.input", repr(safe_kwargs)[:200])
+                civ_trace.append(f"civilization.remember.pipeline.{self.task_type}")
+            except Exception:
+                _logger.warning("Suppressed error", exc_info=True)
+
         # 0. GLM extraction (content extraction before LLM structuring)
         glm_material = None
         try:
             from fzq_ai.glm.extractor import GLMExtractor
             extractor = GLMExtractor()
             glm_material = extractor.extract(user_input)
-            civ = kwargs.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("glm_raw", glm_material.model_dump())
                 civ.remember("glm_quotes", [q.text for q in glm_material.raw_quotes])
@@ -143,11 +161,17 @@ class ZhStructuredPipeline(BasePipeline):
         except Exception as e:
             return self._fail(str(e), trace_id, t0, user_input, warning=f"prompt_load_failed: {e}")
 
-        # 2. Fill prompt
+        # 2. Fill prompt — string.Template + safe_substitute (P0-C11): the zh
+        #    templates contain literal JSON braces, so str.format() always raised
+        #    KeyError and silently fell back to the static instructions — the user
+        #    input never reached the LLM. `$content` does not conflict with JSON
+        #    braces, and each template ends with a 【待分析输入】 block holding it.
         try:
-            prompt = prompt_template.format(intent=user_input, context=user_input)
+            prompt = Template(prompt_template).safe_substitute(
+                content=user_input, intent=user_input, context=user_input,
+            )
         except Exception:
-            # If template has no placeholders, use as-is
+            # Defensive fallback: use the raw template if substitution itself fails
             prompt = prompt_template
 
         # 3. Pick model (V24 router)
@@ -196,8 +220,9 @@ class ZhStructuredPipeline(BasePipeline):
             "duration_ms": duration_ms,
             "status": "ok" if validated is not None else "partial",
         }
-        # V25: Minimax strict schema validation
-        result["minimax"] = self._minimax_pass(result, civ=None)
+        # V25: Minimax strict schema validation (single execution point — P0-C12;
+        # run_async() no longer re-runs this pass)
+        result["minimax"] = self._minimax_pass(result, civ=civ)
 
         # V25: Doubao formatting (Minimax → clean JSON for Kimi/Qwen)
         try:
@@ -209,7 +234,6 @@ class ZhStructuredPipeline(BasePipeline):
                 result.get("validated") or result.get("parsed") or {},
                 feedback_context=fb_doubao,
             )
-            civ = kwargs.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("doubao_formatted", str(result["doubao_formatted"])[:1000])
         except Exception:
@@ -226,11 +250,14 @@ class ZhStructuredPipeline(BasePipeline):
                 doubao,
                 feedback_context=fb_kimi,
             ).model_dump()
-            civ = kwargs.get("civilization")
             if civ and hasattr(civ, "remember"):
                 civ.remember("kimi_interpreted", str(result["kimi_interpreted"].get("policy_brief", ""))[:1000])
         except Exception:
             _logger.warning("Kimi interpretation skipped", exc_info=True)
+
+        # V24-R2: attach the civ trace when running under a civilization handle
+        if civ is not None:
+            result["civilization_trace"] = civ_trace
 
         return result
 
@@ -248,7 +275,10 @@ class ZhStructuredPipeline(BasePipeline):
             except Exception:
                 _logger.warning("Suppressed error", exc_info=True)
 
-        result = await self.run(**kwargs)
+        # Forward civilization into run() so the GLM/Doubao/Kimi stages and the
+        # single Minimax pass can use it (P0-C12: the duplicate _minimax_pass
+        # that used to live here was removed — run() is the one execution point).
+        result = await self.run(civilization=civilization, **kwargs)
 
         # 2. Post-civ: snapshot + status remember
         if civilization and hasattr(civilization, "snapshot"):
@@ -268,19 +298,14 @@ class ZhStructuredPipeline(BasePipeline):
 
         result["civilization_trace"] = civ_trace
 
-        # 3. V25: Minimax strict schema validation (default-on)
-        #    Validates the result dict's structure against StrictSchema (13 fields).
-        #    Never modifies the input result (R1, R2, R5 compliance).
-        #    On failure: sets minimax.valid=False with errors captured; pipeline still succeeds.
-        result["minimax"] = self._minimax_pass(result, civ=civilization)
-
-        # 4. V25: Minimax Phase 2 — Structural Feedback Layer
+        # 3. V25: Minimax Phase 2 — Structural Feedback Layer
         #    Generates structural feedback (no code, no schema changes) for
         #    upstream (GLM, DeepSeek) and downstream (豆包, Kimi, Qwen).
         #    Routed feedback is also written to civilization memory.
+        #    (Minimax Phase 1 runs exactly once, inside run() — P0-C12 dedup.)
         self._minimax_phase2_pass(result, civ=civilization)
 
-        # 5. V24.3.5: MinimaxFeedbackLoop — close the structural loop
+        # 4. V24.3.5: MinimaxFeedbackLoop — close the structural loop
         #    Persists Phase 2 routed feedback into civ with target-prefixed keys
         #    so downstream modules (GLM/Doubao/Kimi/Qwen) can OPTIONALLY read on
         #    next call. This is the wiring that turns Phase 2 reports into a
@@ -292,9 +317,19 @@ class ZhStructuredPipeline(BasePipeline):
     # V25: Minimax strict schema validation pass
     # ============================================================
     def _minimax_pass(self, result: Dict[str, Any], civ: Any = None) -> Dict[str, Any]:
-        """Validate pipeline result through Minimax (StrictSchemaValidator).
+        """Validate the pipeline's PARSED payload through Minimax (StrictSchemaValidator).
 
-        Minimax guarantees:
+        P0-C12: the validation target is `result["parsed"]` — the actual LLM
+        analysis payload. Previously the whole pipeline wrapper dict was fed to
+        StrictSchema, which repair-stepped it into an all-empty schema yet still
+        reported valid=True (false positive: "validation passed" while every
+        real field had been discarded).
+
+        If `parsed` is not a dict (e.g. JSON parse failed or the LLM call
+        errored), validation is SKIPPED and a warning is recorded in both the
+        log and `result["warnings"]` — no fabricated validation result.
+
+        Minimax guarantees (on the parsed payload):
           - R1: Never fabricates facts (preserves all input keys with non-None values)
           - R2: Never infers content (no semantic expansion)
           - R3: Fills missing fields with empty defaults
@@ -305,10 +340,25 @@ class ZhStructuredPipeline(BasePipeline):
         Returns a sub-dict: {valid: bool, strict: dict | None, errors: list[str]}
         Pipeline never fails on Minimax errors — they're captured in the sub-dict.
         """
+        parsed = result.get("parsed") if isinstance(result, dict) else None
+        if not isinstance(parsed, dict):
+            _logger.warning(
+                "minimax validation skipped: result['parsed'] is %s, not a dict",
+                type(parsed).__name__,
+            )
+            warnings_list = result.get("warnings") if isinstance(result, dict) else None
+            if isinstance(warnings_list, list):
+                warnings_list.append("minimax_validation_skipped: parsed_not_dict")
+            return {
+                "valid": False,
+                "strict": None,
+                "errors": [],
+                "skipped": True,
+            }
         try:
             from fzq_ai.minimax import StrictSchemaValidator
             validator = StrictSchemaValidator()
-            strict = validator.validate_with_civ(result, civ=civ)
+            strict = validator.validate_with_civ(parsed, civ=civ)
             return {
                 "valid": True,
                 "strict": strict.model_dump(),

@@ -151,3 +151,6 @@ You must output and only output the following JSON structure:
 - No value judgments  
 - No invented historical claims  
 - No hiding disagreements
+
+【待分析输入】
+$content

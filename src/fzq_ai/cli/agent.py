@@ -17,13 +17,12 @@ import sys
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-# --- 修复路径：确保 fzq_ai 可被正确 import ---
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# --- 修复路径：确保 fzq_ai 可被正确 import（应插入 src 根，而非 src/fzq_ai） ---
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 from fzq_ai.orchestrator.task_orchestrator import TaskOrchestrator
-from fzq_ai.domain.models import ServiceResult
 
 
 def print_report(data: Dict[str, Any]) -> None:
@@ -43,13 +42,13 @@ def print_report(data: Dict[str, Any]) -> None:
         print(data)
 
 
-async def run_orchestrator(verbose: bool) -> ServiceResult:
+async def run_orchestrator(verbose: bool, text: str) -> Dict[str, Any]:
     orch = TaskOrchestrator()
-    result = await orch.orchestrate()
+    result = await orch.run(text=text)
 
     if verbose:
-        print("\n[DEBUG] Raw ServiceResult:")
-        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+        print("\n[DEBUG] Raw orchestrator result:")
+        print(json.dumps(result, indent=2, ensure_ascii=False, default=str))
 
     return result
 
@@ -82,6 +81,13 @@ def main():
     )
 
     parser.add_argument(
+        "--text",
+        type=str,
+        default="生成今日中文情报日报",
+        help="输入给编排器的任务文本（默认：生成每日情报日报）",
+    )
+
+    parser.add_argument(
         "--save",
         type=str,
         default=None,
@@ -91,13 +97,13 @@ def main():
     args = parser.parse_args()
 
     # --- Run orchestrator ---
-    result: ServiceResult = asyncio.run(run_orchestrator(args.verbose))
+    result: Dict[str, Any] = asyncio.run(run_orchestrator(args.verbose, args.text))
 
-    if not result.success:
-        print("\n❌ 生成失败：", result.error)
+    if not result.get("success"):
+        print("\n❌ 生成失败：", result.get("error"))
         sys.exit(1)
 
-    data = result.data or {}
+    data = result.get("output") or {}
 
     # --- JSON 输出 ---
     if args.json:

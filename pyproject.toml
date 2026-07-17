@@ -56,6 +56,13 @@ dev = [
 Homepage = "https://github.com/yourname/FZQ-AI"
 
 # ============================================================
+# Setuptools — runtime resource files inside src/fzq_ai
+# (prompts/zh/*.txt, prompts/system/*.txt, config/*.yaml, manifest.json, ...)
+# ============================================================
+[tool.setuptools.package-data]
+fzq_ai = ["**/*.yaml", "**/*.txt", "**/*.j2", "**/*.json"]
+
+# ============================================================
 # Black
 # ============================================================
 [tool.black]

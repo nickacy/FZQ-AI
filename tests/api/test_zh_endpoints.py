@@ -15,6 +15,8 @@ def assert_v24_structure(resp_json):
     for field in ["intent", "route", "pipeline", "model", "agent",
                    "timeline", "state_machine", "trace_id"]:
         assert field in ex, f"Missing execution.{field}"
+    # P0-C3: pipeline 调用链路必须真正成功，而不是仅返回 200 包装
+    assert ex["success"] is True, f"execution.success is not True: {ex.get('error')}"
 
 
 def test_zh_policy_brief():

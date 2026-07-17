@@ -17,24 +17,36 @@ class EntryRequest(BaseModel):
 
 
 @router.post("/entry")
-def run_single_agent(req: EntryRequest) -> dict:
-    result = orchestrator.run(req.task, req.ctx)
-    if hasattr(result, 'to_dict'):
-        d = result.to_dict()
+async def run_single_agent(req: EntryRequest) -> dict:
+    # UnifiedOrchestratorV24.run() is async and returns a plain dict:
+    # {success, task_type, pipeline, agent, model, fallback_used,
+    #  output, error, recovery_trace}
+    result = await orchestrator.run(req.task, req.ctx)
+    if result.get("success"):
         # Wrap in V24 contract
         return {
             "execution": {
                 "intent": {},
                 "route": {"task_type": req.task},
-                "pipeline": d.get("data", {}).get("pipeline", "unknown"),
-                "model": d.get("data", {}).get("model", "unknown"),
-                "agent": d.get("data", {}).get("agent", "unknown"),
-                "timeline": d.get("timeline", []),
+                "pipeline": result.get("pipeline") or "unknown",
+                "model": result.get("model") or "unknown",
+                "agent": result.get("agent") or "unknown",
+                "timeline": result.get("recovery_trace") or [],
                 "state_machine": {"current": "FINALIZE", "history": []},
-                "trace_id": d.get("trace_id", ""),
-                "success": d.get("status") == "ok",
+                "trace_id": "",
+                "success": True,
             },
-            "ui_schema": d.get("ui_schema", {}),
-            "output": d.get("data"),
+            "ui_schema": {},
+            "output": result.get("output"),
         }
-    return {"execution": {"success": False, "error": {"code": "UNKNOWN", "message": "No result"}}, "ui_schema": {}, "output": None}
+    return {
+        "execution": {
+            "success": False,
+            "error": {
+                "code": "EXECUTION_ERROR",
+                "message": result.get("error") or "No result",
+            },
+        },
+        "ui_schema": {},
+        "output": None,
+    }

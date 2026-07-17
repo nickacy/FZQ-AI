@@ -1,12 +1,12 @@
 # fzq_ai/store/intel_store.py — v2.7 Data Layer
 from __future__ import annotations
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import json, logging, sqlite3
 
-from fzq_ai.domain.models import Article, IntelBundle, IntelMeta
+from fzq_ai.domain.models import IntelBundle
 
 logger = logging.getLogger(__name__)
 
@@ -26,15 +26,30 @@ class IntelStore:
     def __init__(self, db_path: str = "data/intel_store.sqlite") -> None:
         self.db_path = Path(db_path)
         self._is_memory = (str(db_path) == ":memory:")
-        if not self._is_memory:
+        # P0-C10: :memory: 模式必须持有单一持久连接，
+        # 否则每次 _get_conn() 都新建独立内存库，表与数据随即丢失。
+        self._mem_conn: Optional[sqlite3.Connection] = None
+        if self._is_memory:
+            self._mem_conn = sqlite3.connect(":memory:", check_same_thread=False)
+            self._mem_conn.row_factory = sqlite3.Row
+        else:
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
 
     def _get_conn(self) -> sqlite3.Connection:
-        db = ":memory:" if self._is_memory else self.db_path.as_posix()
-        conn = sqlite3.connect(db)
+        if self._is_memory:
+            # 复用持久连接；调用方的 `with conn:` 只做 commit/rollback，不会关闭连接。
+            assert self._mem_conn is not None
+            return self._mem_conn
+        conn = sqlite3.connect(self.db_path.as_posix())
         conn.row_factory = sqlite3.Row
         return conn
+
+    def close(self) -> None:
+        """关闭 :memory: 模式持有的持久连接（文件模式无持久连接，调用安全）。"""
+        if self._mem_conn is not None:
+            self._mem_conn.close()
+            self._mem_conn = None
 
     def _init_db(self) -> None:
         with self._get_conn() as conn:
@@ -55,19 +70,19 @@ class IntelStore:
         provider_snapshot: Dict[str, Any],
         created_at: Optional[datetime] = None,
     ) -> None:
+        """持久化 IntelBundle。失败时抛错（不再静默吞异常）。"""
         created_at = created_at or datetime.now(timezone.utc)
-        try:
-            bj = json.dumps(asdict(bundle), ensure_ascii=False, default=str)
-            ps = json.dumps(provider_snapshot, ensure_ascii=False)
-            with self._get_conn() as conn:
-                conn.execute(
-                    """INSERT OR REPLACE INTO intel_runs
-                       (run_id, topic, created_at, provider_snapshot, bundle_json)
-                       VALUES (?, ?, ?, ?, ?)""",
-                    (run_id, topic, created_at.isoformat(),
-                     ps, bj))
-        except Exception as e:
-            logger.warning(f"IntelStore.save_bundle failed: {e}")
+        # P0-C9: bundle 是 pydantic BaseModel，必须用 model_dump(mode="json")；
+        # dataclasses.asdict 对 BaseModel 必抛 TypeError。
+        bj = json.dumps(bundle.model_dump(mode="json"), ensure_ascii=False)
+        ps = json.dumps(provider_snapshot, ensure_ascii=False)
+        with self._get_conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO intel_runs
+                   (run_id, topic, created_at, provider_snapshot, bundle_json)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (run_id, topic, created_at.isoformat(),
+                 ps, bj))
 
     def load_latest(self, topic: str, limit: int = 1) -> List[IntelRecord]:
         return self._query(
@@ -103,30 +118,9 @@ class IntelStore:
 
 
 def _dict_to_bundle(d: dict) -> IntelBundle:
-    """Reconstruct IntelBundle from dict."""
-    meta_d = d.get("meta", {})
-    meta = IntelMeta(
-        topics=meta_d.get("topics", []),
-        regions=meta_d.get("regions", []),
-        depth=meta_d.get("depth", "normal"),
-    )
-    articles = []
-    for ad in d.get("articles", []):
-        a = Article(
-            title_original=ad.get("title_original", ""),
-            url=ad.get("url", ""),
-            source_name=ad.get("source_name", ""),
-            region=ad.get("region", ""),
-            language=ad.get("language", ""),
-            content_original=ad.get("content_original", ""),
-            credibility=ad.get("credibility", 0.8),
-        )
-        # Preserve fetched_at if present
-        if ad.get("fetched_at"):
-            try:
-                a.fetched_at = datetime.fromisoformat(ad["fetched_at"])
-            except (ValueError, TypeError):
-                pass
-        articles.append(a)
-    events = d.get("events", [])
-    return IntelBundle(meta=meta, articles=articles, events=events)
+    """Reconstruct IntelBundle from dict.
+
+    存储端使用 model_dump(mode="json")，故直接 model_validate 全字段还原，
+    保证 save→load 往返无字段丢失（summary/risk_summary/fetched_at 等一并保留）。
+    """
+    return IntelBundle.model_validate(d)

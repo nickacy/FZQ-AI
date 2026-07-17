@@ -15,6 +15,7 @@ FZQ-AI Task Orchestrator (V19-Final)
 
 from __future__ import annotations
 import logging
+from dataclasses import asdict
 from typing import Dict, Any
 
 from fzq_ai.core.intent_engine import classify
@@ -29,20 +30,21 @@ class TaskOrchestrator:
     def __init__(self):
         self.router = TaskRouter()
 
-    def _resolve_pipeline(self, req: Dict[str, Any]):
-        """Resolve a pipeline for the given request. Returns None if unresolvable."""
-        return None
-
     # ------------------------------------------------------------
     # 主入口
     # ------------------------------------------------------------
-    def run(
+    async def run(
         self,
         req: Dict[str, Any] = None,
         pipeline=None,
         text: str = None,
     ) -> Dict[str, Any]:
-        """Run a request. Accepts req dict or plain text. Auto-resolves pipeline."""
+        """Run a request. Accepts req dict or plain text.
+
+        Pipeline resolution is delegated to TaskRouter (PIPELINE_MAP), so the
+        `pipeline` hint is accepted for interface compatibility but routing
+        itself always goes through the router.
+        """
         # Normalize input: if text is given, wrap it
         if text and not req:
             req = {"query": text, "task_type": "default"}
@@ -50,18 +52,14 @@ class TaskOrchestrator:
             req = {}
         query_text = text or req.get("query", "")
 
-        # Auto-resolve pipeline if not provided
-        if pipeline is None:
-            pipeline = self._resolve_pipeline(req)
-
         recovery_trace = []
         try:
             # 1. 意图识别
             intent = classify(query_text)
-            recovery_trace.append({"stage": "intent", "intent": intent.model_dump()})
+            recovery_trace.append({"stage": "intent", "intent": asdict(intent)})
 
-            # 2. 路由任务
-            result = self.router.route(intent, text)
+            # 2. 路由任务（使用归一化后的 query_text）
+            result = await self.router.route(intent, query_text)
             recovery_trace.append(
                 {
                     "stage": "task_router",

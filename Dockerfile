@@ -15,6 +15,8 @@ COPY . /app
 # Install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+# Install the src-layout package itself so `from fzq_ai...` is importable
+RUN pip install -e . --no-deps
 
 # Create log directory
 RUN mkdir -p /app/data/logs
