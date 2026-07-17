@@ -1,0 +1,17 @@
+-r requirements.txt
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=4.1
+
+# Linting & Formatting
+black>=24.0
+ruff>=0.4
+mypy>=1.10
+
+# Security
+bandit>=1.7
+
+# Pre-commit
+pre-commit>=3.7
